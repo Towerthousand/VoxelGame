@@ -16,7 +16,7 @@
 
 extern int SCRWIDTH; //1366
 extern int SCRHEIGHT; //768
-#define WINDOW_TITLE "OPENGLTEST"
+#define WINDOW_TITLE "VoxelGame"
 #define CONTEXT_SETTINGS_OPENGL sf::ContextSettings(32,32,0,2,0)
 #define CHUNKWIDTH 16 //blocks in x and z coords
 #define CHUNKHEIGHT 128 //blocks in y coords
