@@ -8,6 +8,12 @@ World::World() {
 }
 
 World::~World() {
+	for (int x = 0; x < WORLDSIZE; ++x) {
+		for (int z = 0; z < WORLDSIZE; ++z) {
+			delete chunks[x][z];
+			chunks[x][z] = NULL;
+		}
+	}
 }
 
 int World::getCubeAbs(int x, int y, int z) const {
@@ -20,7 +26,7 @@ void World::setCubeAbs(int x, int y, int z, int id) {
 	chunks[x/CHUNKWIDTH][z/CHUNKWIDTH]->setCube(x%CHUNKWIDTH,y,z%CHUNKWIDTH,id);
 }
 
-void World::populateChunk(int x, int z, int seed) {
+void World::regenChunk(int x, int z, int seed) {
 	if (chunks[x][z] != NULL)
 		delete chunks[x][z];
 	chunks[x][z] = new Chunk(x,z,seed,*this);

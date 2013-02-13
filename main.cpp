@@ -1,8 +1,8 @@
 #include "Game.hpp"
 
 //extern'd in tools.hpp
-int SCRWIDTH = 1366; //1366
-int SCRHEIGHT = 768; //768
+int SCRWIDTH = 500; //1366
+int SCRHEIGHT = 500; //768
 
 //short main is bettah
 int main() {

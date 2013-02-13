@@ -135,8 +135,9 @@ void Game::onMouseButtonPressed(float deltaTime) {
 
 // Whenever you wnat to ende the game, you must call this function, NOT close()
 void Game::onClose() {
-	if (currentScene != NULL) 
+	if (currentScene != NULL) {
 		currentScene->onClose();
+	}
 	std::cout << "* EXITING GAME" << std::endl;
 	close();
 }

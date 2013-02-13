@@ -112,6 +112,7 @@ void Chunk::pushTexture(int textureID) {
 void Chunk::update(float deltaTime) {
 	updateGrass(deltaTime);
 	if (markedForRedraw) { //empty arrays and re-do them
+		markedForRedraw = false;
 		vertexPoints.resize(0);
 		normals.resize(0);
 		textureCoords.resize(0);

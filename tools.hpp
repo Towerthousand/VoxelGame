@@ -20,7 +20,7 @@ extern int SCRHEIGHT; //768
 #define CONTEXT_SETTINGS_OPENGL sf::ContextSettings(32,32,0,2,0)
 #define CHUNKWIDTH 16 //blocks in x and z coords
 #define CHUNKHEIGHT 128 //blocks in y coords
-#define WORLDSIZE 5 //worldsize in CHUNKSxCHUNKS
-#define SEALEVEL 64
+#define WORLDSIZE 10 //worldsize in CHUNKSxCHUNKS
+#define SEALEVEL 0
 
 #endif

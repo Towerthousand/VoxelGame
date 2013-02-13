@@ -10,7 +10,7 @@ class World
 		~World();
 		int getCubeAbs(int x, int y, int z) const;
 		void setCubeAbs(int x, int y, int z, int id);
-		void populateChunk(int x, int z, int seed);
+		void regenChunk(int x, int z, int seed);
 		void draw() const;
 		void update(float deltaTime);
 

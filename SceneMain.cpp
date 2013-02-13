@@ -29,9 +29,11 @@ bool SceneMain::init() {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(60.0f, float(SCRWIDTH)/float(SCRHEIGHT), 0.01f, 10000.0f);
+
+	std::cout << "* Loading chunks" << std::endl;
 	for (int x = 0; x < WORLDSIZE; ++x) {
 		for (int z = 0; z < WORLDSIZE; ++z) {
-			world.populateChunk(x,z,WORLDSEED);
+			world.regenChunk(x,z,WORLDSEED);
 		}
 	}
 	std::cout << "* Init was succesful" << std::endl;
@@ -95,5 +97,6 @@ void SceneMain::onMouseButtonPressed(float deltaTime) {
 void SceneMain::onClose() {
 	std::cout << "* Closing scene: Main" << std::endl;
 	parent.resources.deleteTexture("boxTexture");
+
 }
 
