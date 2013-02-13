@@ -97,6 +97,5 @@ void SceneMain::onMouseButtonPressed(float deltaTime) {
 void SceneMain::onClose() {
 	std::cout << "* Closing scene: Main" << std::endl;
 	parent.resources.deleteTexture("boxTexture");
-
 }
 
