@@ -1,8 +1,8 @@
 #ifndef WORLD_HPP
 #define WORLD_HPP
 #include "tools.hpp"
-#include "Chunk.hpp"
 
+class Chunk;
 class World
 {
 	public:

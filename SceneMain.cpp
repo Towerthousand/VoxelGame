@@ -1,5 +1,5 @@
 #include "SceneMain.hpp"
-#include "World.hpp"
+#include "Game.hpp"
 
 SceneMain::SceneMain(Game &parent) : Scene(parent) {
 }

@@ -1,7 +1,8 @@
 #ifndef SCENE_CLASS_INTRO_H
 #define SCENE_CLASS_INTRO_H
-#include "Game.hpp"
 #include "World.hpp"
+#include "Scene.hpp"
+#include "Camera.hpp"
 
 class SceneMain : public Scene {
 	public:

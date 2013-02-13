@@ -1,4 +1,5 @@
 #include "World.hpp"
+#include "Chunk.hpp"
 
 World::World() {
 	chunks = std::vector<std::vector<Chunk*> > //init chunks to 0, will never be used like this.

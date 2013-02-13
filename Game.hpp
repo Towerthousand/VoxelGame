@@ -2,7 +2,6 @@
 #define GAME_CLASS_H
 #include "tools.hpp"
 #include "MediaManager.hpp"
-#include "Camera.hpp"
 #include "Scene.hpp"
 #include "SceneMain.hpp"
 

@@ -1,10 +1,9 @@
 #ifndef CAMERA_H
 #define CAMERA_H
-
 #include "tools.hpp"
 
-class Camera
-{
+class World;
+class Camera {
 	public:
 		Camera();
 		~Camera();
@@ -17,7 +16,7 @@ class Camera
 		void rotateX(float deg);
 		void rotateY(float deg);
 		void draw();
-		//bool collide(const World& world);
+		bool collide(const World& world);
 };
 
-#endif // CAMERA_HPP
+#endif // _HPP

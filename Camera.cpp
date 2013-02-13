@@ -1,8 +1,11 @@
 #include "Camera.hpp"
+#include "World.hpp"
+
 //
 // This implementation of "camera" has no z rotation (fuck quaternions)
 // and is thougt of as a no-fly, fps kind of view. Tweak it!
 //
+
 Camera::Camera() {
 	posX = 0;
 	posZ = 0;
@@ -55,6 +58,6 @@ void Camera::rotateY(float deg) {
 void Camera::draw() {
 }
 
-//bool Camera::collide(const World &world) {
+bool Camera::collide(const World &world) {
 
-//}
+}
