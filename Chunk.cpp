@@ -8,8 +8,11 @@ Chunk::Chunk(int x, int z, int seed, World &world) : XPOS(x), ZPOS(z), SEED(seed
 			(CHUNKWIDTH,std::vector<std::vector<int> >
 			(CHUNKHEIGHT,std::vector<int>
 			(CHUNKWIDTH,0)));
+
+	VBOID = XPOS*WORLDSIZE+ZPOS+1;
 	markedForRedraw = false;
 	grassTimer = 0.0;
+	quadCount = 0;
 	populate();
 }
 
@@ -36,7 +39,7 @@ void Chunk::populate() {
 
 	module::ScaleBias flatTerrain;
 	flatTerrain.SetSourceModule (0, myModule);
-	flatTerrain.SetScale (0.50);
+	flatTerrain.SetScale (0.5);
 	flatTerrain.SetBias(-0.95);
 
 	utils::NoiseMap heightMap;
@@ -82,15 +85,20 @@ void Chunk::populate() {
 }
 
 void Chunk::setCube(int x, int y, int z, int id) {
-	cubes[x][y][z] = id;
+	if (y < 0 || y >= CHUNKHEIGHT) //over the skylimit, under bedrock
+		return;
+	else if (x >= CHUNKWIDTH || z >= CHUNKWIDTH || x < 0 || z < 0)//outside of this chunk
+		parentWorld.setCubeAbs(x+(XPOS*CHUNKWIDTH),y,z+(ZPOS*CHUNKWIDTH),id);
+	else //inside this chunk
+		cubes[x][y][z] = id;
 	markedForRedraw = true;
 }
 
 int Chunk::getCube(int x, int y, int z) const {
-	if (y < 0 || y >= CHUNKHEIGHT) return 0; //over the skylimit, under bedrock
-	if (x >= CHUNKWIDTH || z >= CHUNKWIDTH || x < 0 || z < 0) { //outside of this chunk
+	if (y < 0 || y >= CHUNKHEIGHT) //over the skylimit, under bedrock
+		return 0;
+	if (x >= CHUNKWIDTH || z >= CHUNKWIDTH || x < 0 || z < 0)//outside of this chunk
 		return parentWorld.getCubeAbs(x+(XPOS*CHUNKWIDTH),y,z+(ZPOS*CHUNKWIDTH));
-	}
 	return cubes[x][y][z]; //inside current chunk
 }
 
@@ -116,53 +124,60 @@ void Chunk::update(float deltaTime) {
 		vertexPoints.resize(0);
 		normals.resize(0);
 		textureCoords.resize(0);
+		quadCount = 0;
 		for(int z = 0; z < CHUNKWIDTH; ++z) {
 			for(int y = 0; y < CHUNKHEIGHT; ++y) {
 				for(int x = 0; x < CHUNKWIDTH; ++x) {
 					if (getCube(x,y,z) != 0) { // only draw if it's not air
 						if(getCube(x,y,z+1) == 0) { // front face
+							++quadCount;
 							pushNormal(0,0,1);
-							pushTexture(Chunk::textureIndexes[getCube(x,y,z)][0]);
+							pushTexture(textureIndexes[getCube(x,y,z)][0]);
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y+1.0, (z+CHUNKWIDTH*ZPOS)+1.0));
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y    , (z+CHUNKWIDTH*ZPOS)+1.0));
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y    , (z+CHUNKWIDTH*ZPOS)+1.0));
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y+1.0, (z+CHUNKWIDTH*ZPOS)+1.0));
 						}
 						if(getCube(x,y,z-1) == 0) { // back face
+							++quadCount;
 							pushNormal(0,0,-1);
-							pushTexture(Chunk::textureIndexes[getCube(x,y,z)][1]);
+							pushTexture(textureIndexes[getCube(x,y,z)][1]);
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y+1.0, (z+CHUNKWIDTH*ZPOS)));
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y    , (z+CHUNKWIDTH*ZPOS)));
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y    , (z+CHUNKWIDTH*ZPOS)));
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y+1.0, (z+CHUNKWIDTH*ZPOS)));
 						}
 						if(getCube(x+1,y,z) == 0) { // left face
+							++quadCount;
 							pushNormal(1,0,0);
-							pushTexture(Chunk::textureIndexes[getCube(x,y,z)][2]);
+							pushTexture(textureIndexes[getCube(x,y,z)][2]);
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y+1.0, (z+CHUNKWIDTH*ZPOS)+1.0));
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y    , (z+CHUNKWIDTH*ZPOS)+1.0));
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y    , (z+CHUNKWIDTH*ZPOS)    ));
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y+1.0, (z+CHUNKWIDTH*ZPOS)    ));
 						}
 						if(getCube(x-1,y,z) == 0) { // right face
+							++quadCount;
 							pushNormal(-1,0,0);
-							pushTexture(Chunk::textureIndexes[getCube(x,y,z)][3]);
+							pushTexture(textureIndexes[getCube(x,y,z)][3]);
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y+1.0, (z+CHUNKWIDTH*ZPOS)    ));
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y    , (z+CHUNKWIDTH*ZPOS)    ));
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y    , (z+CHUNKWIDTH*ZPOS)+1.0));
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y+1.0, (z+CHUNKWIDTH*ZPOS)+1.0));
 						}
 						if(getCube(x,y-1,z) == 0) { // bottom face
+							++quadCount;
 							pushNormal(0,-1, 0);
-							pushTexture(Chunk::textureIndexes[getCube(x,y,z)][4]);
+							pushTexture(textureIndexes[getCube(x,y,z)][4]);
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y    , (z+CHUNKWIDTH*ZPOS)+1.0));
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y    , (z+CHUNKWIDTH*ZPOS)+1.0));
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y    , (z+CHUNKWIDTH*ZPOS)    ));
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y    , (z+CHUNKWIDTH*ZPOS)    ));
 						}
 						if(getCube(x,y+1,z) == 0) { // top face
+							++quadCount;
 							pushNormal(0,1,0);
-							pushTexture(Chunk::textureIndexes[getCube(x,y,z)][5]);
+							pushTexture(textureIndexes[getCube(x,y,z)][5]);
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y+1.0, (z+CHUNKWIDTH*ZPOS)+1.0));
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y+1.0, (z+CHUNKWIDTH*ZPOS)+1.0));
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y+1.0, (z+CHUNKWIDTH*ZPOS)    ));
@@ -172,24 +187,56 @@ void Chunk::update(float deltaTime) {
 				}
 			}
 		}
+		makeVbo();
 	}
 }
 
 void Chunk::draw() const {
 	glPushMatrix();
+	glBindBuffer(GL_ARRAY_BUFFER, VBOID);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-	glVertexPointer(3, GL_FLOAT, 0, &vertexPoints[0]);
-	glNormalPointer(GL_FLOAT, 0, &normals[0]);
-	glTexCoordPointer(2, GL_FLOAT, 0, &textureCoords[0]);
+	glVertexPointer(3, GL_FLOAT, 0, 0);
+	glNormalPointer(GL_FLOAT, 0, (GLvoid*)(vertexPoints.size()*sizeof(float)*3));
+	glTexCoordPointer(2, GL_FLOAT, 0, (GLvoid*)(vertexPoints.size()*sizeof(float)*3+normals.size()*sizeof(float)*3));
+
 	glDrawArrays(GL_QUADS, 0, vertexPoints.size());
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glPopMatrix();
+
+//	glBindBuffer(GL_ARRAY_BUFFER, 0);
+//	glPushMatrix();
+//	glEnableClientState(GL_VERTEX_ARRAY);
+//	glEnableClientState(GL_NORMAL_ARRAY);
+//	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+//	glVertexPointer(3, GL_FLOAT, 0, &vertexPoints[0]);
+//	glNormalPointer(GL_FLOAT, 0, &normals[0]);
+//	glTexCoordPointer(2, GL_FLOAT, 0, &textureCoords[0]);
+//	glDrawArrays(GL_QUADS, 0, vertexPoints.size());
+
+//	glDisableClientState(GL_VERTEX_ARRAY);
+//	glDisableClientState(GL_NORMAL_ARRAY);
+//	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+//	glPopMatrix();
+}
+
+void Chunk::makeVbo() {
+	uint nvertex = vertexPoints.size()*sizeof(float)*3;
+	uint nnormals = normals.size()*sizeof(float)*3;
+	uint ntexture = textureCoords.size()*sizeof(float)*2;
+	glGenBuffers(1, (GLuint*) &VBOID);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOID);
+	glBufferData(GL_ARRAY_BUFFER, nvertex+nnormals+ntexture, 0, GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, nvertex, &vertexPoints[0]);
+	glBufferSubData(GL_ARRAY_BUFFER, nvertex, nnormals, &normals[0]);
+	glBufferSubData(GL_ARRAY_BUFFER, nvertex+nnormals, ntexture, &textureCoords[0]);
 }
 
 void Chunk::updateGrass(float deltaTime) { //only to be called by main update()
@@ -200,7 +247,7 @@ void Chunk::updateGrass(float deltaTime) { //only to be called by main update()
 			int y = rand()%CHUNKHEIGHT;
 			int z = rand()%CHUNKWIDTH;
 			if (y != CHUNKHEIGHT-1 && getCube(x,y+1,z) != 0 && getCube(x,y,z) == 3) {
-				parentWorld.setCubeAbs(x+(XPOS*CHUNKWIDTH),y,z+(ZPOS*CHUNKWIDTH),1);
+				setCube(x+(XPOS*CHUNKWIDTH),y,z+(ZPOS*CHUNKWIDTH),1);
 				markedForRedraw = true;
 			}
 		}

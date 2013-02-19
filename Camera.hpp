@@ -16,7 +16,7 @@ class Camera {
 		void rotateX(float deg);
 		void rotateY(float deg);
 		void draw();
-		bool collide(const World& world);
+		sf::Vector3f collide(const World& world);
 };
 
 #endif // _HPP

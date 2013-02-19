@@ -7,9 +7,9 @@
 //
 
 Camera::Camera() {
-	posX = 0;
-	posZ = 0;
-	posY = 0;
+	posX = (WORLDSIZE/2)*16;
+	posZ = (WORLDSIZE/2)*16;
+	posY = 70;
 	rotX = 0.0;
 	rotY = 0.0;
 	rotZ = 0.0;
@@ -56,8 +56,21 @@ void Camera::rotateY(float deg) {
 }
 
 void Camera::draw() {
+	//implement player body
 }
 
-bool Camera::collide(const World &world) {
+sf::Vector3f Camera::collide(const World &world) {
+	GLfloat m[16];
+	glGetFloatv(GL_MODELVIEW_MATRIX, m);
 
+	sf::Vector3f ans(0,0,0), pos(posX,posY,posZ), dir(m[8],m[9],m[10]);
+	int stepX, stepY, stepZ;
+	if (dir.x < 0) stepX = -1;
+	else stepX = 1;
+	if (dir.y < 0) stepY = -1;
+	else stepX = 1;
+	if (dir.z < 0) stepZ = -1;
+	else stepX = 1;
+
+	return ans;
 }

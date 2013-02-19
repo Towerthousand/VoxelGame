@@ -17,7 +17,8 @@ World::~World() {
 }
 
 int World::getCubeAbs(int x, int y, int z) const {
-	if (uint(x/CHUNKWIDTH) >= chunks.size() || uint(z/CHUNKWIDTH) >= chunks[0].size() || x%CHUNKWIDTH < 0 || z%CHUNKWIDTH < 0)
+	if (uint(x/CHUNKWIDTH) >= chunks.size() || uint(z/CHUNKWIDTH) >= chunks[0].size() //out of chunk grid (positive side)
+		|| x%CHUNKWIDTH < 0 || z%CHUNKWIDTH < 0) //out of the chunk grid (negative side)
 		return 0;
 	else return chunks[x/CHUNKWIDTH][z/CHUNKWIDTH]->cubes[x%CHUNKWIDTH][y][z%CHUNKWIDTH];
 }
@@ -38,6 +39,10 @@ void World::draw() const {
 			chunks[x][z]->draw();
 		}
 	}
+}
+
+void World::drawWireCube(sf::Vector3f pos) {
+
 }
 
 void World::update(float deltaTime) {

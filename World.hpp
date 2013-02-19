@@ -12,6 +12,7 @@ class World
 		void setCubeAbs(int x, int y, int z, int id);
 		void regenChunk(int x, int z, int seed);
 		void draw() const;
+		void drawWireCube(sf::Vector3f pos);
 		void update(float deltaTime);
 
 	private:

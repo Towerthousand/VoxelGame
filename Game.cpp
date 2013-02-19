@@ -4,6 +4,7 @@ Game::Game() : currentScene(NULL), nextScene(NULL) {
 	window.create(sf::VideoMode(SCRWIDTH,SCRHEIGHT,32), WINDOW_TITLE ,sf::Style::Default,CONTEXT_SETTINGS_OPENGL);
 	window.setMouseCursorVisible(false);
 	window.setVerticalSyncEnabled(false);
+	WINDOWFOCUS = true;
 	glClearColor(180.0/255.0,205.0/255.0,205.0/255.0,1);
 }
 
@@ -97,6 +98,13 @@ void Game::update(float deltaTime) {
 				glMatrixMode(GL_PROJECTION);
 				glLoadIdentity();
 				gluPerspective(60.0f, float(SCRWIDTH)/float(SCRHEIGHT), 0.01f, 1000.0f);
+				break;
+			case sf::Event::GainedFocus:
+				WINDOWFOCUS = true;
+				break;
+			case sf::Event::LostFocus:
+				WINDOWFOCUS = false;
+				break;
 			default:
 				break;
 		}
@@ -115,7 +123,6 @@ void Game::update(float deltaTime) {
 void Game::draw() {
 	//window.clear(); //not necessary? only for SFML-spedific draws? wut?
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	if (currentScene != NULL) 
 		currentScene->draw();
 	window.display();

@@ -53,10 +53,14 @@ void SceneMain::draw() {
 	glTranslatef(-Player.posX, -Player.posY, -Player.posZ);
 
 	parent.resources.textureBank["boxTexture"]->bind();
-	glMatrixMode(GL_MODELVIEW);
+
+	//glBindTexture(GL_TEXTURE_2D,parent.resources.textureBank["boxTexture"]);
 
 	world.draw();
 	Player.draw();
+
+	//world.drawWireCube(Player.collide());
+
 
 	glFlush();
 }
@@ -84,10 +88,9 @@ void SceneMain::onKeyPressed(float deltaTime) {
 }
 
 void SceneMain::onMouseButtonPressed(float deltaTime) {
-
 	//Move camera according to mouse imput
 	sf::Vector2i mousePos = mouse.getPosition(parent.getWindow());
-	if (mousePos.x != SCRHEIGHT/2 || mousePos.y != SCRWIDTH/2){
+	if ((mousePos.x != SCRHEIGHT/2 || mousePos.y != SCRWIDTH/2) && WINDOWFOCUS){
 		Player.rotateX(((float)mousePos.y - SCRHEIGHT/2));
 		Player.rotateY(((float)mousePos.x - SCRWIDTH/2));
 		mouse.setPosition(sf::Vector2i(SCRWIDTH/2, SCRHEIGHT/2),parent.getWindow());

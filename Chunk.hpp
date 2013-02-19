@@ -9,12 +9,17 @@ class Chunk { //16*16*128
 		~Chunk();
 
 		void populate();
-		void draw() const;
-		void update(float deltaTime);
-		void setCube(int x, int y, int z, int id);
-		int getCube(int x, int y, int z) const;
+
 		void pushNormal(int x, int y, int z);
 		void pushTexture(int textureID);
+		void draw() const;
+		void makeVbo();
+
+		void update(float deltaTime);
+
+		void setCube(int x, int y, int z, int id);
+		int getCube(int x, int y, int z) const;
+
 		void updateGrass(float deltaTime);
 
 		std::vector<sf::Vector3f> vertexPoints;
@@ -25,6 +30,8 @@ class Chunk { //16*16*128
 		int XPOS; //x pos of chunk inside world matrix
 		int ZPOS; //z pos of chunk inside world matrix
 		int SEED; //constant across chunks
+		uint VBOID;
+		uint quadCount;
 		std::vector<std::vector<std::vector<int> > > cubes;
 		float grassTimer;
 		World& parentWorld;
