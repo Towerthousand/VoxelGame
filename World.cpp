@@ -42,7 +42,7 @@ void World::draw() const {
 }
 
 void World::drawWireCube(sf::Vector3f pos) {
-
+	//D: not implemented
 }
 
 void World::update(float deltaTime) {

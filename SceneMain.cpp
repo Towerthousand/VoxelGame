@@ -52,15 +52,11 @@ void SceneMain::draw() {
 	glRotatef(Player.rotY, 0, 1, 0);
 	glTranslatef(-Player.posX, -Player.posY, -Player.posZ);
 
-	parent.resources.textureBank["boxTexture"]->bind();
-
-	//glBindTexture(GL_TEXTURE_2D,parent.resources.textureBank["boxTexture"]);
-
+	parent.resources.bindTexture("boxTexture");
 	world.draw();
 	Player.draw();
 
-	//world.drawWireCube(Player.collide());
-
+	//world.drawWireCube(Player.collide()); //no implementat encara
 
 	glFlush();
 }

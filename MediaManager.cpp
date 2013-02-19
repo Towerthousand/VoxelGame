@@ -95,26 +95,43 @@ void MediaManager::deleteText(std::string textName) {
 
 bool MediaManager::loadTexture(std::string textureName, std::string filePath) {
 	if (textureBank.count(textureName) != 0)
-		if (textureBank[textureName] != NULL) {
+		if (textureBank[textureName].second != NULL) {
 			std::cout << "#WARNING " << textureName << " already loaded!"<< std::endl;
 			return true;
 		}
 	std::cout << "* Loading new texture: \"" << textureName << "\" from " << filePath << std::endl;
-	sf::Texture * newTexture = new sf::Texture;
+	sf::Image * newTexture = new sf::Image;
 	if (!newTexture->loadFromFile(filePath)) {
 		std::cout << "#ERROR " << filePath << " didn't load"<< std::endl;
 		return false;
 	}
-	newTexture->setSmooth(false);
-	textureBank[textureName] = newTexture;
+	GLuint texture_handle;
+	glGenTextures(1, &texture_handle);
+	textureBank[textureName].second = newTexture;
+	textureBank[textureName].first = texture_handle;
 	return true;
 }
 
 void MediaManager::deleteTexture(std::string textureName) {
 	if (textureBank.count(textureName) != 0)
-		if (textureBank[textureName] != NULL) {
-			delete textureBank[textureName];
-			textureBank[textureName] = NULL;
+		if (textureBank[textureName].second != NULL) {
+			glDeleteTextures(1,&textureBank[textureName].first);
+			delete textureBank[textureName].second;
+			textureBank[textureName].second = NULL;
 			std::cout << "* Deleting texture \"" << textureName << "\"" << std::endl;
 		}
+}
+
+void MediaManager::bindTexture(std::string textureName) {
+	glBindTexture(GL_TEXTURE_2D, textureBank[textureName].first);
+	glTexImage2D(
+		GL_TEXTURE_2D, 0, GL_RGBA,
+		textureBank[textureName].second->getSize().x, textureBank[textureName].second->getSize().y,
+		0,
+		GL_RGBA, GL_UNSIGNED_BYTE, textureBank[textureName].second->getPixelsPtr()
+	);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }

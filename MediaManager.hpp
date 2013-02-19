@@ -16,11 +16,12 @@ class MediaManager {
 		void deleteText(std::string textName);
 		bool loadTexture(std::string textureName, std::string filePath);
 		void deleteTexture(std::string textureName);
+		void bindTexture(std::string textureName);
 
 		sf::Font globalFont;
 		std::map<std::string,sf::Text *> texts;
 		std::map<std::string,sf::Music *> musicBank;
 		std::map<std::string,std::pair<sf::Sound *,sf::SoundBuffer *> > effectBank;
-		std::map<std::string,sf::Texture *> textureBank;
+		std::map<std::string,std::pair<GLuint, sf::Image *> > textureBank;
 };
 #endif
