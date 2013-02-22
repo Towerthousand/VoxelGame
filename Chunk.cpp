@@ -242,14 +242,12 @@ void Chunk::makeVbo() {
 void Chunk::updateGrass(float deltaTime) { //only to be called by main update()
 	if (grassTimer >= 0.01) {
 		grassTimer -= 0.01;
-		for(int i = 0; i < 10; ++i) {
-			int x = rand()%CHUNKWIDTH;
-			int y = rand()%CHUNKHEIGHT;
-			int z = rand()%CHUNKWIDTH;
-			if (y != CHUNKHEIGHT-1 && getCube(x,y+1,z) != 0 && getCube(x,y,z) == 3) {
-				setCube(x+(XPOS*CHUNKWIDTH),y,z+(ZPOS*CHUNKWIDTH),1);
-				markedForRedraw = true;
-			}
+		int x = rand()%CHUNKWIDTH;
+		int y = rand()%CHUNKHEIGHT;
+		int z = rand()%CHUNKWIDTH;
+		if (y != CHUNKHEIGHT-1 && getCube(x,y+1,z) != 0 && getCube(x,y,z) == 3) {
+			setCube(x+(XPOS*CHUNKWIDTH),y,z+(ZPOS*CHUNKWIDTH),1);
+			markedForRedraw = true;
 		}
 	}
 	grassTimer += deltaTime;

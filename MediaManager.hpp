@@ -24,4 +24,5 @@ class MediaManager {
 		std::map<std::string,std::pair<sf::Sound *,sf::SoundBuffer *> > effectBank;
 		std::map<std::string,std::pair<GLuint, sf::Image *> > textureBank;
 };
+
 #endif

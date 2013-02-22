@@ -1,5 +1,4 @@
 #include "Camera.hpp"
-#include "World.hpp"
 
 //
 // This implementation of "camera" has no z rotation (fuck quaternions)
@@ -7,8 +6,8 @@
 //
 
 Camera::Camera() {
-	posX = (WORLDSIZE/2)*16;
-	posZ = (WORLDSIZE/2)*16;
+	posX = 0;
+	posZ = 0;
 	posY = 70;
 	rotX = 0.0;
 	rotY = 0.0;
@@ -30,9 +29,9 @@ void Camera::moveY(GLfloat* m,float distance) {
 }
 
 void Camera::moveZ(GLfloat* m,float distance) {
-	posX += m[2] * distance;
+	posX += (m[2]) * (distance);
 	//posY += m[6] * distance; I SAID NO FLYING! DAMMIT, HAROLD
-	posZ += m[10] * distance;
+	posZ += (m[10]) * (distance);
 }
 
 void Camera::rotateX(float deg) {
@@ -57,20 +56,4 @@ void Camera::rotateY(float deg) {
 
 void Camera::draw() {
 	//implement player body
-}
-
-sf::Vector3f Camera::collide(const World &world) {
-	GLfloat m[16];
-	glGetFloatv(GL_MODELVIEW_MATRIX, m);
-
-	sf::Vector3f ans(0,0,0), pos(posX,posY,posZ), dir(m[8],m[9],m[10]);
-	int stepX, stepY, stepZ;
-	if (dir.x < 0) stepX = -1;
-	else stepX = 1;
-	if (dir.y < 0) stepY = -1;
-	else stepX = 1;
-	if (dir.z < 0) stepZ = -1;
-	else stepX = 1;
-
-	return ans;
 }

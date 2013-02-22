@@ -2,7 +2,6 @@
 #define CAMERA_H
 #include "tools.hpp"
 
-class World;
 class Camera {
 	public:
 		Camera();
@@ -16,7 +15,6 @@ class Camera {
 		void rotateX(float deg);
 		void rotateY(float deg);
 		void draw();
-		sf::Vector3f collide(const World& world);
 };
 
 #endif // _HPP

@@ -3,8 +3,8 @@
 #include "tools.hpp"
 
 class Chunk;
-class World
-{
+class Camera;
+class World {
 	public:
 		World();
 		~World();
@@ -12,8 +12,15 @@ class World
 		void setCubeAbs(int x, int y, int z, int id);
 		void regenChunk(int x, int z, int seed);
 		void draw() const;
-		void drawWireCube(sf::Vector3f pos);
+		void drawWireCube(sf::Vector3f pos) const;
 		void update(float deltaTime);
+		void traceView(const Camera& player);
+
+		bool playerTargetsBlock;
+		sf::Vector3f targetedBlock;
+		sf::Vector3f last;
+		static const int vertexPoints[8][3];
+		static const int indexes[24];
 
 	private:
 		std::vector<std::vector<Chunk*> > chunks;

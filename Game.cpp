@@ -3,7 +3,7 @@
 Game::Game() : currentScene(NULL), nextScene(NULL) {
 	window.create(sf::VideoMode(SCRWIDTH,SCRHEIGHT,32), WINDOW_TITLE ,sf::Style::Default,CONTEXT_SETTINGS_OPENGL);
 	window.setMouseCursorVisible(false);
-	window.setVerticalSyncEnabled(false);
+	//window.setVerticalSyncEnabled(false);
 	WINDOWFOCUS = true;
 	glClearColor(180.0/255.0,205.0/255.0,205.0/255.0,1);
 }
@@ -24,7 +24,9 @@ bool Game::init() {
 
 	//GL stuff..
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_CULL_FACE); //enable backface culling
 	glCullFace(GL_BACK);
 
@@ -121,9 +123,9 @@ void Game::update(float deltaTime) {
 
 // Draw scene
 void Game::draw() {
-	//window.clear(); //not necessary? only for SFML-spedific draws? wut?
+	window.clear(sf::Color(180.0,205.0,205.0)); //not necessary? only for SFML-spedific draws? wut?
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	if (currentScene != NULL) 
+	if (currentScene != NULL)
 		currentScene->draw();
 	window.display();
 }

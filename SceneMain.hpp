@@ -20,7 +20,7 @@ class SceneMain : public Scene {
 		bool loadResources();
 
 		int WORLDSEED;
-		Camera Player;
+		Camera player;
 		sf::Mouse mouse;
 		float grassTimer;
 		World world;

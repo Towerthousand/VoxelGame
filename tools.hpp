@@ -23,5 +23,6 @@ extern bool WINDOWFOCUS;
 #define CHUNKHEIGHT 128 //blocks in y coords
 #define WORLDSIZE 20 //worldsize in CHUNKSxCHUNKS
 #define SEALEVEL 64
+#define DEG_TO_RAD ((2*M_PI)/360.0)
 
 #endif
