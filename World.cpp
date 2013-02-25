@@ -67,7 +67,8 @@ void World::drawWireCube(sf::Vector3<double> pos) const {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glColor3f(0.0,0.0,0.0);
 	glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
-	glTranslatef(pos.x,pos.y,pos.z);
+	glTranslatef(pos.x-0.001,pos.y-0.001,pos.z-0.001);
+	glScalef(1.002,1.002,1.002);
 	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glColor3f(1.0,1.0,1.0);
@@ -95,7 +96,7 @@ void World::update(float deltaTime) {
 
 //Based on: Fast Voxel Traversal Algorithm for Ray Tracing
 //By: John Amanatides et al.
-void World::traceView(const Camera& player) {
+void World::traceView(const Camera& player, float tMax) {
 	GLfloat m[16];
 	glGetFloatv(GL_MODELVIEW_MATRIX, m);
 	sf::Vector3<double>
@@ -103,14 +104,11 @@ void World::traceView(const Camera& player) {
 			dir(cos(-player.rot.x*DEG_TO_RAD)*(-sin(-player.rot.y*DEG_TO_RAD)),
 				sin(-player.rot.x*DEG_TO_RAD),
 				-cos(-player.rot.x*DEG_TO_RAD)*cos(-player.rot.y*DEG_TO_RAD)),
-			//dir(-m[2],-m[6],-m[10]),
-			//dir(1,-1,0),
 			vox(floor(pos.x), floor(pos.y), floor(pos.z)),
 			step(0,0,0),
-			tMaxc,
-			tDelta;
-
-	//normalize(dir);
+			next(0,0,0),
+			tMaxc(tMax,tMax,tMax),
+			tDelta(tMax,tMax,tMax);
 
 	if (dir.x < 0) step.x = -1;
 	else step.x = 1;
@@ -119,23 +117,22 @@ void World::traceView(const Camera& player) {
 	if (dir.z < 0) step.z = -1;
 	else step.z = 1;
 
-	float tMax = 50; //Range of view
+	next.x = vox.x + (step.x > 0 ? 1 : 0);
+	next.y = vox.y + (step.y > 0 ? 1 : 0);
+	next.z = vox.z + (step.z > 0 ? 1 : 0);
 
 	if (dir.x != 0) {
-		tDelta.x = std::fabs(1.0f/dir.x);
-		tMaxc.x = (pos.x - vox.x)/dir.x;
+		tDelta.x = step.x/dir.x;
+		tMaxc.x = (next.x - pos.x)/dir.x;
 	}
-	else tMaxc.x = 10000.0;
 	if (dir.y != 0) {
-		tDelta.y = std::fabs(1.0f/dir.y);
-		tMaxc.y = (pos.y - vox.y)/dir.y;
+		tDelta.y = step.y/dir.y;
+		tMaxc.y = (next.y - pos.y)/dir.y;
 	}
-	else tMaxc.y = 10000.0;
 	if (dir.z != 0) {
-		tDelta.z = std::fabs(1.0f/dir.z);
-		tMaxc.z = (pos.z - vox.z)/dir.z;
+		tDelta.z = step.z/dir.z;
+		tMaxc.z = (next.z - pos.z)/dir.z;
 	}
-	else tMaxc.z = 10000.0;
 
 	float tCurr = 0;
 	while (tCurr < tMax) {

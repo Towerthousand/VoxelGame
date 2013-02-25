@@ -46,7 +46,7 @@ bool SceneMain::init() {
 void SceneMain::update(const float &deltaTime) {
 	player.vel = sf::Vector3f(0, 0, 0);
 	world.update(deltaTime);
-	world.traceView(player);
+	world.traceView(player,50);
 	//Constant input (done every frame)
 	//Rotate camera according to mouse input
 	sf::Vector2i mousePos = mouse.getPosition(parent.getWindow());//sf::Vector2i(event.mouseMove.x,event.mouseMove.y);

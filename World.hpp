@@ -14,7 +14,7 @@ class World {
 		void draw() const;
 		void drawWireCube(sf::Vector3<double> pos) const;
 		void update(float deltaTime);
-		void traceView(const Camera& player);
+		void traceView(const Camera& player, float tMax);
 
 		bool playerTargetsBlock;
 		sf::Vector3<double> targetedBlock;
