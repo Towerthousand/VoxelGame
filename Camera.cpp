@@ -1,59 +1,55 @@
 #include "Camera.hpp"
+#include "World.hpp"
 
 //
 // This implementation of "camera" has no z rotation (fuck quaternions)
 // and is thougt of as a no-fly, fps kind of view. Tweak it!
 //
 
-Camera::Camera() {
-	posX = 0;
-	posZ = 0;
-	posY = 70;
-	rotX = 0.0;
-	rotY = 0.0;
-	rotZ = 0.0;
+Camera::Camera(const World &world) : parentWorld(world) {
+	pos = sf::Vector3f(0,75,0);
+	rot = sf::Vector3f(0,0,0);
 }
 
 Camera::~Camera() {
 }
 
-void Camera::moveX(GLfloat* m,float distance) {
-	posX += m[0] * distance;
-	//posY += m[4] * distance; No flying
-	posZ += m[8] * distance;
+void Camera::moveX(const float& distance) {
+	//sin(rot.yDEG_TO_RAD) --> 1 if looking at x
+	//cos(rot.y*DEG_TO_RAD) --> 1 if looking at z
+	if(parentWorld.getCubeAbs(pos.x + cos(rot.y*DEG_TO_RAD)*distance,pos.y + PLAYER_HEIGHT,pos.z) == 0)
+		pos.x += cos(rot.y*DEG_TO_RAD) * distance;
+	if(parentWorld.getCubeAbs(pos.x,pos.y + PLAYER_HEIGHT,pos.z + sin(rot.y*DEG_TO_RAD)*distance) == 0)
+		pos.z += sin(rot.y*DEG_TO_RAD) * distance;
 }
 
-void Camera::moveY(GLfloat* m,float distance) {
-	posY += distance; // not gonna spread it throuh X and Z to avoid flying.
-					  // to spread it use x += m[1], y += m[5], z += m[9]
+void Camera::moveY(const float& distance) {
+	if(parentWorld.getCubeAbs(pos.x,pos.y + distance + PLAYER_HEIGHT,pos.z) == 0)
+		pos.y += distance;
 }
 
-void Camera::moveZ(GLfloat* m,float distance) {
-	posX += (m[2]) * (distance);
-	//posY += m[6] * distance; I SAID NO FLYING! DAMMIT, HAROLD
-	posZ += (m[10]) * (distance);
+void Camera::moveZ(const float& distance) {
+	if(parentWorld.getCubeAbs(pos.x + sin(rot.y*DEG_TO_RAD)*distance,pos.y + PLAYER_HEIGHT,pos.z) == 0)
+		pos.x += sin(rot.y*DEG_TO_RAD) * distance;
+	if(parentWorld.getCubeAbs(pos.x,pos.y + PLAYER_HEIGHT,pos.z - cos(rot.y*DEG_TO_RAD)*distance) == 0)
+		pos.z -= cos(rot.y*DEG_TO_RAD) * distance;
 }
-
-void Camera::rotateX(float deg) {
-	rotX += deg;
+void Camera::rotateX(const float& deg) {
+	rot.x += deg;
 
 	//Euler fix
-	if (rotX > 89.9)
-		rotX = 89.9;
-	else if (rotX < -89.9)
-		rotX = -89.9;
+	if (rot.x > 89.9)
+		rot.x = 89.9;
+	else if (rot.x < -89.9)
+		rot.x = -89.9;
 }
 
-void Camera::rotateY(float deg) {
-	rotY += deg;
+void Camera::rotateY(const float &deg) {
+	rot.y += deg;
 
-	//prevent overflow of float rotY
-	if (rotY > 360)
-		rotY = rotY - 360;
-	else if (rotY < -360)
-			rotY = rotY + 360;
-}
-
-void Camera::draw() {
-	//implement player body
+	//prevent overflow of float rot.y
+	if (rot.y > 360)
+		rot.y = rot.y - 360;
+	else if (rot.y < -360)
+		rot.y = rot.y + 360;
 }

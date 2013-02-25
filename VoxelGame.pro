@@ -10,7 +10,8 @@ SOURCES += \
     Camera.cpp \
     Chunk.cpp \
     noiseutils.cpp \
-    World.cpp
+    World.cpp \
+    Player.cpp
 
 HEADERS += \
     SceneMain.hpp \
@@ -21,4 +22,5 @@ HEADERS += \
     tools.hpp \
     Chunk.hpp \
     noiseutils.h \
-    World.hpp
+    World.hpp \
+    Player.hpp

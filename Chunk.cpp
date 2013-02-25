@@ -3,16 +3,14 @@
 #include <noise/noise.h>
 #include "noiseutils.h"
 
-Chunk::Chunk(int x, int z, int seed, World &world) : XPOS(x), ZPOS(z), SEED(seed), parentWorld(world){
+Chunk::Chunk(const int& x, const int& z, const int& seed, World &world) : XPOS(x), ZPOS(z), SEED(seed), parentWorld(world){
 	cubes = std::vector<std::vector<std::vector<int> > >
 			(CHUNKWIDTH,std::vector<std::vector<int> >
 			(CHUNKHEIGHT,std::vector<int>
 			(CHUNKWIDTH,0)));
-
 	VBOID = XPOS*WORLDSIZE+ZPOS+1;
 	markedForRedraw = false;
 	grassTimer = 0.0;
-	quadCount = 0;
 	populate();
 }
 
@@ -57,8 +55,8 @@ void Chunk::populate() {
 	renderer.SetSourceNoiseMap (heightMap);
 	renderer.SetDestImage (image);
 	renderer.ClearGradient ();
-	renderer.AddGradientPoint (-1.00, utils::Color (  0,   0, 0, 255));
-	renderer.AddGradientPoint ( 1.00, utils::Color (  255,   255, 255, 255));
+	renderer.AddGradientPoint (-1.00, utils::Color (    0,  0,   0, 255));
+	renderer.AddGradientPoint ( 1.00, utils::Color (  255,255, 255, 255));
 	renderer.Render ();
 
 	// populate acording to heightmap
@@ -84,7 +82,7 @@ void Chunk::populate() {
 	markedForRedraw = true;
 }
 
-void Chunk::setCube(int x, int y, int z, int id) {
+void Chunk::setCube(const int& x, const int& y, const int& z, const int &id) {
 	if (y < 0 || y >= CHUNKHEIGHT) //over the skylimit, under bedrock
 		return;
 	else if (x >= CHUNKWIDTH || z >= CHUNKWIDTH || x < 0 || z < 0)//outside of this chunk
@@ -94,7 +92,7 @@ void Chunk::setCube(int x, int y, int z, int id) {
 	markedForRedraw = true;
 }
 
-int Chunk::getCube(int x, int y, int z) const {
+int Chunk::getCube(const int& x, const int& y, const int& z) const {
 	if (y < 0 || y >= CHUNKHEIGHT) //over the skylimit, under bedrock
 		return 0;
 	if (x >= CHUNKWIDTH || z >= CHUNKWIDTH || x < 0 || z < 0)//outside of this chunk
@@ -102,13 +100,13 @@ int Chunk::getCube(int x, int y, int z) const {
 	return cubes[x][y][z]; //inside current chunk
 }
 
-void Chunk::pushNormal(int x, int y, int z) {
+void Chunk::pushNormal(const int &x, const int &y, const int &z) {
 	for (int i = 0; i < 4; ++i) {
 		normals.push_back(sf::Vector3f( x, y, z));
 	}
 }
 
-void Chunk::pushTexture(int textureID) {
+void Chunk::pushTexture(const int &textureID) {
 	int x = (textureID % 4)*16; // 4 = number of textures/row, 16 = width
 	int y = (textureID / 4)*16; // 4 = number of textures/row, 16 = height
 	textureCoords.push_back(sf::Vector2f(x,y));
@@ -117,20 +115,18 @@ void Chunk::pushTexture(int textureID) {
 	textureCoords.push_back(sf::Vector2f(x+16.0,y));
 }
 
-void Chunk::update(float deltaTime) {
+void Chunk::update(const float& deltaTime) {
 	updateGrass(deltaTime);
 	if (markedForRedraw) { //empty arrays and re-do them
 		markedForRedraw = false;
 		vertexPoints.resize(0);
 		normals.resize(0);
 		textureCoords.resize(0);
-		quadCount = 0;
 		for(int z = 0; z < CHUNKWIDTH; ++z) {
 			for(int y = 0; y < CHUNKHEIGHT; ++y) {
 				for(int x = 0; x < CHUNKWIDTH; ++x) {
 					if (getCube(x,y,z) != 0) { // only draw if it's not air
 						if(getCube(x,y,z+1) == 0) { // front face
-							++quadCount;
 							pushNormal(0,0,1);
 							pushTexture(textureIndexes[getCube(x,y,z)][0]);
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y+1.0, (z+CHUNKWIDTH*ZPOS)+1.0));
@@ -139,7 +135,6 @@ void Chunk::update(float deltaTime) {
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y+1.0, (z+CHUNKWIDTH*ZPOS)+1.0));
 						}
 						if(getCube(x,y,z-1) == 0) { // back face
-							++quadCount;
 							pushNormal(0,0,-1);
 							pushTexture(textureIndexes[getCube(x,y,z)][1]);
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y+1.0, (z+CHUNKWIDTH*ZPOS)));
@@ -148,7 +143,6 @@ void Chunk::update(float deltaTime) {
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y+1.0, (z+CHUNKWIDTH*ZPOS)));
 						}
 						if(getCube(x+1,y,z) == 0) { // left face
-							++quadCount;
 							pushNormal(1,0,0);
 							pushTexture(textureIndexes[getCube(x,y,z)][2]);
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y+1.0, (z+CHUNKWIDTH*ZPOS)+1.0));
@@ -157,7 +151,6 @@ void Chunk::update(float deltaTime) {
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y+1.0, (z+CHUNKWIDTH*ZPOS)    ));
 						}
 						if(getCube(x-1,y,z) == 0) { // right face
-							++quadCount;
 							pushNormal(-1,0,0);
 							pushTexture(textureIndexes[getCube(x,y,z)][3]);
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y+1.0, (z+CHUNKWIDTH*ZPOS)    ));
@@ -166,7 +159,6 @@ void Chunk::update(float deltaTime) {
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y+1.0, (z+CHUNKWIDTH*ZPOS)+1.0));
 						}
 						if(getCube(x,y-1,z) == 0) { // bottom face
-							++quadCount;
 							pushNormal(0,-1, 0);
 							pushTexture(textureIndexes[getCube(x,y,z)][4]);
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y    , (z+CHUNKWIDTH*ZPOS)+1.0));
@@ -175,7 +167,6 @@ void Chunk::update(float deltaTime) {
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y    , (z+CHUNKWIDTH*ZPOS)    ));
 						}
 						if(getCube(x,y+1,z) == 0) { // top face
-							++quadCount;
 							pushNormal(0,1,0);
 							pushTexture(textureIndexes[getCube(x,y,z)][5]);
 							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y+1.0, (z+CHUNKWIDTH*ZPOS)+1.0));
@@ -209,22 +200,6 @@ void Chunk::draw() const {
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glPopMatrix();
-
-//	glBindBuffer(GL_ARRAY_BUFFER, 0);
-//	glPushMatrix();
-//	glEnableClientState(GL_VERTEX_ARRAY);
-//	glEnableClientState(GL_NORMAL_ARRAY);
-//	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-//	glVertexPointer(3, GL_FLOAT, 0, &vertexPoints[0]);
-//	glNormalPointer(GL_FLOAT, 0, &normals[0]);
-//	glTexCoordPointer(2, GL_FLOAT, 0, &textureCoords[0]);
-//	glDrawArrays(GL_QUADS, 0, vertexPoints.size());
-
-//	glDisableClientState(GL_VERTEX_ARRAY);
-//	glDisableClientState(GL_NORMAL_ARRAY);
-//	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-//	glPopMatrix();
 }
 
 void Chunk::makeVbo() {
@@ -239,14 +214,14 @@ void Chunk::makeVbo() {
 	glBufferSubData(GL_ARRAY_BUFFER, nvertex+nnormals, ntexture, &textureCoords[0]);
 }
 
-void Chunk::updateGrass(float deltaTime) { //only to be called by main update()
+void Chunk::updateGrass(const float& deltaTime) { //only to be called by main update()
 	if (grassTimer >= 0.01) {
 		grassTimer -= 0.01;
 		int x = rand()%CHUNKWIDTH;
 		int y = rand()%CHUNKHEIGHT;
 		int z = rand()%CHUNKWIDTH;
-		if (y != CHUNKHEIGHT-1 && getCube(x,y+1,z) != 0 && getCube(x,y,z) == 3) {
-			setCube(x+(XPOS*CHUNKWIDTH),y,z+(ZPOS*CHUNKWIDTH),1);
+		if (getCube(x,y+1,z) != 0 && getCube(x,y,z) == 3) {
+			setCube(x,y,z,1);
 			markedForRedraw = true;
 		}
 	}

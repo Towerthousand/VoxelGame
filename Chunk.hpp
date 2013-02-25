@@ -5,35 +5,37 @@
 class World;
 class Chunk { //16*16*128
 	public:
-		Chunk(int x, int z, int seed, World &world);
+		Chunk(const int& x, const int& z, const int& seed, World &world);
 		~Chunk();
 
 		void populate();
 
-		void pushNormal(int x, int y, int z);
-		void pushTexture(int textureID);
+		void pushNormal(const int& x,const int& y,const int& z);
+		void pushTexture(const int& textureID);
 		void draw() const;
 		void makeVbo();
 
-		void update(float deltaTime);
+		void update(const float& deltaTime);
 
-		void setCube(int x, int y, int z, int id);
-		int getCube(int x, int y, int z) const;
+		void setCube(const int& x, const int& y, const int& z, const int&id);
+		int getCube(const int& x, const int& y, const int& z) const;
 
-		void updateGrass(float deltaTime);
+		void updateGrass(const float& deltaTime);
 
+		std::vector<std::vector<std::vector<int> > > cubes;
 		std::vector<sf::Vector3f> vertexPoints;
 		std::vector<sf::Vector3f> normals;
 		std::vector<sf::Vector2f> textureCoords;
 		static const int textureIndexes[4][6];
-		bool markedForRedraw;
+
 		int XPOS; //x pos of chunk inside world matrix
 		int ZPOS; //z pos of chunk inside world matrix
 		int SEED; //constant across chunks
 		uint VBOID;
-		uint quadCount;
-		std::vector<std::vector<std::vector<int> > > cubes;
+
+		bool markedForRedraw;
 		float grassTimer;
+
 		World& parentWorld;
 };
 

@@ -2,19 +2,20 @@
 #define CAMERA_H
 #include "tools.hpp"
 
+class World;
 class Camera {
 	public:
-		Camera();
+		Camera(const World &world);
 		~Camera();
+		void moveX(const float& distance);
+		void moveY(const float& distance);
+		void moveZ(const float& distance);
+		void rotateX(const float &deg);
+		void rotateY(const float& deg);
 
-		float posX, posY,posZ,
-			  rotX, rotY, rotZ;
-		void moveX(GLfloat m[16], float distance);
-		void moveY(GLfloat m[16], float distance);
-		void moveZ(GLfloat m[16], float distance);
-		void rotateX(float deg);
-		void rotateY(float deg);
-		void draw();
+		sf::Vector3f pos;
+		sf::Vector3f rot;
+		const World& parentWorld;
 };
 
 #endif // _HPP

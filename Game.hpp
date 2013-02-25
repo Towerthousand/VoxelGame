@@ -12,7 +12,7 @@ class Game {
 		bool init(); // inits game-wide stuff here (init and resource loading)
 		void run(); // won't run if Game::init() isn't called first
 					// contains main loop, calls update() and draw()
-		void update(float deltaTime); // changes scene if necessary
+		void update(const float& deltaTime); // changes scene if necessary
 									  // updates fps
 									  // checks for window events
 									  // updates input with
@@ -39,12 +39,13 @@ class Game {
 	private:
 		bool loadResources (); // loads game-wide resources. only called
 									 // by init() once
-		void onKeyPressed(float deltaTime);
+		void onKeyPressed(const float& deltaTime, sf::Event event);
 									 	// currentScene.onKeyPressed
-										// (event, deltaTime)
-		void onMouseButtonPressed(float deltaTime);
+										// (deltaTime, event)
+		void onMouseButtonPressed(const float& deltaTime, sf::Event event);
 									 	// currentScene.onMouseButtonPressed
-										// (deltaTime)
+										// (deltaTime, event)
+		void onMouseMoved(const float& deltaTime, sf::Event event);
 
 		sf::RenderWindow window;
 		Scene* currentScene;

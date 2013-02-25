@@ -6,7 +6,7 @@ MediaManager::MediaManager() {
 MediaManager::~MediaManager() {
 }
 
-bool MediaManager::loadMusic(std::string trackName, std::string filePath) {
+bool MediaManager::loadMusic(const std::string &trackName, const std::string &filePath) {
 	if (musicBank.count(trackName) != 0)
 		if (musicBank[trackName] != NULL) {
 			std::cout << "#WARNING " << trackName << " already loaded!"<< std::endl;
@@ -22,7 +22,7 @@ bool MediaManager::loadMusic(std::string trackName, std::string filePath) {
 	return true;
 }
 
-bool MediaManager::loadEffect(std::string effectName, std::string filePath) {
+bool MediaManager::loadEffect(const std::string &effectName, const std::string &filePath) {
 	if (effectBank.count(effectName) != 0)
 		if (effectBank[effectName].first != NULL) {
 			std::cout << "#WARNING " << effectName << " already loaded!"<< std::endl;
@@ -40,7 +40,7 @@ bool MediaManager::loadEffect(std::string effectName, std::string filePath) {
 	return true;
 }
 
-void MediaManager::deleteMusic(std::string trackName) {
+void MediaManager::deleteMusic(const std::string &trackName) {
 	if (musicBank.count(trackName) != 0)
 		if (musicBank[trackName] != NULL) {
 			std::cout << "* Deleting music track \"" << trackName << "\"" << std::endl;
@@ -49,7 +49,7 @@ void MediaManager::deleteMusic(std::string trackName) {
 		}
 }
 
-void MediaManager::deleteEffect(std::string effectName) {
+void MediaManager::deleteEffect(const std::string &effectName) {
 	if (effectBank.count(effectName) != 0)
 		if (effectBank[effectName].first != NULL) {
 			std::cout << "* Deleting sound effect \"" << effectName << "\"" << std::endl;
@@ -60,11 +60,10 @@ void MediaManager::deleteEffect(std::string effectName) {
 		}
 }
 
-bool MediaManager::makeText(std::string textName, std::string textString,
-							int size, sf::Vector2f position,
-							sf::Color color = sf::Color::White,
-							sf::Text::Style style = sf::Text::Regular,
-							bool center_origin = false) {
+bool MediaManager::makeText(const std::string& textName, const std::string& textString,
+							const int& size, const sf::Vector2f& position,
+							const sf::Color& color, const sf::Text::Style& style,
+							const bool& center_origin) {
 	if (texts.count(textName) != 0)
 		if (texts[textName] != NULL)
 			deleteText(textName);
@@ -84,7 +83,7 @@ bool MediaManager::makeText(std::string textName, std::string textString,
 	return true;
 }
 
-void MediaManager::deleteText(std::string textName) {
+void MediaManager::deleteText(const std::string &textName) {
 	if (texts.count(textName) != 0)
 		if (texts[textName] != NULL) {
 			std::cout << "* Deleting text \"" << textName << "\"" << std::endl;
@@ -93,7 +92,7 @@ void MediaManager::deleteText(std::string textName) {
 		}
 }
 
-bool MediaManager::loadTexture(std::string textureName, std::string filePath) {
+bool MediaManager::loadTexture(const std::string &textureName, const std::string &filePath) {
 	if (textureBank.count(textureName) != 0)
 		if (textureBank[textureName].second != NULL) {
 			std::cout << "#WARNING " << textureName << " already loaded!"<< std::endl;
@@ -112,7 +111,7 @@ bool MediaManager::loadTexture(std::string textureName, std::string filePath) {
 	return true;
 }
 
-void MediaManager::deleteTexture(std::string textureName) {
+void MediaManager::deleteTexture(const std::string &textureName) {
 	if (textureBank.count(textureName) != 0)
 		if (textureBank[textureName].second != NULL) {
 			glDeleteTextures(1,&textureBank[textureName].first);
@@ -122,7 +121,7 @@ void MediaManager::deleteTexture(std::string textureName) {
 		}
 }
 
-void MediaManager::bindTexture(std::string textureName) {
+void MediaManager::bindTexture(const std::string &textureName) {
 	glBindTexture(GL_TEXTURE_2D, textureBank[textureName].first);
 	glTexImage2D(
 		GL_TEXTURE_2D, 0, GL_RGBA,

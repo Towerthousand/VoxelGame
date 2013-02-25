@@ -6,9 +6,9 @@ World::World() {
 	chunks = std::vector<std::vector<Chunk*> > //init chunks to 0, will never be used like this.
 			 (WORLDSIZE,std::vector<Chunk*>
 			  (WORLDSIZE,NULL));
-	targetedBlock = sf::Vector3f(0,0,0);
+	targetedBlock = sf::Vector3<double>(0,0,0);
 	playerTargetsBlock = false;
-	last = sf::Vector3f(0,0,0);
+	last = sf::Vector3<double>(0,0,0);
 }
 
 World::~World() {
@@ -20,15 +20,39 @@ World::~World() {
 	}
 }
 
-int World::getCubeAbs(int x, int y, int z) const {
-	if (uint(x/CHUNKWIDTH) >= chunks.size() || uint(z/CHUNKWIDTH) >= chunks[0].size() //out of chunk grid (positive side)
-		|| x%CHUNKWIDTH < 0 || z%CHUNKWIDTH < 0) //out of the chunk grid (negative side)
+int World::getCubeAbs(float x, float y, float z) const {
+	x = floor(x);
+	y = floor(y);
+	z = floor(z);
+	if (   x/CHUNKWIDTH >= WORLDSIZE || x/CHUNKWIDTH < 0
+		   || z/CHUNKWIDTH >= WORLDSIZE || z/CHUNKWIDTH < 0
+		   || y >= CHUNKHEIGHT
+		   || int(x)%CHUNKWIDTH < 0
+		   || int(z)%CHUNKWIDTH < 0
+		   || y < 0
+		   || z < 0
+		   || x < 0)
 		return 0;
-	else return chunks[x/CHUNKWIDTH][z/CHUNKWIDTH]->cubes[x%CHUNKWIDTH][y][z%CHUNKWIDTH];
+	else return chunks[x/CHUNKWIDTH][z/CHUNKWIDTH]->cubes[int(x)%CHUNKWIDTH][y][int(z)%CHUNKWIDTH];
 }
 
 void World::setCubeAbs(int x, int y, int z, int id) {
+	if (   x/CHUNKWIDTH >= WORLDSIZE || x/CHUNKWIDTH < 0
+		   || z/CHUNKWIDTH >= WORLDSIZE || z/CHUNKWIDTH < 0
+		   || y >= CHUNKHEIGHT
+		   || x%CHUNKWIDTH < 0
+		   || z%CHUNKWIDTH < 0
+		   || y < 0 )
+		return;
 	chunks[x/CHUNKWIDTH][z/CHUNKWIDTH]->setCube(x%CHUNKWIDTH,y,z%CHUNKWIDTH,id);
+	if(x%CHUNKWIDTH == 0 && x/CHUNKWIDTH > 0)
+		chunks[x/CHUNKWIDTH - 1][z/CHUNKWIDTH]->markedForRedraw = true;
+	if(x%CHUNKWIDTH == CHUNKWIDTH-1 && x/CHUNKWIDTH < WORLDSIZE-1)
+		chunks[x/CHUNKWIDTH + 1][z/CHUNKWIDTH]->markedForRedraw = true;
+	if(z%CHUNKWIDTH == 0 && z/CHUNKWIDTH > 0)
+		chunks[x/CHUNKWIDTH][z/CHUNKWIDTH - 1]->markedForRedraw = true;
+	if(z%CHUNKWIDTH == CHUNKWIDTH-1 && z/CHUNKWIDTH < WORLDSIZE-1)
+		chunks[x/CHUNKWIDTH][z/CHUNKWIDTH + 1]->markedForRedraw = true;
 }
 
 void World::regenChunk(int x, int z, int seed) {
@@ -37,14 +61,13 @@ void World::regenChunk(int x, int z, int seed) {
 	chunks[x][z] = new Chunk(x,z,seed,*this);
 }
 
-void World::drawWireCube(sf::Vector3f pos) const {
+void World::drawWireCube(sf::Vector3<double> pos) const {
 	glPushMatrix();
 	glLineWidth(3.0);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glColor3f(0.0,0.0,0.0);
 	glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
 	glTranslatef(pos.x,pos.y,pos.z);
-	glScalef(1.001,1.001,1.001);
 	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glColor3f(1.0,1.0,1.0);
@@ -75,13 +98,19 @@ void World::update(float deltaTime) {
 void World::traceView(const Camera& player) {
 	GLfloat m[16];
 	glGetFloatv(GL_MODELVIEW_MATRIX, m);
-	sf::Vector3f
-			pos(player.posX+0.5,player.posY+0.5,player.posZ+0.5),
-			dir(-m[2],-m[6],-m[10]),
+	sf::Vector3<double>
+			pos(player.pos.x,player.pos.y,player.pos.z),
+			dir(cos(-player.rot.x*DEG_TO_RAD)*(-sin(-player.rot.y*DEG_TO_RAD)),
+				sin(-player.rot.x*DEG_TO_RAD),
+				-cos(-player.rot.x*DEG_TO_RAD)*cos(-player.rot.y*DEG_TO_RAD)),
+			//dir(-m[2],-m[6],-m[10]),
+			//dir(1,-1,0),
 			vox(floor(pos.x), floor(pos.y), floor(pos.z)),
-			step,
+			step(0,0,0),
 			tMaxc,
 			tDelta;
+
+	//normalize(dir);
 
 	if (dir.x < 0) step.x = -1;
 	else step.x = 1;
@@ -90,20 +119,23 @@ void World::traceView(const Camera& player) {
 	if (dir.z < 0) step.z = -1;
 	else step.z = 1;
 
-	float tMax = 5;
+	float tMax = 50; //Range of view
 
 	if (dir.x != 0) {
-		tDelta.x = std::fabs(1/dir.x);
-		tMaxc.x = std::fabs((vox.x - pos.x)/dir.x);
+		tDelta.x = std::fabs(1.0f/dir.x);
+		tMaxc.x = (pos.x - vox.x)/dir.x;
 	}
+	else tMaxc.x = 10000.0;
 	if (dir.y != 0) {
-		tDelta.y = std::fabs(1/dir.y);
-		tMaxc.y = std::fabs((vox.y - pos.y)/dir.y);
-	};
-	if (dir.z != 0) {
-		tDelta.z = std::fabs(1/dir.z);
-		tMaxc.z = std::fabs((vox.z - pos.z)/dir.z);
+		tDelta.y = std::fabs(1.0f/dir.y);
+		tMaxc.y = (pos.y - vox.y)/dir.y;
 	}
+	else tMaxc.y = 10000.0;
+	if (dir.z != 0) {
+		tDelta.z = std::fabs(1.0f/dir.z);
+		tMaxc.z = (pos.z - vox.z)/dir.z;
+	}
+	else tMaxc.z = 10000.0;
 
 	float tCurr = 0;
 	while (tCurr < tMax) {
@@ -113,20 +145,12 @@ void World::traceView(const Camera& player) {
 				last = vox;
 				tMaxc.x= tMaxc.x + tDelta.x;
 				vox.x = vox.x + step.x;
-				if(vox.x < 0 || vox.x >= WORLDSIZE*CHUNKWIDTH){
-					playerTargetsBlock = false;
-					return;
-				}
 			}
 			else {
 				tCurr = tMaxc.z;
 				last = vox;
 				vox.z = vox.z + step.z;
-				if(vox.z < 0 || vox.z >= WORLDSIZE*CHUNKWIDTH) {
-					playerTargetsBlock = false;
-					return;
-				}
-				tMaxc.z= tMaxc.z + tDelta.z;
+				tMaxc.z = tMaxc.z + tDelta.z;
 
 			}
 		}
@@ -135,20 +159,12 @@ void World::traceView(const Camera& player) {
 				tCurr = tMaxc.y;
 				last = vox;
 				vox.y = vox.y + step.y;
-				if(vox.y < 0 || vox.y >= CHUNKHEIGHT){
-					playerTargetsBlock = false;
-					return;
-				}
 				tMaxc.y = tMaxc.y + tDelta.y;
 			}
 			else {
 				tCurr = tMaxc.z;
 				last = vox;
 				vox.z = vox.z + step.z;
-				if(vox.z < 0 || vox.z >= WORLDSIZE*CHUNKWIDTH){
-					playerTargetsBlock = false;
-					return;
-				}
 				tMaxc.z= tMaxc.z + tDelta.z;
 			}
 		}

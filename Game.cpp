@@ -3,9 +3,10 @@
 Game::Game() : currentScene(NULL), nextScene(NULL) {
 	window.create(sf::VideoMode(SCRWIDTH,SCRHEIGHT,32), WINDOW_TITLE ,sf::Style::Default,CONTEXT_SETTINGS_OPENGL);
 	window.setMouseCursorVisible(false);
-	//window.setVerticalSyncEnabled(false);
-	WINDOWFOCUS = true;
-	glClearColor(180.0/255.0,205.0/255.0,205.0/255.0,1);
+	window.setKeyRepeatEnabled(false);
+	window.setVerticalSyncEnabled(false);
+	WINDOWFOCUS = true;/*
+	glClearColor(180.0/255.0,205.0/255.0,205.0/255.0,1);*/
 }
 
 Game::~Game() {
@@ -26,12 +27,12 @@ bool Game::init() {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_LINE_SMOOTH);
+	//glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_CULL_FACE); //enable backface culling
 	glCullFace(GL_BACK);
 
 	//initialise game-wide logic and objects
-	fpsTime = 0;
+	fpsTime = 0.0;
 	fpsCount = 0;
 
 	std::cout << "* INIT GAME SUCCESFUL" << std::endl;
@@ -59,7 +60,7 @@ void Game::run() {
 // 2: Update game-wide logic
 // 3: Process input
 // 4: Update scene
-void Game::update(float deltaTime) {
+void Game::update(const float &deltaTime) {
 	
 	//Change scene, initialise it and close if it fails to initialise
 	if (nextScene != NULL) {
@@ -84,6 +85,10 @@ void Game::update(float deltaTime) {
 	}
 	fpsTime += deltaTime;
 	++fpsCount;
+	
+	//Scene logic updating
+	if (currentScene != NULL) 
+		currentScene->update(deltaTime);
 
 	//Check window events
 	sf::Event event;
@@ -99,7 +104,7 @@ void Game::update(float deltaTime) {
 				glViewport(0, 0, SCRWIDTH, SCRHEIGHT);
 				glMatrixMode(GL_PROJECTION);
 				glLoadIdentity();
-				gluPerspective(60.0f, float(SCRWIDTH)/float(SCRHEIGHT), 0.01f, 1000.0f);
+				gluPerspective(60.0f, float(SCRWIDTH)/float(SCRHEIGHT), 0.01f, 500.0f);
 				break;
 			case sf::Event::GainedFocus:
 				WINDOWFOCUS = true;
@@ -107,39 +112,47 @@ void Game::update(float deltaTime) {
 			case sf::Event::LostFocus:
 				WINDOWFOCUS = false;
 				break;
+			case sf::Event::MouseButtonPressed:
+				onMouseButtonPressed(deltaTime, event);
+				break;
+			case sf::Event::KeyPressed:
+				onKeyPressed(deltaTime, event);
+				if (event.key.code == sf::Keyboard::Escape)
+					onClose();
+				break;
+			case sf::Event::MouseMoved:
+				onMouseMoved(deltaTime,event);
+				break;
 			default:
 				break;
 		}
 	}
-
-	//Input processing
-	onKeyPressed(deltaTime);
-	onMouseButtonPressed(deltaTime);
-	
-	//Scene logic updating
-	if (currentScene != NULL) 
-		currentScene->update(deltaTime);
 }
 
 // Draw scene
 void Game::draw() {
-	window.clear(sf::Color(180.0,205.0,205.0)); //not necessary? only for SFML-spedific draws? wut?
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	window.clear(sf::Color(180.0,205.0,205.0)); //not necessary? only for SFML-spedific draws? wut?
 	if (currentScene != NULL)
 		currentScene->draw();
 	window.display();
 }
 
 // Pass the time elapsed to scene so it can handle key imput
-void Game::onKeyPressed(float deltaTime) {
+void Game::onKeyPressed(const float& deltaTime, sf::Event event) {
 	if (currentScene != NULL) 
-		currentScene->onKeyPressed(deltaTime);
+		currentScene->onKeyPressed(deltaTime, event);
 }
 
 // Pass the time elapsed to scene and mouse event so it can handle mouse imput
-void Game::onMouseButtonPressed(float deltaTime) {
+void Game::onMouseButtonPressed(const float& deltaTime, sf::Event event) {
 	if (currentScene != NULL) 
-		currentScene->onMouseButtonPressed(deltaTime);
+		currentScene->onMouseButtonPressed(deltaTime, event);
+}
+
+void Game::onMouseMoved(const float &deltaTime, sf::Event event) {
+	if (currentScene != NULL)
+		currentScene->onMouseMoved(deltaTime,event);
 }
 
 // Whenever you wnat to ende the game, you must call this function, NOT close()
