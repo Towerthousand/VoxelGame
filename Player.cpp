@@ -9,7 +9,10 @@ Player::~Player() {
 }
 
 void Player::update(const float& deltaTime) {
-	applyVel(deltaTime);
+	vel.y -= 1000.0f*deltaTime;
+	moveX(vel.x*deltaTime);
+	moveZ(vel.z*deltaTime);
+	moveY(vel.y*deltaTime);
 }
 
 void Player::draw() const {
@@ -29,10 +32,4 @@ void Player::draw() const {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_TEXTURE_2D);
 	glPopMatrix();
-}
-
-void Player::applyVel(const float& deltaTime) {
-	moveX(vel.x*deltaTime);
-	moveZ(vel.z*deltaTime);
-	moveY(vel.y*deltaTime);
 }

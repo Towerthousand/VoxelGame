@@ -6,9 +6,9 @@ World::World() {
 	chunks = std::vector<std::vector<Chunk*> > //init chunks to 0, will never be used like this.
 			 (WORLDSIZE,std::vector<Chunk*>
 			  (WORLDSIZE,NULL));
-	targetedBlock = sf::Vector3<double>(0,0,0);
+	targetedBlock = sf::Vector3f(0,0,0);
 	playerTargetsBlock = false;
-	last = sf::Vector3<double>(0,0,0);
+	last = sf::Vector3f(0,0,0);
 }
 
 World::~World() {
@@ -20,20 +20,17 @@ World::~World() {
 	}
 }
 
-int World::getCubeAbs(float x, float y, float z) const {
-	x = floor(x);
-	y = floor(y);
-	z = floor(z);
+int World::getCubeAbs(int x, int y, int z) const {
 	if (   x/CHUNKWIDTH >= WORLDSIZE || x/CHUNKWIDTH < 0
 		   || z/CHUNKWIDTH >= WORLDSIZE || z/CHUNKWIDTH < 0
 		   || y >= CHUNKHEIGHT
-		   || int(x)%CHUNKWIDTH < 0
-		   || int(z)%CHUNKWIDTH < 0
-		   || y < 0
 		   || z < 0
-		   || x < 0)
+		   || x < 0
+		   || x%CHUNKWIDTH < 0
+		   || z%CHUNKWIDTH < 0
+		   || y < 0)
 		return 0;
-	else return chunks[x/CHUNKWIDTH][z/CHUNKWIDTH]->cubes[int(x)%CHUNKWIDTH][y][int(z)%CHUNKWIDTH];
+	else return chunks[x/CHUNKWIDTH][z/CHUNKWIDTH]->cubes[x%CHUNKWIDTH][y][z%CHUNKWIDTH];
 }
 
 void World::setCubeAbs(int x, int y, int z, int id) {
@@ -61,7 +58,7 @@ void World::regenChunk(int x, int z, int seed) {
 	chunks[x][z] = new Chunk(x,z,seed,*this);
 }
 
-void World::drawWireCube(sf::Vector3<double> pos) const {
+void World::drawWireCube(sf::Vector3f pos) const {
 	glPushMatrix();
 	glLineWidth(3.0);
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -97,9 +94,7 @@ void World::update(float deltaTime) {
 //Based on: Fast Voxel Traversal Algorithm for Ray Tracing
 //By: John Amanatides et al.
 void World::traceView(const Camera& player, float tMax) {
-	GLfloat m[16];
-	glGetFloatv(GL_MODELVIEW_MATRIX, m);
-	sf::Vector3<double>
+	sf::Vector3f
 			pos(player.pos.x,player.pos.y,player.pos.z),
 			dir(cos(-player.rot.x*DEG_TO_RAD)*(-sin(-player.rot.y*DEG_TO_RAD)),
 				sin(-player.rot.x*DEG_TO_RAD),

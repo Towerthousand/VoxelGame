@@ -1,7 +1,7 @@
 #include "SceneMain.hpp"
 #include "Game.hpp"
 
-SceneMain::SceneMain(Game &parent) : Scene(parent), player(world), WORLDSEED(std::time(0)%1000){
+SceneMain::SceneMain(Game &parent) : Scene(parent), WORLDSEED(std::time(0)%1000), player(world){
 }
 
 SceneMain::~SceneMain() {
@@ -46,7 +46,7 @@ bool SceneMain::init() {
 void SceneMain::update(const float &deltaTime) {
 	player.vel = sf::Vector3f(0, 0, 0);
 	world.update(deltaTime);
-	world.traceView(player,50);
+	world.traceView(player,5);
 	//Constant input (done every frame)
 	//Rotate camera according to mouse input
 	sf::Vector2i mousePos = mouse.getPosition(parent.getWindow());//sf::Vector2i(event.mouseMove.x,event.mouseMove.y);
@@ -56,43 +56,22 @@ void SceneMain::update(const float &deltaTime) {
 		mouse.setPosition(sf::Vector2i(SCRWIDTH/2, SCRHEIGHT/2),parent.getWindow());
 	}
 	//Move player
-	const float vel = 10.0f;
+	const float vel = 500.0f;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-		player.vel.z += 20;
+		player.vel.z += vel*deltaTime;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-		player.vel.z -= 20;
+		player.vel.z -= vel*deltaTime;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-		player.vel.x -= 20;
+		player.vel.x -= vel*deltaTime;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-		player.vel.x += 20;
+		player.vel.x += vel*deltaTime;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-		player.vel.y += 20;
+		player.vel.y += 2*vel*deltaTime;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-		player.vel.y -= 20;
-	//Looking tests
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad7)){
-		player.rot.y = 0;
-		player.rot.x = 0;
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad1)){
-		player.rot.x = 89.9;
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad3)){
-		player.rot.y = 90;
-		player.rot.x = 0;
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad4)){
-		player.rot.y = 0;
-		player.rot.x = 45;
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad2)){
-		player.rot.y = 90;
-		player.rot.x = 45;
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad5)){
-		player.rot.y = 45;
-		player.rot.x = 45;
-	}
+		player.vel.y -= vel*deltaTime;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
+		player.pos = sf::Vector3f(0,70,0);
+
 	player.update(deltaTime);
 }
 
@@ -103,11 +82,13 @@ void SceneMain::draw() const {
 	glRotatef(player.rot.x, 1, 0, 0);
 	glRotatef(player.rot.y, 0, 1, 0);
 	glTranslatef(-player.pos.x, -player.pos.y, -player.pos.z);
+
 	parent.resources.bindTexture("boxTexture");
 	world.draw();
 	player.draw();
 	glFlush();
 
+	//Debug tags
 	std::stringstream ss;
 	ss << "X: " << player.pos.x;
 	parent.resources.texts["posX"]->setString(ss.str());
@@ -126,6 +107,7 @@ void SceneMain::draw() const {
 	ss.str("");
 	glDisable(GL_CULL_FACE);
 	parent.getWindow().pushGLStates();
+	//SFML draws (until window.popGLStates())
 	parent.getWindow().draw(*parent.resources.texts["posX"]);
 	parent.getWindow().draw(*parent.resources.texts["posY"]);
 	parent.getWindow().draw(*parent.resources.texts["posZ"]);
@@ -141,14 +123,12 @@ void SceneMain::onKeyPressed(const float& deltaTime, const sf::Event& event) {
 void SceneMain::onMouseButtonPressed(const float& deltaTime, const sf::Event& event) {
 	switch(event.mouseButton.button) {
 		case sf::Mouse::Left:
-			if(world.playerTargetsBlock) {
+			if(world.playerTargetsBlock)
 				world.setCubeAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z,0);
-			}
 			break;
 		case sf::Mouse::Right:
-			if(world.playerTargetsBlock) {
+			if(world.playerTargetsBlock)
 				world.setCubeAbs(world.last.x,world.last.y,world.last.z,2);
-			}
 			break;
 		default:
 			break;

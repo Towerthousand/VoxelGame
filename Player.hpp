@@ -9,7 +9,6 @@ class Player : public Camera {
 		~Player();
 		void update(const float& deltaTime);
 		void draw() const;
-		void applyVel(const float&deltaTime);
 
 		sf::Vector3f vel;
 };

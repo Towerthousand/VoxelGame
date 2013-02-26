@@ -19,20 +19,10 @@ extern int SCRWIDTH; //1366
 extern int SCRHEIGHT; //768
 extern bool WINDOWFOCUS;
 
-inline float dot(const sf::Vector3f& a, const sf::Vector3f& b) {
-	return a.x*b.x + a.y*b.y + a.z*b.z;
-}
-
-inline float norm(sf::Vector3f v) {
-	return sqrt(dot(v, v));
-}
-
-inline void normalize(sf::Vector3f& v) {
-	v /= norm(v);
-}
+//prototype random functions here (define in tools.cpp)
 
 #define WINDOW_TITLE "VoxelGame"
-#define CONTEXT_SETTINGS_OPENGL sf::ContextSettings(32,32,0,4,3)
+#define CONTEXT_SETTINGS_OPENGL sf::ContextSettings(32,32,0,3,0)
 #define CHUNKWIDTH 16 //blocks in x and z coords
 #define CHUNKHEIGHT 128 //blocks in y coords
 #define WORLDSIZE 20 //worldsize in CHUNKSxCHUNKS

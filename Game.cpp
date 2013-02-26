@@ -5,8 +5,8 @@ Game::Game() : currentScene(NULL), nextScene(NULL) {
 	window.setMouseCursorVisible(false);
 	window.setKeyRepeatEnabled(false);
 	window.setVerticalSyncEnabled(false);
-	WINDOWFOCUS = true;/*
-	glClearColor(180.0/255.0,205.0/255.0,205.0/255.0,1);*/
+	WINDOWFOCUS = true;
+	glClearColor(180.0/255.0,205.0/255.0,205.0/255.0,1);
 }
 
 Game::~Game() {
@@ -132,7 +132,6 @@ void Game::update(const float &deltaTime) {
 // Draw scene
 void Game::draw() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	window.clear(sf::Color(180.0,205.0,205.0)); //not necessary? only for SFML-spedific draws? wut?
 	if (currentScene != NULL)
 		currentScene->draw();
 	window.display();
