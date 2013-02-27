@@ -22,11 +22,11 @@ struct Vertex {
 		Vertex(float vx = 0.0, float vy = 0.0, float vz = 0.0,
 			   float nx = 0.0, float ny = 0.0, float nz = 0.0,
 			   float tx = 0.0, float ty = 0.0) :
-			v1(vx), v2(vy), v3(vz), v4(1),
-			n1(nx), n2(ny), n3(nz), n4(0),
-			t1(tx), t2(ty), t3(0) , t4(0)
+			v1(vx), v2(vy), v3(vz),
+			n1(nx), n2(ny), n3(nz),
+			t1(tx), t2(ty)
 		{}
-		float v1,v2,v3,v4,n1,n2,n3,n4,t1,t2,t3,t4;
+		float v1,v2,v3,n1,n2,n3,t1,t2;
 };
 //prototype random functions here (define in tools.cpp)
 

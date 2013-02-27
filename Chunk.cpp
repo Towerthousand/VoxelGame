@@ -117,101 +117,54 @@ void Chunk::update(const float& deltaTime) {
 					if (cubeID != 0) { // only draw if it's not air
 						absX = x+CHUNKWIDTH*XPOS;
 						absZ = z+CHUNKWIDTH*ZPOS;
+						//STRUCTURE PER VERTEX: Vx,Vy,Vz,Nx,Ny,Nz,Tx,Ty
 						if(getCube(x,y,z+1) == 0) { // front face
 							textureX = (textureIndexes[cubeID][0] % 4)*16; // 4 = number of textures/row, 16 = width
 							textureY = (textureIndexes[cubeID][0] / 4)*16; // 4 = number of textures/row, 16 = height
-							renderData.push_back(Vertex(absX    , y+1.0, absZ+1.0,
-														0,0,1,
-														textureX,textureY));
-							renderData.push_back(Vertex(absX    , y    , absZ+1.0,
-														0,0,1,
-														textureX	 ,textureY+16.0));
-							renderData.push_back(Vertex(absX+1.0, y    , absZ+1.0,
-														0,0,1,
-														textureX+16.0,textureY+16.0));
-							renderData.push_back(Vertex(absX+1.0, y+1.0, absZ+1.0,
-														0,0,1,
-														textureX+16.0,textureY));
+							renderData.push_back(Vertex(absX    , y+1.0, absZ+1.0, 0,0,1, textureX     ,textureY));
+							renderData.push_back(Vertex(absX    , y    , absZ+1.0, 0,0,1, textureX	   ,textureY+16.0));
+							renderData.push_back(Vertex(absX+1.0, y    , absZ+1.0, 0,0,1, textureX+16.0,textureY+16.0));
+							renderData.push_back(Vertex(absX+1.0, y+1.0, absZ+1.0, 0,0,1, textureX+16.0,textureY));
 						}
 						if(getCube(x,y,z-1) == 0) { // back face
 							textureX = (textureIndexes[cubeID][1] % 4)*16; // 4 = number of textures/row, 16 = width
 							textureY = (textureIndexes[cubeID][1] / 4)*16; // 4 = number of textures/row, 16 = height
-							renderData.push_back(Vertex(absX+1.0, y+1.0, absZ,
-														0,0,-1,
-														textureX,textureY));
-							renderData.push_back(Vertex(absX+1.0, y    , absZ,
-														0,0,-1,
-														textureX	 ,textureY+16.0));
-							renderData.push_back(Vertex(absX    , y    , absZ,
-														0,0,-1,
-														textureX+16.0,textureY+16.0));
-							renderData.push_back(Vertex(absX    , y+1.0, absZ,
-														0,0,-1,
-														textureX+16.0,textureY));
+							renderData.push_back(Vertex(absX+1.0, y+1.0, absZ, 0,0,-1, textureX     ,textureY));
+							renderData.push_back(Vertex(absX+1.0, y    , absZ, 0,0,-1, textureX	    ,textureY+16.0));
+							renderData.push_back(Vertex(absX    , y    , absZ, 0,0,-1, textureX+16.0,textureY+16.0));
+							renderData.push_back(Vertex(absX    , y+1.0, absZ, 0,0,-1, textureX+16.0,textureY));
 						}
 						if(getCube(x+1,y,z) == 0) { // left face
 							textureX = (textureIndexes[cubeID][2] % 4)*16; // 4 = number of textures/row, 16 = width
 							textureY = (textureIndexes[cubeID][2] / 4)*16; // 4 = number of textures/row, 16 = height
-							renderData.push_back(Vertex(absX+1.0, y+1.0, absZ+1.0,
-														1,0,0,
-														textureX,textureY));
-							renderData.push_back(Vertex(absX+1.0, y    , absZ+1.0,
-														1,0,0,
-														textureX	 ,textureY+16.0));
-							renderData.push_back(Vertex(absX+1.0, y    , absZ    ,
-														1,0,0,
-														textureX+16.0,textureY+16.0));
-							renderData.push_back(Vertex(absX+1.0, y+1.0, absZ    ,
-														1,0,0,
-														textureX+16.0,textureY));
+							renderData.push_back(Vertex(absX+1.0, y+1.0, absZ+1.0, 1,0,0, textureX     ,textureY));
+							renderData.push_back(Vertex(absX+1.0, y    , absZ+1.0, 1,0,0, textureX	   ,textureY+16.0));
+							renderData.push_back(Vertex(absX+1.0, y    , absZ    , 1,0,0, textureX+16.0,textureY+16.0));
+							renderData.push_back(Vertex(absX+1.0, y+1.0, absZ    , 1,0,0, textureX+16.0,textureY));
 						}
 						if(getCube(x-1,y,z) == 0) { // right face
 							textureX = (textureIndexes[cubeID][3] % 4)*16; // 4 = number of textures/row, 16 = width
 							textureY = (textureIndexes[cubeID][3] / 4)*16; // 4 = number of textures/row, 16 = height
-							renderData.push_back(Vertex(absX    , y+1.0, absZ    ,
-														-1,0,0,
-														textureX,textureY));
-							renderData.push_back(Vertex(absX    , y    , absZ    ,
-														-1,0,0,
-														textureX	 ,textureY+16.0));
-							renderData.push_back(Vertex(absX    , y    , absZ+1.0,
-														-1,0,0,
-														textureX+16.0,textureY+16.0));
-							renderData.push_back(Vertex(absX    , y+1.0, absZ+1.0,
-														-1,0,0,
-														textureX+16.0,textureY));
+							renderData.push_back(Vertex(absX    , y+1.0, absZ    , -1,0,0, textureX     ,textureY));
+							renderData.push_back(Vertex(absX    , y    , absZ    , -1,0,0, textureX	    ,textureY+16.0));
+							renderData.push_back(Vertex(absX    , y    , absZ+1.0, -1,0,0, textureX+16.0,textureY+16.0));
+							renderData.push_back(Vertex(absX    , y+1.0, absZ+1.0, -1,0,0, textureX+16.0,textureY));
 						}
 						if(getCube(x,y-1,z) == 0) { // bottom face
 							textureX = (textureIndexes[cubeID][4] % 4)*16; // 4 = number of textures/row, 16 = width
 							textureY = (textureIndexes[cubeID][4] / 4)*16; // 4 = number of textures/row, 16 = height
-							renderData.push_back(Vertex(absX+1.0, y    , absZ+1.0,
-														0,-1,0,
-														textureX,textureY));
-							renderData.push_back(Vertex(absX    , y    , absZ+1.0,
-														0,-1,0,
-														textureX	 ,textureY+16.0));
-							renderData.push_back(Vertex(absX    , y    , absZ    ,
-														0,-1,0,
-														textureX+16.0,textureY+16.0));
-							renderData.push_back(Vertex(absX+1.0, y    , absZ    ,
-														0,-1,0,
-														textureX+16.0,textureY));
+							renderData.push_back(Vertex(absX+1.0, y    , absZ+1.0, 0,-1,0, textureX     ,textureY));
+							renderData.push_back(Vertex(absX    , y    , absZ+1.0, 0,-1,0, textureX     ,textureY+16.0));
+							renderData.push_back(Vertex(absX    , y    , absZ    , 0,-1,0, textureX+16.0,textureY+16.0));
+							renderData.push_back(Vertex(absX+1.0, y    , absZ    , 0,-1,0, textureX+16.0,textureY));
 						}
 						if(getCube(x,y+1,z) == 0) { // top face
 							textureX = (textureIndexes[cubeID][5] % 4)*16; // 4 = number of textures/row, 16 = width
 							textureY = (textureIndexes[cubeID][5] / 4)*16; // 4 = number of textures/row, 16 = height
-							renderData.push_back(Vertex(absX    , y+1.0, absZ+1.0,
-														0,1,0,
-														textureX,textureY));
-							renderData.push_back(Vertex(absX+1.0, y+1.0, absZ+1.0,
-														0,1,0,
-														textureX	 ,textureY+16.0));
-							renderData.push_back(Vertex(absX+1.0, y+1.0, absZ    ,
-														0,1,0,
-														textureX+16.0,textureY+16.0));
-							renderData.push_back(Vertex(absX    , y+1.0, absZ    ,
-														0,1,0,
-														textureX+16.0,textureY));
+							renderData.push_back(Vertex(absX    , y+1.0, absZ+1.0, 0,1,0, textureX     ,textureY));
+							renderData.push_back(Vertex(absX+1.0, y+1.0, absZ+1.0, 0,1,0, textureX     ,textureY+16.0));
+							renderData.push_back(Vertex(absX+1.0, y+1.0, absZ    , 0,1,0, textureX+16.0,textureY+16.0));
+							renderData.push_back(Vertex(absX    , y+1.0, absZ    , 0,1,0, textureX+16.0,textureY));
 						}
 					}
 				}
@@ -228,9 +181,9 @@ void Chunk::draw() const {
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-	glVertexPointer(4, GL_FLOAT, sizeof(float)*12, 0);
-	glNormalPointer(GL_FLOAT, sizeof(Vertex),(GLvoid*)(4*sizeof(float)));
-	glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (GLvoid*)(8*sizeof(float)));
+	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), 0);
+	glNormalPointer(GL_FLOAT, sizeof(Vertex),(GLvoid*)(3*sizeof(float)));
+	glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (GLvoid*)(6*sizeof(float)));
 
 	glDrawArrays(GL_QUADS, 0, renderData.size());
 
@@ -244,7 +197,7 @@ void Chunk::draw() const {
 void Chunk::makeVbo() {
 	glGenBuffers(1, (GLuint*) &VBOID);
 	glBindBuffer(GL_ARRAY_BUFFER, VBOID);
-	glBufferData(GL_ARRAY_BUFFER, renderData.size()*sizeof(float)*12, &renderData[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, renderData.size()*sizeof(Vertex), &renderData[0], GL_STATIC_DRAW);
 }
 
 void Chunk::updateGrass(const float& deltaTime) { //only to be called by main update()

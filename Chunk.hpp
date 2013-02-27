@@ -23,9 +23,6 @@ class Chunk { //16*16*128
 		void updateGrass(const float& deltaTime);
 
 		std::vector<std::vector<std::vector<int> > > cubes;
-		std::vector<sf::Vector3f> vertexPoints;
-		std::vector<sf::Vector3f> normals;
-		std::vector<sf::Vector2f> textureCoords;
 		std::vector<Vertex> renderData;
 		static const int textureIndexes[4][6];
 
