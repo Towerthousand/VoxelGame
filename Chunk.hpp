@@ -10,8 +10,8 @@ class Chunk { //16*16*128
 
 		void populate();
 
-		void pushNormal(const int& x,const int& y,const int& z);
-		void pushTexture(const int& textureID);
+		void pushNormal(const int& x, const int& y, const int& z, Vertex &v);
+		void pushTexture(const int &textureID,Vertex &v);
 		void draw() const;
 		void makeVbo();
 
@@ -26,6 +26,7 @@ class Chunk { //16*16*128
 		std::vector<sf::Vector3f> vertexPoints;
 		std::vector<sf::Vector3f> normals;
 		std::vector<sf::Vector2f> textureCoords;
+		std::vector<Vertex> renderData;
 		static const int textureIndexes[4][6];
 
 		int XPOS; //x pos of chunk inside world matrix

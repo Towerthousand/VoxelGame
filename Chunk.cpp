@@ -1,6 +1,6 @@
 #include "Chunk.hpp"
 #include "World.hpp"
-#include <libsnoise/noise.h>
+#include <libnoise/noise.h>
 #include "noiseutils.h"
 
 Chunk::Chunk(const int& x, const int& z, const int& seed, World &world) : XPOS(x), ZPOS(z), SEED(seed), parentWorld(world){
@@ -100,79 +100,118 @@ int Chunk::getCube(const int& x, const int& y, const int& z) const {
 	return cubes[x][y][z]; //inside current chunk
 }
 
-void Chunk::pushNormal(const int &x, const int &y, const int &z) {
-	for (int i = 0; i < 4; ++i) {
-		normals.push_back(sf::Vector3f( x, y, z));
-	}
-}
-
-void Chunk::pushTexture(const int &textureID) {
-	int x = (textureID % 4)*16; // 4 = number of textures/row, 16 = width
-	int y = (textureID / 4)*16; // 4 = number of textures/row, 16 = height
-	textureCoords.push_back(sf::Vector2f(x,y));
-	textureCoords.push_back(sf::Vector2f(x,y+16.0));
-	textureCoords.push_back(sf::Vector2f(x+16.0,y+16.0));
-	textureCoords.push_back(sf::Vector2f(x+16.0,y));
-}
-
 void Chunk::update(const float& deltaTime) {
 	updateGrass(deltaTime);
 	if (markedForRedraw) { //empty arrays and re-do them
 		markedForRedraw = false;
-		vertexPoints.resize(0);
-		normals.resize(0);
-		textureCoords.resize(0);
+		renderData.resize(0);
+		int absX = 0;
+		int absZ = 0;
+		int textureX = 0;
+		int textureY = 0;
+		int cubeID;
 		for(int z = 0; z < CHUNKWIDTH; ++z) {
 			for(int y = 0; y < CHUNKHEIGHT; ++y) {
 				for(int x = 0; x < CHUNKWIDTH; ++x) {
-					if (getCube(x,y,z) != 0) { // only draw if it's not air
+					cubeID = getCube(x,y,z);
+					if (cubeID != 0) { // only draw if it's not air
+						absX = x+CHUNKWIDTH*XPOS;
+						absZ = z+CHUNKWIDTH*ZPOS;
 						if(getCube(x,y,z+1) == 0) { // front face
-							pushNormal(0,0,1);
-							pushTexture(textureIndexes[getCube(x,y,z)][0]);
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y+1.0, (z+CHUNKWIDTH*ZPOS)+1.0));
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y    , (z+CHUNKWIDTH*ZPOS)+1.0));
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y    , (z+CHUNKWIDTH*ZPOS)+1.0));
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y+1.0, (z+CHUNKWIDTH*ZPOS)+1.0));
+							textureX = (textureIndexes[cubeID][0] % 4)*16; // 4 = number of textures/row, 16 = width
+							textureY = (textureIndexes[cubeID][0] / 4)*16; // 4 = number of textures/row, 16 = height
+							renderData.push_back(Vertex(absX    , y+1.0, absZ+1.0,
+														0,0,1,
+														textureX,textureY));
+							renderData.push_back(Vertex(absX    , y    , absZ+1.0,
+														0,0,1,
+														textureX	 ,textureY+16.0));
+							renderData.push_back(Vertex(absX+1.0, y    , absZ+1.0,
+														0,0,1,
+														textureX+16.0,textureY+16.0));
+							renderData.push_back(Vertex(absX+1.0, y+1.0, absZ+1.0,
+														0,0,1,
+														textureX+16.0,textureY));
 						}
 						if(getCube(x,y,z-1) == 0) { // back face
-							pushNormal(0,0,-1);
-							pushTexture(textureIndexes[getCube(x,y,z)][1]);
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y+1.0, (z+CHUNKWIDTH*ZPOS)));
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y    , (z+CHUNKWIDTH*ZPOS)));
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y    , (z+CHUNKWIDTH*ZPOS)));
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y+1.0, (z+CHUNKWIDTH*ZPOS)));
+							textureX = (textureIndexes[cubeID][1] % 4)*16; // 4 = number of textures/row, 16 = width
+							textureY = (textureIndexes[cubeID][1] / 4)*16; // 4 = number of textures/row, 16 = height
+							renderData.push_back(Vertex(absX+1.0, y+1.0, absZ,
+														0,0,-1,
+														textureX,textureY));
+							renderData.push_back(Vertex(absX+1.0, y    , absZ,
+														0,0,-1,
+														textureX	 ,textureY+16.0));
+							renderData.push_back(Vertex(absX    , y    , absZ,
+														0,0,-1,
+														textureX+16.0,textureY+16.0));
+							renderData.push_back(Vertex(absX    , y+1.0, absZ,
+														0,0,-1,
+														textureX+16.0,textureY));
 						}
 						if(getCube(x+1,y,z) == 0) { // left face
-							pushNormal(1,0,0);
-							pushTexture(textureIndexes[getCube(x,y,z)][2]);
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y+1.0, (z+CHUNKWIDTH*ZPOS)+1.0));
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y    , (z+CHUNKWIDTH*ZPOS)+1.0));
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y    , (z+CHUNKWIDTH*ZPOS)    ));
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y+1.0, (z+CHUNKWIDTH*ZPOS)    ));
+							textureX = (textureIndexes[cubeID][2] % 4)*16; // 4 = number of textures/row, 16 = width
+							textureY = (textureIndexes[cubeID][2] / 4)*16; // 4 = number of textures/row, 16 = height
+							renderData.push_back(Vertex(absX+1.0, y+1.0, absZ+1.0,
+														1,0,0,
+														textureX,textureY));
+							renderData.push_back(Vertex(absX+1.0, y    , absZ+1.0,
+														1,0,0,
+														textureX	 ,textureY+16.0));
+							renderData.push_back(Vertex(absX+1.0, y    , absZ    ,
+														1,0,0,
+														textureX+16.0,textureY+16.0));
+							renderData.push_back(Vertex(absX+1.0, y+1.0, absZ    ,
+														1,0,0,
+														textureX+16.0,textureY));
 						}
 						if(getCube(x-1,y,z) == 0) { // right face
-							pushNormal(-1,0,0);
-							pushTexture(textureIndexes[getCube(x,y,z)][3]);
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y+1.0, (z+CHUNKWIDTH*ZPOS)    ));
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y    , (z+CHUNKWIDTH*ZPOS)    ));
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y    , (z+CHUNKWIDTH*ZPOS)+1.0));
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y+1.0, (z+CHUNKWIDTH*ZPOS)+1.0));
+							textureX = (textureIndexes[cubeID][3] % 4)*16; // 4 = number of textures/row, 16 = width
+							textureY = (textureIndexes[cubeID][3] / 4)*16; // 4 = number of textures/row, 16 = height
+							renderData.push_back(Vertex(absX    , y+1.0, absZ    ,
+														-1,0,0,
+														textureX,textureY));
+							renderData.push_back(Vertex(absX    , y    , absZ    ,
+														-1,0,0,
+														textureX	 ,textureY+16.0));
+							renderData.push_back(Vertex(absX    , y    , absZ+1.0,
+														-1,0,0,
+														textureX+16.0,textureY+16.0));
+							renderData.push_back(Vertex(absX    , y+1.0, absZ+1.0,
+														-1,0,0,
+														textureX+16.0,textureY));
 						}
 						if(getCube(x,y-1,z) == 0) { // bottom face
-							pushNormal(0,-1, 0);
-							pushTexture(textureIndexes[getCube(x,y,z)][4]);
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y    , (z+CHUNKWIDTH*ZPOS)+1.0));
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y    , (z+CHUNKWIDTH*ZPOS)+1.0));
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y    , (z+CHUNKWIDTH*ZPOS)    ));
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y    , (z+CHUNKWIDTH*ZPOS)    ));
+							textureX = (textureIndexes[cubeID][4] % 4)*16; // 4 = number of textures/row, 16 = width
+							textureY = (textureIndexes[cubeID][4] / 4)*16; // 4 = number of textures/row, 16 = height
+							renderData.push_back(Vertex(absX+1.0, y    , absZ+1.0,
+														0,-1,0,
+														textureX,textureY));
+							renderData.push_back(Vertex(absX    , y    , absZ+1.0,
+														0,-1,0,
+														textureX	 ,textureY+16.0));
+							renderData.push_back(Vertex(absX    , y    , absZ    ,
+														0,-1,0,
+														textureX+16.0,textureY+16.0));
+							renderData.push_back(Vertex(absX+1.0, y    , absZ    ,
+														0,-1,0,
+														textureX+16.0,textureY));
 						}
 						if(getCube(x,y+1,z) == 0) { // top face
-							pushNormal(0,1,0);
-							pushTexture(textureIndexes[getCube(x,y,z)][5]);
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y+1.0, (z+CHUNKWIDTH*ZPOS)+1.0));
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y+1.0, (z+CHUNKWIDTH*ZPOS)+1.0));
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)+1.0, y+1.0, (z+CHUNKWIDTH*ZPOS)    ));
-							vertexPoints.push_back(sf::Vector3f((x+CHUNKWIDTH*XPOS)    , y+1.0, (z+CHUNKWIDTH*ZPOS)    ));
+							textureX = (textureIndexes[cubeID][5] % 4)*16; // 4 = number of textures/row, 16 = width
+							textureY = (textureIndexes[cubeID][5] / 4)*16; // 4 = number of textures/row, 16 = height
+							renderData.push_back(Vertex(absX    , y+1.0, absZ+1.0,
+														0,1,0,
+														textureX,textureY));
+							renderData.push_back(Vertex(absX+1.0, y+1.0, absZ+1.0,
+														0,1,0,
+														textureX	 ,textureY+16.0));
+							renderData.push_back(Vertex(absX+1.0, y+1.0, absZ    ,
+														0,1,0,
+														textureX+16.0,textureY+16.0));
+							renderData.push_back(Vertex(absX    , y+1.0, absZ    ,
+														0,1,0,
+														textureX+16.0,textureY));
 						}
 					}
 				}
@@ -189,11 +228,11 @@ void Chunk::draw() const {
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-	glVertexPointer(3, GL_FLOAT, 0, 0);
-	glNormalPointer(GL_FLOAT, 0, (GLvoid*)(vertexPoints.size()*sizeof(float)*3));
-	glTexCoordPointer(2, GL_FLOAT, 0, (GLvoid*)(vertexPoints.size()*sizeof(float)*3+normals.size()*sizeof(float)*3));
+	glVertexPointer(4, GL_FLOAT, sizeof(float)*12, 0);
+	glNormalPointer(GL_FLOAT, sizeof(Vertex),(GLvoid*)(4*sizeof(float)));
+	glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (GLvoid*)(8*sizeof(float)));
 
-	glDrawArrays(GL_QUADS, 0, vertexPoints.size());
+	glDrawArrays(GL_QUADS, 0, renderData.size());
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
@@ -203,15 +242,9 @@ void Chunk::draw() const {
 }
 
 void Chunk::makeVbo() {
-	uint nvertex = vertexPoints.size()*sizeof(float)*3;
-	uint nnormals = normals.size()*sizeof(float)*3;
-	uint ntexture = textureCoords.size()*sizeof(float)*2;
 	glGenBuffers(1, (GLuint*) &VBOID);
 	glBindBuffer(GL_ARRAY_BUFFER, VBOID);
-	glBufferData(GL_ARRAY_BUFFER, nvertex+nnormals+ntexture, 0, GL_STATIC_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, nvertex, &vertexPoints[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, nvertex, nnormals, &normals[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, nvertex+nnormals, ntexture, &textureCoords[0]);
+	glBufferData(GL_ARRAY_BUFFER, renderData.size()*sizeof(float)*12, &renderData[0], GL_STATIC_DRAW);
 }
 
 void Chunk::updateGrass(const float& deltaTime) { //only to be called by main update()

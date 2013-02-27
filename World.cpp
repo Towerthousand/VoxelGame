@@ -93,6 +93,12 @@ void World::update(float deltaTime) {
 //By: John Amanatides et al.
 //Implemented by Jordi "BuD" Santiago Provencio
 void World::traceView(const Camera& player, float tMax) {
+	if (getCubeAbs(floor(player.pos.x),floor(player.pos.y),floor(player.pos.z))) {
+		playerTargetsBlock = true;
+		targetedBlock = sf::Vector3f(floor(player.pos.x),floor(player.pos.y),floor(player.pos.z));
+		return;
+	}
+
 	sf::Vector3f
 			pos(player.pos.x,player.pos.y,player.pos.z),
 			dir(cos(-player.rot.x*DEG_TO_RAD)*(-sin(-player.rot.y*DEG_TO_RAD)),
