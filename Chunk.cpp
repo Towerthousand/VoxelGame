@@ -1,6 +1,6 @@
 #include "Chunk.hpp"
 #include "World.hpp"
-#include <noise/noise.h>
+#include <libsnoise/noise.h>
 #include "noiseutils.h"
 
 Chunk::Chunk(const int& x, const int& z, const int& seed, World &world) : XPOS(x), ZPOS(z), SEED(seed), parentWorld(world){

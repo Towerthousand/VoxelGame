@@ -24,8 +24,6 @@ int World::getCubeAbs(int x, int y, int z) const {
 	if (   x/CHUNKWIDTH >= WORLDSIZE || x/CHUNKWIDTH < 0
 		   || z/CHUNKWIDTH >= WORLDSIZE || z/CHUNKWIDTH < 0
 		   || y >= CHUNKHEIGHT
-		   || z < 0
-		   || x < 0
 		   || x%CHUNKWIDTH < 0
 		   || z%CHUNKWIDTH < 0
 		   || y < 0)
@@ -60,12 +58,12 @@ void World::regenChunk(int x, int z, int seed) {
 
 void World::drawWireCube(sf::Vector3f pos) const {
 	glPushMatrix();
-	glLineWidth(3.0);
+	glLineWidth(1.5);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glColor3f(0.0,0.0,0.0);
 	glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
-	glTranslatef(pos.x-0.001,pos.y-0.001,pos.z-0.001);
-	glScalef(1.002,1.002,1.002);
+	glTranslatef(pos.x-0.0025,pos.y-0.0025,pos.z-0.0025);
+	glScalef(1.005,1.005,1.005);
 	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glColor3f(1.0,1.0,1.0);
@@ -93,6 +91,7 @@ void World::update(float deltaTime) {
 
 //Based on: Fast Voxel Traversal Algorithm for Ray Tracing
 //By: John Amanatides et al.
+//Implemented by Jordi "BuD" Santiago Provencio
 void World::traceView(const Camera& player, float tMax) {
 	sf::Vector3f
 			pos(player.pos.x,player.pos.y,player.pos.z),

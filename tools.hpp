@@ -25,9 +25,9 @@ extern bool WINDOWFOCUS;
 #define CONTEXT_SETTINGS_OPENGL sf::ContextSettings(32,32,0,3,0)
 #define CHUNKWIDTH 16 //blocks in x and z coords
 #define CHUNKHEIGHT 128 //blocks in y coords
-#define WORLDSIZE 20 //worldsize in CHUNKSxCHUNKS
+#define WORLDSIZE 10 //worldsize in CHUNKSxCHUNKS
 #define SEALEVEL 64
-#define PLAYER_HEIGHT 0
+#define PLAYER_HEIGHT -2
 #define DEG_TO_RAD ((2*M_PI)/360.0)
 
 #endif

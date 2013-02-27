@@ -4,7 +4,7 @@ Game::Game() : currentScene(NULL), nextScene(NULL) {
 	window.create(sf::VideoMode(SCRWIDTH,SCRHEIGHT,32), WINDOW_TITLE ,sf::Style::Default,CONTEXT_SETTINGS_OPENGL);
 	window.setMouseCursorVisible(false);
 	window.setKeyRepeatEnabled(false);
-	window.setVerticalSyncEnabled(false);
+	window.setVerticalSyncEnabled(true);
 	WINDOWFOCUS = true;
 	glClearColor(180.0/255.0,205.0/255.0,205.0/255.0,1);
 }
