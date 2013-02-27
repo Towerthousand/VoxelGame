@@ -18,7 +18,12 @@
 extern int SCRWIDTH; //1366
 extern int SCRHEIGHT; //768
 extern bool WINDOWFOCUS;
-
+struct Vector4f {
+		Vector4f(int a = 0, int b = 0, int c = 0, int d = 0) :
+			a(a), b(b), c(c), d(d)
+		{}
+		float a,b,c,d;
+};
 //prototype random functions here (define in tools.cpp)
 
 #define WINDOW_TITLE "VoxelGame"
