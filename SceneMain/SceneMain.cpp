@@ -125,11 +125,11 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Event& event) {
 	switch(event.mouseButton.button) {
 		case sf::Mouse::Left:
 			if(world.playerTargetsBlock)
-				world.setCubeAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z,0);
+                world.setCubeIDAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z,0);
 			break;
 		case sf::Mouse::Right:
 			if(world.playerTargetsBlock)
-				world.setCubeAbs(world.last.x,world.last.y,world.last.z,2);
+                world.setCubeIDAbs(world.last.x,world.last.y,world.last.z,2);
 			break;
 		default:
 			break;

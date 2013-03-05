@@ -10,19 +10,19 @@ class Chunk { //16*16*128
 		~Chunk();
 
 		void populate();
+        void recalculateLight();
 		void update(float deltaTime);
-		void pushCubeToArray(int x, int y, int z, int cubeID);
-		void pushBudToArray(int x, int y, int z, int cubeID);
+        void pushCubeToArray(int x, int y, int z, int cubeID);
 		void draw() const;
 		bool checkCulling(const Camera &cam);
 		void makeVbo();
 
-		void setCube(int x, int y, int z, int id);
-		int getCube(int x, int y, int z) const;
+        void setCubeID(int x, int y, int z, int id);
+        int getCubeID(int x, int y, int z) const;
 
 		void updateGrass(float deltaTime);
 
-		std::vector<std::vector<std::vector<int> > > cubes;
+        std::vector<std::vector<std::vector<Cube> > > cubes;
 		std::vector<Vertex> renderData;
 		static const int textureIndexes[4][6];
 

@@ -10,9 +10,7 @@ Player::~Player() {
 
 void Player::update(float deltaTime) {
 	vel.y -= 15.0f*deltaTime;
-	moveX(vel.x);
-	moveZ(vel.z);
-	moveY(vel.y);
+    movePos(vel);
 }
 
 void Player::draw() const {

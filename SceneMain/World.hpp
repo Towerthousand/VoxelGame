@@ -12,7 +12,7 @@
 //MIN_INT <= x,z <= MAX_INT
 //0 <= y < CHUNKHEIGHT
 //
-//Conversion must be done by Chunk::getCube and Chunk::setCube
+//Conversion must be done by Chunk::getCube and Chunk::setCubeID
 
 class Chunk;
 class Camera;
@@ -20,8 +20,8 @@ class World {
 	public:
 		World();
 		~World();
-		int getCubeAbs(int x, int y, int z) const;
-		void setCubeAbs(int x, int y, int z, int id);
+		int getCubeAbsID(int x, int y, int z) const;
+		void setCubeIDAbs(int x, int y, int z, int id);
 		void regenChunk(int x, int z, int seed);
 		void draw() const;
 		void drawWireCube(const sf::Vector3f& pos) const;

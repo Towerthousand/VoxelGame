@@ -15,20 +15,15 @@ Camera::Camera(const World &world) :
 Camera::~Camera() {
 }
 
-void Camera::moveX(float distance) {
-	if(parentWorld.getCubeAbs(floor(pos.x + distance),floor(pos.y + PLAYER_HEIGHT),floor(pos.z)) == 0)
-		pos.x += distance;
+void Camera::movePos(sf::Vector3f disp) {
+    if(parentWorld.getCubeAbsID(floor(pos.x + disp.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z)) == 0)
+        pos.x += disp.x;
+    if(parentWorld.getCubeAbsID(floor(pos.x),floor(pos.y + disp.y + PLAYER_HEIGHT),floor(pos.z)) == 0)
+        pos.y += disp.y;
+    if(parentWorld.getCubeAbsID(floor(pos.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z + disp.z)) == 0)
+        pos.z += disp.z;
 }
 
-void Camera::moveY(float distance) {
-	if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + distance + PLAYER_HEIGHT),floor(pos.z)) == 0)
-		pos.y += distance;
-}
-
-void Camera::moveZ(float distance) {
-	if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z + distance)) == 0)
-		pos.z += distance;
-}
 void Camera::rotateX(float deg) {
 	rot.x += deg;
 

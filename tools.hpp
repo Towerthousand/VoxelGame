@@ -18,16 +18,29 @@
 extern int SCRWIDTH; //1366
 extern int SCRHEIGHT; //768
 extern bool WINDOWFOCUS;
+
 struct Vertex {
 		Vertex(float vx = 0.0, float vy = 0.0, float vz = 0.0,
 			   float nx = 0.0, float ny = 0.0, float nz = 0.0,
-			   float tx = 0.0, float ty = 0.0) :
-			v1(vx), v2(vy), v3(vz),
-			n1(nx), n2(ny), n3(nz),
-			t1(tx), t2(ty)
+               float tx = 0.0, float ty = 0.0,
+               float cr = 1.0, float cg = 1.0, float cb = 1.0, float ca = 1.0) :
+            vx(vx), vy(vy), vz(vz),
+            nx(nx), ny(ny), nz(nz),
+            tx(tx), ty(ty),
+            cr(cr), cg(cg), cb(cb), ca(ca)
 		{}
-		float v1,v2,v3,n1,n2,n3,t1,t2;
+        float vx,vy,vz,
+              nx,ny,nz,
+              tx,ty,
+              cr,cg,cb,ca;
 };
+
+struct Cube {
+    Cube (int id = 0, int light = 0) : id(id), light(light) {}
+    int id;
+    int light;
+};
+
 //prototype random functions here (define in tools.cpp). Inlines go here too
 
 inline void outLog(std::string msg) {
