@@ -1,9 +1,8 @@
-#ifndef GAME_CLASS_H
-#define GAME_CLASS_H
-#include "tools.hpp"
-#include "MediaManager.hpp"
-#include "Scene.hpp"
-#include "SceneMain.hpp"
+#ifndef GAME_HPP
+#define GAME_HPP
+#include "graphics/TextureManager.hpp"
+#include "graphics/FontManager.hpp"
+#include "SceneMain/SceneMain.hpp"
 
 class Game {
 	public:
@@ -12,7 +11,23 @@ class Game {
 		bool init(); // inits game-wide stuff here (init and resource loading)
 		void run(); // won't run if Game::init() isn't called first
 					// contains main loop, calls update() and draw()
-		void update(const float& deltaTime); // changes scene if necessary
+		void setScene(Scene * scene); // sets nextScene to scene, which will
+									  // move into currentScene on next update()
+									  // so that there is no update() of one
+									  // scene followed by a draw() method
+									  // of a different scene.
+		void onClose(); // calls currentScene.onClose(), and then Game::close()
+						// currentScene.onClose() will save scene specific stuff
+						// and then call for the whole game to save game-wide
+						// stuff and shut down
+
+		sf::RenderWindow &getWindow() { return window; }
+		TextureManager &textures() { return texManager; }
+		FontManager &font() { return fontManager; }
+		
+		bool isRunning;
+	private:
+		void update(float deltaTime); // changes scene if necessary
 									  // updates fps
 									  // checks for window events
 									  // updates input with
@@ -20,38 +35,30 @@ class Game {
 									  // Game::onKeyPressed();
 									  // calls currentScene.update(deltaTime)
 		void draw(); // calls currentScene.draw()
-		void onClose(); // calls currentScene.onClose(), and then Game::close()
-						// currentScene.onClose() will save scene specific stuff
-						// and then call for the whole game to save game-wide
-						// stuff and shut down		
-		void close(); // closes app completely, saves game-wide stuff first
-		void setScene(Scene * scene); // sets nextScene to scene, which will
-								      // move into currentScene on next update()
-								      // so that there is no update() of one
-								      // scene followed by a draw() method
-								      // of a different scene.
-
-		sf::RenderWindow &getWindow() { return window; }
-		
-		bool isRunning;
-		MediaManager resources;
-		
-	private:
+		void close(); // closes app completely, saves game-wide stuff first.
+					  // should only be called by onClose();
 		bool loadResources (); // loads game-wide resources. only called
 									 // by init() once
-		void onKeyPressed(const float& deltaTime, sf::Event event);
+		void onKeyPressed(float deltaTime, sf::Event event);
 									 	// currentScene.onKeyPressed
 										// (deltaTime, event)
-		void onMouseButtonPressed(const float& deltaTime, sf::Event event);
+		void onMouseButtonPressed(float deltaTime, sf::Event event);
 									 	// currentScene.onMouseButtonPressed
 										// (deltaTime, event)
-		void onMouseMoved(const float& deltaTime, sf::Event event);
+		void onMouseMoved(float deltaTime, sf::Event event);
 
+		//context
 		sf::RenderWindow window;
 		Scene* currentScene;
 		Scene* nextScene;
+
+		//managers
+		TextureManager texManager;
+		FontManager fontManager;
+
+		//logic
 		float fpsTime;
-		int fpsCount;	
+		int fpsCount;
 };
 
-#endif
+#endif //GAME_HPP

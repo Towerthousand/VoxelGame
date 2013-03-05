@@ -1,5 +1,5 @@
-#ifndef TOOLS_H
-#define TOOLS_H
+#ifndef TOOLS_HPP
+#define TOOLS_HPP
 
 #define GL_GLEXT_PROTOTYPES 1
 #include <SFML/System.hpp>
@@ -28,15 +28,20 @@ struct Vertex {
 		{}
 		float v1,v2,v3,n1,n2,n3,t1,t2;
 };
-//prototype random functions here (define in tools.cpp)
+//prototype random functions here (define in tools.cpp). Inlines go here too
+
+inline void outLog(std::string msg) {
+	std::cout << msg << std::endl;
+}
+std::string toString(float num);
 
 #define WINDOW_TITLE "VoxelGame"
 #define CONTEXT_SETTINGS_OPENGL sf::ContextSettings(32,32,0,3,0)
 #define CHUNKWIDTH 16 //blocks in x and z coords
 #define CHUNKHEIGHT 128 //blocks in y coords
-#define WORLDSIZE 10 //worldsize in CHUNKSxCHUNKS
+#define WORLDSIZE 20 //worldsize in CHUNKSxCHUNKS
 #define SEALEVEL 64
-#define PLAYER_HEIGHT -2
+#define PLAYER_HEIGHT -1.8
 #define DEG_TO_RAD ((2*M_PI)/360.0)
 
-#endif
+#endif // TOOLS_HPP

@@ -1,26 +1,26 @@
 #ifndef CHUNK_HPP
 #define CHUNK_HPP
 #include "tools.hpp"
+#include "Camera.hpp"
 
 class World;
 class Chunk { //16*16*128
 	public:
-		Chunk(const int& x, const int& z, const int& seed, World &world);
+		Chunk(int x, int z, int seed, World &world);
 		~Chunk();
 
 		void populate();
-
-		void pushNormal(const int& x, const int& y, const int& z, Vertex &v);
-		void pushTexture(const int &textureID,Vertex &v);
+		void update(float deltaTime);
+		void pushCubeToArray(int x, int y, int z, int cubeID);
+		void pushBudToArray(int x, int y, int z, int cubeID);
 		void draw() const;
+		bool checkCulling(const Camera &cam);
 		void makeVbo();
 
-		void update(const float& deltaTime);
+		void setCube(int x, int y, int z, int id);
+		int getCube(int x, int y, int z) const;
 
-		void setCube(const int& x, const int& y, const int& z, const int&id);
-		int getCube(const int& x, const int& y, const int& z) const;
-
-		void updateGrass(const float& deltaTime);
+		void updateGrass(float deltaTime);
 
 		std::vector<std::vector<std::vector<int> > > cubes;
 		std::vector<Vertex> renderData;
@@ -32,9 +32,10 @@ class Chunk { //16*16*128
 		uint VBOID;
 
 		bool markedForRedraw;
+		bool outOfView;
 		float grassTimer;
 
 		World& parentWorld;
 };
 
-#endif // WORLD_HPP
+#endif // CHUNK_HPP

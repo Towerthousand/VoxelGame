@@ -6,12 +6,13 @@
 //chunk grid coords:
 //0 <= x < WORLDSIZE*CHUNKWIDTH
 //0 <= z < WORLDSIZE*CHUNKWIDTH
-//0 <= x < CHUNKHEIGHT
+//0 <= y < CHUNKHEIGHT
 //
 //infdev coordinates (Work In Progress):
-//MIN_INT <= x,y,z <= MAX_INT
+//MIN_INT <= x,z <= MAX_INT
+//0 <= y < CHUNKHEIGHT
 //
-//Conversion must be done by Chunk::getCube
+//Conversion must be done by Chunk::getCube and Chunk::setCube
 
 class Chunk;
 class Camera;
@@ -23,11 +24,12 @@ class World {
 		void setCubeAbs(int x, int y, int z, int id);
 		void regenChunk(int x, int z, int seed);
 		void draw() const;
-		void drawWireCube(sf::Vector3f pos) const;
-		void update(float deltaTime);
+		void drawWireCube(const sf::Vector3f& pos) const;
+		void update(float deltaTime, const Camera &camera);
 		void traceView(const Camera& player, float tMax);
 
 		bool playerTargetsBlock;
+		int chunksDrawn;
 		sf::Vector3f targetedBlock;
 		sf::Vector3f last;
 		static const int vertexPoints[8][3];

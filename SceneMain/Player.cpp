@@ -8,11 +8,11 @@ Player::Player(const World &world) : Camera(world) {
 Player::~Player() {
 }
 
-void Player::update(const float& deltaTime) {
-	vel.y -= 500.0f*deltaTime;
-	moveX(vel.x*deltaTime);
-	moveZ(vel.z*deltaTime);
-	moveY(vel.y*deltaTime);
+void Player::update(float deltaTime) {
+	vel.y -= 15.0f*deltaTime;
+	moveX(vel.x);
+	moveZ(vel.z);
+	moveY(vel.y);
 }
 
 void Player::draw() const {

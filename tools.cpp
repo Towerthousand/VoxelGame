@@ -6,3 +6,9 @@ int SCRHEIGHT = 768; //768
 bool WINDOWFOCUS = false;
 
 //implement random functions here
+
+std::string toString(float num) {
+	std::stringstream ss;
+	ss << num;
+	return ss.str();
+}

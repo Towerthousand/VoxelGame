@@ -16,7 +16,7 @@ Game::~Game() {
 
 // Init non-resource, general game frame stuff here. It calls loadResources()
 bool Game::init() {
-	std::cout << "* INIT GAME" << std::endl;
+	outLog("* INIT GAME" );
 
 	//Load game resources
 	if (!loadResources()) 
@@ -34,14 +34,13 @@ bool Game::init() {
 	//initialise game-wide logic and objects
 	fpsTime = 0.0;
 	fpsCount = 0;
-
-	std::cout << "* INIT GAME SUCCESFUL" << std::endl;
+	outLog("* INIT GAME SUCCESFUL" );
 	return true;
 }
 
 // Load scene-independent resources here, return false if failed to load
 bool Game::loadResources () {
-	if (!resources.globalFont.loadFromFile("helvetica.ttf"))
+	if (!fontManager.globalFont.loadFromFile("resources/helvetica.ttf"))
 		return false;
 	return true;
 }
@@ -60,7 +59,7 @@ void Game::run() {
 // 2: Update game-wide logic
 // 3: Process input
 // 4: Update scene
-void Game::update(const float &deltaTime) {
+void Game::update(float deltaTime) {
 	
 	//Change scene, initialise it and close if it fails to initialise
 	if (nextScene != NULL) {
@@ -77,9 +76,7 @@ void Game::update(const float &deltaTime) {
 
 	//FPS Count and title (game-wide logic)
 	if (fpsTime > 1) {
-		std::stringstream ss;
-		ss << WINDOW_TITLE << ", fps: " << fpsCount;
-		window.setTitle(ss.str());
+		window.setTitle(std::string(WINDOW_TITLE) + ", fps: " + toString(fpsCount));
 		fpsTime = 0;
 		fpsCount = 0;
 	}
@@ -138,18 +135,18 @@ void Game::draw() {
 }
 
 // Pass the time elapsed to scene so it can handle key imput
-void Game::onKeyPressed(const float& deltaTime, sf::Event event) {
+void Game::onKeyPressed(float deltaTime, sf::Event event) {
 	if (currentScene != NULL) 
 		currentScene->onKeyPressed(deltaTime, event);
 }
 
 // Pass the time elapsed to scene and mouse event so it can handle mouse imput
-void Game::onMouseButtonPressed(const float& deltaTime, sf::Event event) {
+void Game::onMouseButtonPressed(float deltaTime, sf::Event event) {
 	if (currentScene != NULL) 
 		currentScene->onMouseButtonPressed(deltaTime, event);
 }
 
-void Game::onMouseMoved(const float &deltaTime, sf::Event event) {
+void Game::onMouseMoved(float deltaTime, sf::Event event) {
 	if (currentScene != NULL)
 		currentScene->onMouseMoved(deltaTime,event);
 }
@@ -158,7 +155,7 @@ void Game::onMouseMoved(const float &deltaTime, sf::Event event) {
 void Game::onClose() {
 	if (currentScene != NULL)
 		currentScene->onClose();
-	std::cout << "* EXITING GAME" << std::endl;
+	outLog("* EXITING GAME" );
 	close();
 }
 

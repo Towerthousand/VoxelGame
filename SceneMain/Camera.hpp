@@ -7,15 +7,15 @@ class Camera {
 	public:
 		Camera(const World &world);
 		~Camera();
-		void moveX(const float& distance);
-		void moveY(const float& distance);
-		void moveZ(const float& distance);
-		void rotateX(const float &deg);
-		void rotateY(const float& deg);
+		void moveX(float distance);
+		void moveY(float distance);
+		void moveZ(float distance);
+		void rotateX(float deg);
+		void rotateY(float deg);
 
 		sf::Vector3f pos;
 		sf::Vector3f rot;
 		const World& parentWorld;
 };
 
-#endif // _HPP
+#endif // CAMERA_HPP

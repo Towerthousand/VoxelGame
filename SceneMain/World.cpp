@@ -9,6 +9,7 @@ World::World() {
 	targetedBlock = sf::Vector3f(0,0,0);
 	playerTargetsBlock = false;
 	last = sf::Vector3f(0,0,0);
+	chunksDrawn = 0;
 }
 
 World::~World() {
@@ -56,7 +57,7 @@ void World::regenChunk(int x, int z, int seed) {
 	chunks[x][z] = new Chunk(x,z,seed,*this);
 }
 
-void World::drawWireCube(sf::Vector3f pos) const {
+void World::drawWireCube(const sf::Vector3f &pos) const {
 	glPushMatrix();
 	glLineWidth(1.5);
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -81,9 +82,17 @@ void World::draw() const {
 		drawWireCube(targetedBlock);
 }
 
-void World::update(float deltaTime) {
+void World::update(float deltaTime, const Camera& camera) {
+	chunksDrawn = 0;
 	for (int x = 0; x < WORLDSIZE; ++x)  {
 		for (int z = 0; z < WORLDSIZE; ++z) {
+			if (chunks[x][z]->checkCulling(camera)){
+				chunks[x][z]->outOfView = true;
+			}
+			else {
+				++chunksDrawn;
+				chunks[x][z]->outOfView = false;
+			}
 			chunks[x][z]->update(deltaTime);
 		}
 	}
