@@ -106,7 +106,7 @@ void Chunk::recalculateLight() {
     for(int z = 0; z < CHUNKWIDTH; ++z) {
         for(int y = 0; y < CHUNKHEIGHT; ++y) {
             for(int x = 0; x < CHUNKWIDTH; ++x) {
-                cubeID = getCubeID(x,y,z);
+                int cubeID = getCubeID(x,y,z);
                 if (cubeID  == 4) { // only draw if it's not air
                     pushCubeToArray(x,y,z,cubeID);
                 }
