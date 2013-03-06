@@ -25,7 +25,10 @@ bool Game::init() {
 
 	//GL stuff..
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
+	glEnable(GL_ALPHA_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	//glDepthFunc(GL_LEQUAL);
 	glEnable(GL_TEXTURE_2D);
 	//glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_CULL_FACE); //enable backface culling

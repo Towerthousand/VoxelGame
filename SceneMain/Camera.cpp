@@ -16,11 +16,11 @@ Camera::~Camera() {
 }
 
 void Camera::movePos(sf::Vector3f disp) {
-    if(parentWorld.getCubeAbsID(floor(pos.x + disp.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z)) == 0)
+	if(parentWorld.getCubeAbs(floor(pos.x + disp.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z)).id == 0)
         pos.x += disp.x;
-    if(parentWorld.getCubeAbsID(floor(pos.x),floor(pos.y + disp.y + PLAYER_HEIGHT),floor(pos.z)) == 0)
+	if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + disp.y + PLAYER_HEIGHT),floor(pos.z)).id == 0)
         pos.y += disp.y;
-    if(parentWorld.getCubeAbsID(floor(pos.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z + disp.z)) == 0)
+	if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z + disp.z)).id == 0)
         pos.z += disp.z;
 }
 

@@ -5,7 +5,7 @@
 World::World() {
     chunks = std::vector<std::vector<Chunk*> > //init chunks to 0, will never be used like this.
             (WORLDSIZE,std::vector<Chunk*>
-             (WORLDSIZE,NULL));
+			 (WORLDSIZE,NULL));
     targetedBlock = sf::Vector3f(0,0,0);
     playerTargetsBlock = false;
     last = sf::Vector3f(0,0,0);
@@ -21,47 +21,47 @@ World::~World() {
     }
 }
 
-int World::getCubeAbsID(int x, int y, int z) const {
+Cube &World::getCubeAbs(int x, int y, int z) const {
     if (   x/CHUNKWIDTH >= WORLDSIZE || x/CHUNKWIDTH < 0
            || z/CHUNKWIDTH >= WORLDSIZE || z/CHUNKWIDTH < 0
            || y >= CHUNKHEIGHT
            || x%CHUNKWIDTH < 0
            || z%CHUNKWIDTH < 0
            || y < 0)
-        return 0;
-    else return chunks[x/CHUNKWIDTH][z/CHUNKWIDTH]->cubes[x%CHUNKWIDTH][y][z%CHUNKWIDTH].id;
+		return World::empty;
+	else return chunks[x/CHUNKWIDTH][z/CHUNKWIDTH]->cubes[x%CHUNKWIDTH][y][z%CHUNKWIDTH];
 }
 
-void World::setCubeIDAbs(int x, int y, int z, int id) {
+void World::updateCubeAbs(int x, int y, int z) {
     if (   x/CHUNKWIDTH >= WORLDSIZE || x/CHUNKWIDTH < 0
            || z/CHUNKWIDTH >= WORLDSIZE || z/CHUNKWIDTH < 0
            || y >= CHUNKHEIGHT
            || x%CHUNKWIDTH < 0
            || z%CHUNKWIDTH < 0
            || y < 0 )
-        return;
-    chunks[x/CHUNKWIDTH][z/CHUNKWIDTH]->setCubeID(x%CHUNKWIDTH,y,z%CHUNKWIDTH,id);
-    if(x%CHUNKWIDTH == 0 && x/CHUNKWIDTH > 0)
-        chunks[x/CHUNKWIDTH - 1][z/CHUNKWIDTH]->markedForRedraw = true;
-    if(x%CHUNKWIDTH == CHUNKWIDTH-1 && x/CHUNKWIDTH < WORLDSIZE-1)
-        chunks[x/CHUNKWIDTH + 1][z/CHUNKWIDTH]->markedForRedraw = true;
-    if(z%CHUNKWIDTH == 0 && z/CHUNKWIDTH > 0)
-        chunks[x/CHUNKWIDTH][z/CHUNKWIDTH - 1]->markedForRedraw = true;
-    if(z%CHUNKWIDTH == CHUNKWIDTH-1 && z/CHUNKWIDTH < WORLDSIZE-1)
-        chunks[x/CHUNKWIDTH][z/CHUNKWIDTH + 1]->markedForRedraw = true;
+		return;
+	chunks[x/CHUNKWIDTH][z/CHUNKWIDTH]->markedForRedraw = true;
+	if(x%CHUNKWIDTH == 0 && x/CHUNKWIDTH > 0)
+		chunks[x/CHUNKWIDTH - 1][z/CHUNKWIDTH]->markedForRedraw = true;
+	if(x%CHUNKWIDTH == CHUNKWIDTH-1 && x/CHUNKWIDTH < WORLDSIZE-1)
+		chunks[x/CHUNKWIDTH + 1][z/CHUNKWIDTH]->markedForRedraw = true;
+	if(z%CHUNKWIDTH == 0 && z/CHUNKWIDTH > 0)
+		chunks[x/CHUNKWIDTH][z/CHUNKWIDTH - 1]->markedForRedraw = true;
+	if(z%CHUNKWIDTH == CHUNKWIDTH-1 && z/CHUNKWIDTH < WORLDSIZE-1)
+		chunks[x/CHUNKWIDTH][z/CHUNKWIDTH + 1]->markedForRedraw = true;
 }
 
 void World::regenChunk(int x, int z, int seed) {
     if (chunks[x][z] != NULL)
         delete chunks[x][z];
-    chunks[x][z] = new Chunk(x,z,seed,*this);
+	chunks[x][z] = new Chunk(x,z,seed,*this);
 }
 
 void World::drawWireCube(const sf::Vector3f &pos) const {
     glPushMatrix();
     glLineWidth(1.5);
     glEnableClientState(GL_VERTEX_ARRAY);
-    glColor4f(0.0,0.0,0.0,0.1);
+	glColor4f(0.0,0.0,0.0,0.5);
     glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
     glTranslatef(pos.x-0.0025,pos.y-0.0025,pos.z-0.0025);
     glScalef(1.005,1.005,1.005);
@@ -104,7 +104,7 @@ void World::update(float deltaTime, const Camera& camera) {
 //By: John Amanatides et al.
 //Implemented by Jordi "BuD" Santiago Provencio
 void World::traceView(const Camera& player, float tMax) {
-    if (getCubeAbsID(floor(player.pos.x),floor(player.pos.y),floor(player.pos.z))) {
+	if (getCubeAbs(floor(player.pos.x),floor(player.pos.y),floor(player.pos.z)).id != 0) {
         playerTargetsBlock = true;
         targetedBlock = sf::Vector3f(floor(player.pos.x),floor(player.pos.y),floor(player.pos.z));
         return;
@@ -176,7 +176,7 @@ void World::traceView(const Camera& player, float tMax) {
                 tMaxc.z= tMaxc.z + tDelta.z;
             }
         }
-        if(getCubeAbsID(vox.x,vox.y,vox.z) != 0) {
+		if(getCubeAbs(vox.x,vox.y,vox.z).id != 0) {
             playerTargetsBlock = true;
             targetedBlock = vox;
             return;
@@ -210,3 +210,5 @@ const int World::indexes[24] = {
     2,6,
     3,7,
 };
+
+Cube World::empty(0,1);

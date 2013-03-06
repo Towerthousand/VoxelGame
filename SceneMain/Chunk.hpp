@@ -10,21 +10,21 @@ class Chunk { //16*16*128
 		~Chunk();
 
 		void populate();
-        void recalculateLight();
+		void calculateLight();
 		void update(float deltaTime);
         void pushCubeToArray(int x, int y, int z, int cubeID);
 		void draw() const;
 		bool checkCulling(const Camera &cam);
 		void makeVbo();
 
-        void setCubeID(int x, int y, int z, int id);
-        int getCubeID(int x, int y, int z) const;
+		void updateCube(int x, int y, int z);
+		Cube &getCube(int x, int y, int z);
 
 		void updateGrass(float deltaTime);
 
         std::vector<std::vector<std::vector<Cube> > > cubes;
 		std::vector<Vertex> renderData;
-		static const int textureIndexes[4][6];
+		static const int textureIndexes[5][6];
 
 		int XPOS; //x pos of chunk inside world matrix
 		int ZPOS; //z pos of chunk inside world matrix

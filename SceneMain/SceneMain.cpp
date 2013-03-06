@@ -1,5 +1,6 @@
 #include "SceneMain.hpp"
 #include "Game.hpp"
+#include "Chunk.hpp"
 
 SceneMain::SceneMain(Game &parent) : Scene(parent), WORLDSEED(std::time(0)%1000), player(world){
 }
@@ -37,6 +38,14 @@ bool SceneMain::init() {
 	for (int x = 0; x < WORLDSIZE; ++x) {
 		for (int z = 0; z < WORLDSIZE; ++z) {
 			world.regenChunk(x,z,WORLDSEED);
+		}
+	}
+	world.update(0.1,player); //first update renders basic stuff, but has bugs in lightning
+							  //since other chunks aren't lit yet. Once all chunks are lit
+							  //individually, relighting everything will fix chunk sides
+	for (int x = 0; x < WORLDSIZE; ++x) {
+		for (int z = 0; z < WORLDSIZE; ++z) {
+			world.chunks[x][z]->markedForRedraw = true;
 		}
 	}
 
@@ -124,12 +133,16 @@ void SceneMain::onKeyPressed(float deltaTime, const sf::Event& event) {
 void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Event& event) {
 	switch(event.mouseButton.button) {
 		case sf::Mouse::Left:
-			if(world.playerTargetsBlock)
-                world.setCubeIDAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z,0);
+			if(world.playerTargetsBlock) {
+				world.getCubeAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z).id = 0;
+				world.updateCubeAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z);
+			}
 			break;
 		case sf::Mouse::Right:
-			if(world.playerTargetsBlock)
-                world.setCubeIDAbs(world.last.x,world.last.y,world.last.z,2);
+			if(world.playerTargetsBlock) {
+				world.getCubeAbs(world.last.x,world.last.y,world.last.z).id = 4;
+				world.updateCubeAbs(world.last.x,world.last.y,world.last.z);
+			}
 			break;
 		default:
 			break;

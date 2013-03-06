@@ -14,6 +14,7 @@
 #include <vector>
 #include <cmath>
 #include <exception>
+#include <queue>
 
 extern int SCRWIDTH; //1366
 extern int SCRHEIGHT; //768
@@ -24,19 +25,19 @@ struct Vertex {
 			   float nx = 0.0, float ny = 0.0, float nz = 0.0,
                float tx = 0.0, float ty = 0.0,
                float cr = 1.0, float cg = 1.0, float cb = 1.0, float ca = 1.0) :
-            vx(vx), vy(vy), vz(vz),
-            nx(nx), ny(ny), nz(nz),
-            tx(tx), ty(ty),
+			vx(vx), vy(vy), vz(vz),
+			nx(nx), ny(ny), nz(nz),
+			tx(tx), ty(ty),
             cr(cr), cg(cg), cb(cb), ca(ca)
 		{}
-        float vx,vy,vz,
-              nx,ny,nz,
-              tx,ty,
+		float vx,vy,vz,
+			  nx,ny,nz,
+			  tx,ty,
               cr,cg,cb,ca;
 };
 
 struct Cube {
-    Cube (int id = 0, int light = 0) : id(id), light(light) {}
+	Cube (int id = 0, int light = 0) : id(id), light(light) {}
     int id;
     int light;
 };
@@ -52,9 +53,10 @@ std::string toString(float num);
 #define CONTEXT_SETTINGS_OPENGL sf::ContextSettings(32,32,0,3,0)
 #define CHUNKWIDTH 16 //blocks in x and z coords
 #define CHUNKHEIGHT 128 //blocks in y coords
-#define WORLDSIZE 20 //worldsize in CHUNKSxCHUNKS
+#define WORLDSIZE 2 //worldsize in CHUNKSxCHUNKS
 #define SEALEVEL 64
 #define PLAYER_HEIGHT -1.8
+#define LIGHTMAX 10.0
 #define DEG_TO_RAD ((2*M_PI)/360.0)
 
 #endif // TOOLS_HPP
