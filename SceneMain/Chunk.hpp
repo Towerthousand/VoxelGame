@@ -11,6 +11,7 @@ class Chunk { //16*16*128
 
 		void populate();
 		void calculateLight();
+		void processCubeLighting(sf::Vector3i source, sf::Vector3i offset, std::queue<sf::Vector3i> &queue);
 		void update(float deltaTime);
         void pushCubeToArray(int x, int y, int z, int cubeID);
 		void draw() const;

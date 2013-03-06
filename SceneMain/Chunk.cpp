@@ -100,7 +100,8 @@ Cube &Chunk::getCube(int x, int y, int z) {
 }
 
 void Chunk::calculateLight() {
-	//BFS TO THE MAX, buggy & inefficient
+	//BFS TO THE MAX, bug: I don't know how to preserve light across chunks, since every chunk only looks
+	//					   for its own light blocks
 	std::queue<sf::Vector3i> blocksToCheck;
 	for(int z = 0; z < CHUNKWIDTH; ++z) {
 		for(int y = 0; y < CHUNKHEIGHT; ++y) {
@@ -109,57 +110,40 @@ void Chunk::calculateLight() {
 					cubes[x][y][z].light = LIGHTMAX;
 					blocksToCheck.push(sf::Vector3i(x,y,z));
 				}
+				else {
+					getCube(x,y,z).light = 1;
+				}
 			}
 		}
 	}
 	while(!blocksToCheck.empty()) {
 		sf::Vector3i source = blocksToCheck.front();
-		if(getCube(source.x,source.y,source.z).light == 0) {
+		if(getCube(source.x,source.y,source.z).light == 2) {
 			blocksToCheck.pop();
 		}
-		if(getCube(source.x+1,source.y,source.z).id == 0 &&
-		   getCube(source.x+1,source.y,source.z).light <
-		   getCube(source.x,source.y,source.z).light-1) {
-			updateCube(source.x+1,source.y,source.z);
-			getCube(source.x+1,source.y,source.z).light = getCube(source.x,source.y,source.z).light-1;
-			blocksToCheck.push(source + sf::Vector3i(1,0,0));
+		else {
+			processCubeLighting(source,sf::Vector3i(1,0,0),blocksToCheck);
+			processCubeLighting(source,sf::Vector3i(-1,0,0),blocksToCheck);
+			processCubeLighting(source,sf::Vector3i(0,1,0),blocksToCheck);
+			processCubeLighting(source,sf::Vector3i(0,-1,0),blocksToCheck);
+			processCubeLighting(source,sf::Vector3i(0,0,1),blocksToCheck);
+			processCubeLighting(source,sf::Vector3i(0,0,-1),blocksToCheck);
+			blocksToCheck.pop();
 		}
-		if(getCube(source.x-1,source.y,source.z).id == 0 &&
-		   getCube(source.x-1,source.y,source.z).light <
-		   getCube(source. x,source.y,source.z).light-1) {
-			getCube(source.x-1,source.y,source.z).light = getCube(source.x,source.y,source.z).light-1;
-			updateCube(source.x-1,source.y,source.z);
-			blocksToCheck.push(source + sf::Vector3i(-1,0,0));
+	}
+}
+
+void Chunk::processCubeLighting(sf::Vector3i source, sf::Vector3i offset, std::queue<sf::Vector3i> &queue) {
+	sf::Vector3i subject = source+offset;
+	if(getCube(subject.x,subject.y,subject.z).id == 0) {
+		if(getCube(subject.x,subject.y,subject.z).light == getCube(source.x,source.y,source.z).light-1) {
+			queue.push(subject);
 		}
-		if(getCube(source.x,source.y+1,source.z).id == 0 &&
-		   getCube(source.x,source.y+1,source.z).light <
-		   getCube(source.x,source.y,source.z).light-1) {
-			updateCube(source.x,source.y+1,source.z);
-			getCube(source.x,source.y+1,source.z).light = getCube(source.x,source.y,source.z).light-1;
-			blocksToCheck.push(source + sf::Vector3i(0,1,0));
+		else if(getCube(subject.x,subject.y,subject.z).light < getCube(source.x,source.y,source.z).light-1) {
+			queue.push(subject);
+			updateCube(subject.x,subject.y,subject.z);
+			getCube(subject.x,subject.y,subject.z).light = getCube(source.x,source.y,source.z).light-1;
 		}
-		if(getCube(source.x,source.y-1,source.z).id == 0 &&
-		   getCube(source.x,source.y-1,source.z).light <
-		   getCube(source.x,source.y,source.z).light-1) {
-			updateCube(source.x,source.y-1,source.z);
-			getCube(source.x,source.y-1,source.z).light = getCube(source.x,source.y,source.z).light-1;
-			blocksToCheck.push(source + sf::Vector3i(0,-1,0));
-		}
-		if(getCube(source.x,source.y,source.z+1).id == 0 &&
-		   getCube(source.x,source.y,source.z+1).light <
-		   getCube(source.x,source.y,source.z).light-1) {
-			updateCube(source.x,source.y,source.z+1);
-			getCube(source.x,source.y,source.z+1).light = getCube(source.x,source.y,source.z).light-1;
-			blocksToCheck.push(source + sf::Vector3i(0,0,1));
-		}
-		if(getCube(source.x,source.y,source.z-1).id == 0 &&
-		   getCube(source.x,source.y,source.z-1).light <
-		   getCube(source.x,source.y,source.z).light-1) {
-			updateCube(source.x,source.y,source.z-1);
-			getCube(source.x,source.y,source.z-1).light = getCube(source.x,source.y,source.z).light-1;
-			blocksToCheck.push(source + sf::Vector3i(0,0,-1));
-		}
-		blocksToCheck.pop();
 	}
 }
 

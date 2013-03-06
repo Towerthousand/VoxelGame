@@ -211,4 +211,4 @@ const int World::indexes[24] = {
     3,7,
 };
 
-Cube World::empty(0,1);
+Cube World::empty(0,10);

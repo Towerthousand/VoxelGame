@@ -134,7 +134,7 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Event& event) {
 	switch(event.mouseButton.button) {
 		case sf::Mouse::Left:
 			if(world.playerTargetsBlock) {
-				world.getCubeAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z).id = 0;
+				world.getCubeAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z) = Cube(0,0);
 				world.updateCubeAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z);
 			}
 			break;
