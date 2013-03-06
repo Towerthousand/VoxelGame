@@ -11,6 +11,8 @@ SceneMain::~SceneMain() {
 bool SceneMain::loadResources() {
 	if(!parent.textures().loadTexture("lolwtf","resources/lolwtf.png"))
 		return false;
+	if(!parent.audio().loadMusic("troll","resources/troll.ogg"))
+		return false;
 	return true;
 }
 
@@ -19,7 +21,8 @@ bool SceneMain::init() {
 
 	if (!loadResources())
 		return false;
-
+	parent.audio().musicBank["troll"]->getTrack().play();
+	parent.audio().musicBank["troll"]->getTrack().setLoop(true);
 	parent.font().makeText("Chunks","",20,sf::Vector2f(10,110),sf::Color::White,sf::Text::Bold,false);
 	parent.font().makeText("posX","",20,sf::Vector2f(10,10),sf::Color::White,sf::Text::Bold,false);
 	parent.font().makeText("posY","",20,sf::Vector2f(10,30),sf::Color::White,sf::Text::Bold,false);
@@ -134,7 +137,7 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Event& event) {
 	switch(event.mouseButton.button) {
 		case sf::Mouse::Left:
 			if(world.playerTargetsBlock) {
-				world.getCubeAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z) = Cube(0,0);
+				world.getCubeAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z) = Cube(0,1);
 				world.updateCubeAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z);
 			}
 			break;
@@ -155,4 +158,5 @@ void SceneMain::onMouseMoved(float deltaTime, const sf::Event& event) {
 void SceneMain::onClose() {
 	outLog("* Closing scene: Main" );
 	parent.textures().deleteTexture("lolwtf");
+	parent.audio().deleteMusic("troll");
 }

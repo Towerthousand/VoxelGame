@@ -2,6 +2,7 @@
 #define GAME_HPP
 #include "graphics/TextureManager.hpp"
 #include "graphics/FontManager.hpp"
+#include "audio/AudioManager.hpp"
 #include "SceneMain/SceneMain.hpp"
 
 class Game {
@@ -24,6 +25,7 @@ class Game {
 		sf::RenderWindow &getWindow() { return window; }
 		TextureManager &textures() { return texManager; }
 		FontManager &font() { return fontManager; }
+		AudioManager &audio() { return audioManager; }
 		
 		bool isRunning;
 	private:
@@ -55,6 +57,7 @@ class Game {
 		//managers
 		TextureManager texManager;
 		FontManager fontManager;
+		AudioManager audioManager;
 
 		//logic
 		float fpsTime;

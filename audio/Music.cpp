@@ -8,7 +8,7 @@ Music::~Music() {
 
 
 bool Music::loadFromFile(const std::string& filePath) {
-	if (track.openFromFile(filePath)) {
+	if (!track.openFromFile(filePath)) {
 		return false;
 	}
 	return true;

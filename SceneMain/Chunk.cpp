@@ -88,7 +88,8 @@ void Chunk::updateCube(int x, int y, int z) {
 		return;
 	else if (x >= CHUNKWIDTH-1 || z >= CHUNKWIDTH-1 || x <= 0 || z <= 0)//outside of this chunk or on border
 		parentWorld.updateCubeAbs(x+(XPOS*CHUNKWIDTH),y,z+(ZPOS*CHUNKWIDTH));
-	markedForRedraw = true;
+	else
+		markedForRedraw = true;
 }
 
 Cube &Chunk::getCube(int x, int y, int z) {
@@ -141,7 +142,6 @@ void Chunk::processCubeLighting(sf::Vector3i source, sf::Vector3i offset, std::q
 		}
 		else if(getCube(subject.x,subject.y,subject.z).light < getCube(source.x,source.y,source.z).light-1) {
 			queue.push(subject);
-			updateCube(subject.x,subject.y,subject.z);
 			getCube(subject.x,subject.y,subject.z).light = getCube(source.x,source.y,source.z).light-1;
 		}
 	}
