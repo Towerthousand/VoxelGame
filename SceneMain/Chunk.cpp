@@ -179,8 +179,8 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) {
 	//						Cr,Cg,Cb,Ca
 	if(getCube(x,y,z+1).id == 0) { // front face
 		lind = getCube(x,y,z+1).light/LIGHTMAX; //light index
-		texX = (textureIndexes[cubeID][0] % 4)*16; // 4 = number of textures/row, 16 = width
-		texY = (textureIndexes[cubeID][0] / 4)*16; // 4 = number of textures/row, 16 = height
+		texX = (textureIndexes[cubeID][0] % 32)*16; // 4 = number of textures/row, 16 = width
+		texY = (textureIndexes[cubeID][0] / 32)*16; // 4 = number of textures/row, 16 = height
 		renderData.push_back(Vertex(absX    , y+1.0, absZ+1.0, 0,0,1 , texX     ,texY     , lind,lind,lind,1.0));
 		renderData.push_back(Vertex(absX    , y    , absZ+1.0, 0,0,1 , texX	    ,texY+16.0, lind,lind,lind,1.0));
 		renderData.push_back(Vertex(absX+1.0, y    , absZ+1.0, 0,0,1 , texX+16.0,texY+16.0, lind,lind,lind,1.0));
@@ -188,8 +188,8 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) {
 	}
 	if(getCube(x,y,z-1).id == 0) { // back face
 		lind = getCube(x,y,z-1).light/LIGHTMAX;
-		texX = (textureIndexes[cubeID][1] % 4)*16;
-		texY = (textureIndexes[cubeID][1] / 4)*16;
+		texX = (textureIndexes[cubeID][1] % 32)*16;
+		texY = (textureIndexes[cubeID][1] / 32)*16;
 		renderData.push_back(Vertex(absX+1.0, y+1.0, absZ    , 0,0,-1, texX     ,texY     , lind,lind,lind,1.0));
 		renderData.push_back(Vertex(absX+1.0, y    , absZ    , 0,0,-1, texX	    ,texY+16.0, lind,lind,lind,1.0));
 		renderData.push_back(Vertex(absX    , y    , absZ    , 0,0,-1, texX+16.0,texY+16.0, lind,lind,lind,1.0));
@@ -197,8 +197,8 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) {
 	}
 	if(getCube(x+1,y,z).id == 0) { // left face
 		lind = getCube(x+1,y,z).light/LIGHTMAX;
-		texX = (textureIndexes[cubeID][2] % 4)*16;
-		texY = (textureIndexes[cubeID][2] / 4)*16;
+		texX = (textureIndexes[cubeID][2] % 32)*16;
+		texY = (textureIndexes[cubeID][2] / 32)*16;
 		renderData.push_back(Vertex(absX+1.0, y+1.0, absZ+1.0, 1,0,0 , texX     ,texY     , lind,lind,lind,1.0));
 		renderData.push_back(Vertex(absX+1.0, y    , absZ+1.0, 1,0,0 , texX	    ,texY+16.0, lind,lind,lind,1.0));
 		renderData.push_back(Vertex(absX+1.0, y    , absZ    , 1,0,0 , texX+16.0,texY+16.0, lind,lind,lind,1.0));
@@ -206,8 +206,8 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) {
 	}
 	if(getCube(x-1,y,z).id == 0) { // right face
 		lind = getCube(x-1,y,z).light/LIGHTMAX;
-		texX = (textureIndexes[cubeID][3] % 4)*16;
-		texY = (textureIndexes[cubeID][3] / 4)*16;
+		texX = (textureIndexes[cubeID][3] % 32)*16;
+		texY = (textureIndexes[cubeID][3] / 32)*16;
 		renderData.push_back(Vertex(absX    , y+1.0, absZ    , -1,0,0, texX     ,texY     , lind,lind,lind,1.0));
 		renderData.push_back(Vertex(absX    , y    , absZ    , -1,0,0, texX	    ,texY+16.0, lind,lind,lind,1.0));
 		renderData.push_back(Vertex(absX    , y    , absZ+1.0, -1,0,0, texX+16.0,texY+16.0, lind,lind,lind,1.0));
@@ -215,8 +215,8 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) {
 	}
 	if(getCube(x,y-1,z).id == 0) { // bottom face
 		lind = getCube(x,y-1,z).light/LIGHTMAX;
-		texX = (textureIndexes[cubeID][4] % 4)*16;
-		texY = (textureIndexes[cubeID][4] / 4)*16;
+		texX = (textureIndexes[cubeID][4] % 32)*16;
+		texY = (textureIndexes[cubeID][4] / 32)*16;
 		renderData.push_back(Vertex(absX+1.0, y    , absZ+1.0, 0,-1,0, texX     ,texY     , lind,lind,lind,1.0));
 		renderData.push_back(Vertex(absX    , y    , absZ+1.0, 0,-1,0, texX     ,texY+16.0, lind,lind,lind,1.0));
 		renderData.push_back(Vertex(absX    , y    , absZ    , 0,-1,0, texX+16.0,texY+16.0, lind,lind,lind,1.0));
@@ -224,8 +224,8 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) {
 	}
 	if(getCube(x,y+1,z).id == 0) { // top face
 		lind = getCube(x,y+1,z).light/LIGHTMAX;
-		texX = (textureIndexes[cubeID][5] % 4)*16;
-		texY = (textureIndexes[cubeID][5] / 4)*16;
+		texX = (textureIndexes[cubeID][5] % 32)*16;
+		texY = (textureIndexes[cubeID][5] / 32)*16;
 		renderData.push_back(Vertex(absX    , y+1.0, absZ+1.0, 0,1,0 , texX     ,texY     , lind,lind,lind,1.0));
 		renderData.push_back(Vertex(absX+1.0, y+1.0, absZ+1.0, 0,1,0 , texX     ,texY+16.0, lind,lind,lind,1.0));
 		renderData.push_back(Vertex(absX+1.0, y+1.0, absZ    , 0,1,0 , texX+16.0,texY+16.0, lind,lind,lind,1.0));
@@ -291,5 +291,5 @@ const int Chunk::textureIndexes[5][6] = { //order is front, back, left, right, b
 										  {2,2,2,2,2,2}, //1 = dirt
 										  {3,3,3,3,3,3}, //2 = stone
 										  {0,0,0,0,2,1}, //3 = grass
-										  {3,3,2,2,1,0}  //4 = lolwtf
+										  {4,4,4,4,4,4}  //4 = lolwtf
 										};
