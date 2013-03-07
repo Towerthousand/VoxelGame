@@ -111,9 +111,11 @@ void Chunk::calculateLight() {
 					cubes[x][y][z].light = LIGHTMAX;
 					blocksToCheck.push(sf::Vector3i(x,y,z));
 				}
-				else {
+				else if (getCube(x,y,z).id == 0){
 					getCube(x,y,z).light = 1;
 				}
+				else
+					getCube(x,y,z).light = 0;
 			}
 		}
 	}
