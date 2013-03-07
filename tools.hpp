@@ -51,9 +51,8 @@ std::string toString(float num);
 
 #define WINDOW_TITLE "VoxelGame"
 #define CONTEXT_SETTINGS_OPENGL sf::ContextSettings(32,32,0,3,0)
-#define CHUNKWIDTH 16 //blocks in x and z coords
-#define CHUNKHEIGHT 128 //blocks in y coords
-#define WORLDSIZE 10 //worldsize in CHUNKSxCHUNKS
+#define WORLDSIZE 5 //worldsize in CHUNKSxCHUNKS
+#define CHUNKSIZE 16 //worldsize in CHUNKSxCHUNKS
 #define SEALEVEL 64
 #define PLAYER_HEIGHT -1.8
 #define LIGHTMAX 10.0

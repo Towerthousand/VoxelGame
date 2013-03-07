@@ -3,12 +3,12 @@
 #include <libnoise/noise.h>
 #include "noiseutils.h"
 
-Chunk::Chunk(int x, int z, int seed, World &world) : XPOS(x), ZPOS(z), SEED(seed), parentWorld(world){
+Chunk::Chunk(int x, int y, int z, int seed, World &world) : XPOS(x), ZPOS(z), SEED(seed), parentWorld(world){
 	cubes = std::vector<std::vector<std::vector<Cube> > >
-			(CHUNKWIDTH,std::vector<std::vector<Cube> >
-			 (CHUNKHEIGHT,std::vector<Cube>
-			  (CHUNKWIDTH,Cube(0,1))));
-	VBOID = XPOS*WORLDSIZE+ZPOS+1;
+            (CHUNKSIZE,std::vector<std::vector<Cube> >
+             (CHUNKSIZE,std::vector<Cube>
+              (CHUNKSIZE,Cube(0,1))));
+    VBOID = XPOS*WORLDSIZE+ZPOS*WORLDSIZE+YPOS*WORLDSIZE+1;
 	outOfView = false;
 	markedForRedraw = false;
 	grassTimer = 0.0;
@@ -19,84 +19,80 @@ Chunk::~Chunk() {
 }
 
 void Chunk::populate() {
-	//set everything below SEALEVEL to stone
-	for(int x = 0; x < CHUNKWIDTH; ++x) {
-		for(int z = 0; z < CHUNKWIDTH; ++z) {
-			for(int y = 0; y < SEALEVEL; ++y) {
-				cubes[x][y][z].id = 2;
-			}
-		}
-	}
+    //set everything below SEALEVEL to stone
+    for(int x = 0; x < CHUNKSIZE; ++x) {
+        for(int z = 0; z < CHUNKSIZE; ++z) {
+            for(int y = 0; y < CHUNKSIZE; ++y) {
+                cubes[x][y][z].id = 2;
+            }
+        }
+    }
 
-	// GENERATE TERRAIN HEIGHTMAP
-	module::Perlin myModule;
-	myModule.SetSeed(SEED);
-	myModule.SetOctaveCount(10);
-	myModule.SetLacunarity(1);
-	myModule.SetFrequency(1);
-	myModule.SetPersistence(0.1);
+//	// GENERATE TERRAIN HEIGHTMAP
+//	module::Perlin myModule;
+//	myModule.SetSeed(SEED);
+//	myModule.SetOctaveCount(10);
+//	myModule.SetLacunarity(1);
+//	myModule.SetFrequency(1);
+//	myModule.SetPersistence(0.1);
 
-	module::ScaleBias flatTerrain;
-	flatTerrain.SetSourceModule (0, myModule);
-	flatTerrain.SetScale (0.5);
-	flatTerrain.SetBias(-0.95);
+//	module::ScaleBias flatTerrain;
+//	flatTerrain.SetSourceModule (0, myModule);
+//	flatTerrain.SetScale (0.5);
+//	flatTerrain.SetBias(-0.95);
 
-	utils::NoiseMap heightMap;
-	utils::NoiseMapBuilderPlane heightMapBuilder;
-	heightMapBuilder.SetSourceModule (flatTerrain);
-	heightMapBuilder.SetDestNoiseMap (heightMap);
-	heightMapBuilder.SetDestSize (CHUNKWIDTH,CHUNKWIDTH);
-	float scaleFactor = 2.0;
-	heightMapBuilder.SetBounds ((XPOS)/scaleFactor, (XPOS+1)/scaleFactor,
-								(ZPOS)/scaleFactor, (ZPOS+1)/scaleFactor);
-	heightMapBuilder.Build ();
+//	utils::NoiseMap heightMap;
+//	utils::NoiseMapBuilderPlane heightMapBuilder;
+//	heightMapBuilder.SetSourceModule (flatTerrain);
+//	heightMapBuilder.SetDestNoiseMap (heightMap);
+//	heightMapBuilder.SetDestSize (CHUNKWIDTH,CHUNKWIDTH);
+//	float scaleFactor = 2.0;
+//	heightMapBuilder.SetBounds ((XPOS)/scaleFactor, (XPOS+1)/scaleFactor,
+//								(ZPOS)/scaleFactor, (ZPOS+1)/scaleFactor);
+//	heightMapBuilder.Build ();
 
-	utils::RendererImage renderer;
-	utils::Image image;
-	renderer.SetSourceNoiseMap (heightMap);
-	renderer.SetDestImage (image);
-	renderer.ClearGradient ();
-	renderer.AddGradientPoint (-1.00, utils::Color (    0,  0,   0, 255));
-	renderer.AddGradientPoint ( 1.00, utils::Color (  255,255, 255, 255));
-	renderer.Render ();
+//	utils::RendererImage renderer;
+//	utils::Image image;
+//	renderer.SetSourceNoiseMap (heightMap);
+//	renderer.SetDestImage (image);
+//	renderer.ClearGradient ();
+//	renderer.AddGradientPoint (-1.00, utils::Color (    0,  0,   0, 255));
+//	renderer.AddGradientPoint ( 1.00, utils::Color (  255,255, 255, 255));
+//	renderer.Render ();
 
-	// populate acording to heightmap
-	// everything is raised according to sealevel
-	float index; // relative index from heightmap in float value (between 0 and CHUNKSIZE)
-	int height;  // floored index
-	for(int x = 0; x < CHUNKWIDTH; ++x) {
-		for(int z = 0; z < CHUNKWIDTH; ++z) {
-			for(int y = 0; y < CHUNKHEIGHT; ++y) {
-				index = image.GetValue(x,z).red; //you should implement your own
-				index /= 255.0;				     //fucking perl noise lib
-				index *= CHUNKHEIGHT;
-				height = floor(index);
-				if (y < height-2 && y+SEALEVEL < CHUNKHEIGHT)
-					cubes[x][y+SEALEVEL][z].id = 2;
-				else if (y <= height-1 && y+SEALEVEL < CHUNKHEIGHT)
-					cubes[x][y+SEALEVEL][z].id = 1;
-				else if(y == height && y+SEALEVEL < CHUNKHEIGHT)
-					cubes[x][y+SEALEVEL][z].id = 3;
-			}
-		}
-	}
+//	// populate acording to heightmap
+//	// everything is raised according to sealevel
+//	float index; // relative index from heightmap in float value (between 0 and CHUNKSIZE)
+//	int height;  // floored index
+//	for(int x = 0; x < CHUNKWIDTH; ++x) {
+//		for(int z = 0; z < CHUNKWIDTH; ++z) {
+//			for(int y = 0; y < CHUNKHEIGHT; ++y) {
+//				index = image.GetValue(x,z).red; //you should implement your own
+//				index /= 255.0;				     //fucking perl noise lib
+//				index *= CHUNKHEIGHT;
+//				height = floor(index);
+//				if (y < height-2 && y+SEALEVEL < CHUNKHEIGHT)
+//					cubes[x][y+SEALEVEL][z].id = 2;
+//				else if (y <= height-1 && y+SEALEVEL < CHUNKHEIGHT)
+//					cubes[x][y+SEALEVEL][z].id = 1;
+//				else if(y == height && y+SEALEVEL < CHUNKHEIGHT)
+//					cubes[x][y+SEALEVEL][z].id = 3;
+//			}
+//		}
+//	}
 	markedForRedraw = true;
 }
 
 void Chunk::updateCube(int x, int y, int z) {
-	if (y < 0 || y >= CHUNKHEIGHT) //over the skylimit, under bedrock
-		return;
-	else if (x >= CHUNKWIDTH-1 || z >= CHUNKWIDTH-1 || x <= 0 || z <= 0)//outside of this chunk or on border
-		parentWorld.updateCubeAbs(x+(XPOS*CHUNKWIDTH),y,z+(ZPOS*CHUNKWIDTH));
+    if (x >= CHUNKSIZE-1 || y >= CHUNKSIZE-1 || z >= CHUNKSIZE-1 || x <= 0 || z <= 0 || y <= 0)//outside of this chunk or on border
+        parentWorld.updateCubeAbs(x+(XPOS*CHUNKSIZE),y+(YPOS*CHUNKSIZE),z+(ZPOS*CHUNKSIZE));
 	else
 		markedForRedraw = true;
 }
 
 Cube &Chunk::getCube(int x, int y, int z) {
-	if (y < 0 || y >= CHUNKHEIGHT) //over the skylimit, under bedrock
-		return World::empty;
-	if (x >= CHUNKWIDTH || z >= CHUNKWIDTH || x < 0 || z < 0)//outside of this chunk
-		return parentWorld.getCubeAbs(x+(XPOS*CHUNKWIDTH),y,z+(ZPOS*CHUNKWIDTH));
+    if (x >= CHUNKSIZE || y >= CHUNKSIZE || z >= CHUNKSIZE || x < 0 || z < 0 || y < 0)//outside of this chunk
+        return parentWorld.getCubeAbs(x+(XPOS*CHUNKSIZE),y+(YPOS*CHUNKSIZE),z+(ZPOS*CHUNKSIZE));
 	return cubes[x][y][z]; //inside current chunk
 }
 
@@ -104,9 +100,9 @@ void Chunk::calculateLight() {
 	//BFS TO THE MAX, bug: I don't know how to preserve light across chunks, since every chunk only looks
 	//					   for its own light blocks
 	std::queue<sf::Vector3i> blocksToCheck;
-	for(int z = 0; z < CHUNKWIDTH; ++z) {
-		for(int y = 0; y < CHUNKHEIGHT; ++y) {
-			for(int x = 0; x < CHUNKWIDTH; ++x) {
+    for(int z = 0; z < CHUNKSIZE; ++z) {
+        for(int y = 0; y < CHUNKSIZE; ++y) {
+            for(int x = 0; x < CHUNKSIZE; ++x) {
 				if (getCube(x,y,z).id == 4) { //light block
 					cubes[x][y][z].light = LIGHTMAX;
 					blocksToCheck.push(sf::Vector3i(x,y,z));
@@ -156,9 +152,9 @@ void Chunk::update(float deltaTime) {
 		calculateLight();
 		renderData.resize(0);
 		int cubeID;
-		for(int z = 0; z < CHUNKWIDTH; ++z) {
-			for(int y = 0; y < CHUNKHEIGHT; ++y) {
-				for(int x = 0; x < CHUNKWIDTH; ++x) {
+        for(int z = 0; z < CHUNKSIZE; ++z) {
+            for(int y = 0; y < CHUNKSIZE; ++y) {
+                for(int x = 0; x < CHUNKSIZE; ++x) {
 					cubeID = getCube(x,y,z).id;
 					if (cubeID != 0) { // only draw if it's not air
 						pushCubeToArray(x,y,z,cubeID);
@@ -171,8 +167,9 @@ void Chunk::update(float deltaTime) {
 }
 
 void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) {
-	int absX = x+CHUNKWIDTH*XPOS;
-	int absZ = z+CHUNKWIDTH*ZPOS;
+    int absX = x+CHUNKSIZE*XPOS;
+    int absY = y+CHUNKSIZE*YPOS;
+    int absZ = z+CHUNKSIZE*ZPOS;
 	int texY, texX;
 	float lind;
 	//STRUCTURE PER VERTEX: Vx,Vy,Vz,
@@ -183,55 +180,55 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) {
 		lind = getCube(x,y,z+1).light/LIGHTMAX; //light index
 		texX = (textureIndexes[cubeID][0] % 32)*16; // 4 = number of textures/row, 16 = width
 		texY = (textureIndexes[cubeID][0] / 32)*16; // 4 = number of textures/row, 16 = height
-		renderData.push_back(Vertex(absX    , y+1.0, absZ+1.0, 0,0,1 , texX     ,texY     , lind,lind,lind,1.0));
-		renderData.push_back(Vertex(absX    , y    , absZ+1.0, 0,0,1 , texX	    ,texY+16.0, lind,lind,lind,1.0));
-		renderData.push_back(Vertex(absX+1.0, y    , absZ+1.0, 0,0,1 , texX+16.0,texY+16.0, lind,lind,lind,1.0));
-		renderData.push_back(Vertex(absX+1.0, y+1.0, absZ+1.0, 0,0,1 , texX+16.0,texY     , lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX    , absY+1.0, absZ+1.0, 0,0,1 , texX     ,texY     , lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX    , absY    , absZ+1.0, 0,0,1 , texX	    ,texY+16.0, lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX+1.0, absY    , absZ+1.0, 0,0,1 , texX+16.0,texY+16.0, lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ+1.0, 0,0,1 , texX+16.0,texY     , lind,lind,lind,1.0));
 	}
 	if(getCube(x,y,z-1).id == 0) { // back face
 		lind = getCube(x,y,z-1).light/LIGHTMAX;
 		texX = (textureIndexes[cubeID][1] % 32)*16;
 		texY = (textureIndexes[cubeID][1] / 32)*16;
-		renderData.push_back(Vertex(absX+1.0, y+1.0, absZ    , 0,0,-1, texX     ,texY     , lind,lind,lind,1.0));
-		renderData.push_back(Vertex(absX+1.0, y    , absZ    , 0,0,-1, texX	    ,texY+16.0, lind,lind,lind,1.0));
-		renderData.push_back(Vertex(absX    , y    , absZ    , 0,0,-1, texX+16.0,texY+16.0, lind,lind,lind,1.0));
-		renderData.push_back(Vertex(absX    , y+1.0, absZ    , 0,0,-1, texX+16.0,texY     , lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ    , 0,0,-1, texX     ,texY     , lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX+1.0, absY    , absZ    , 0,0,-1, texX	    ,texY+16.0, lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX    , absY    , absZ    , 0,0,-1, texX+16.0,texY+16.0, lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX    , absY+1.0, absZ    , 0,0,-1, texX+16.0,texY     , lind,lind,lind,1.0));
 	}
 	if(getCube(x+1,y,z).id == 0) { // left face
 		lind = getCube(x+1,y,z).light/LIGHTMAX;
 		texX = (textureIndexes[cubeID][2] % 32)*16;
 		texY = (textureIndexes[cubeID][2] / 32)*16;
-		renderData.push_back(Vertex(absX+1.0, y+1.0, absZ+1.0, 1,0,0 , texX     ,texY     , lind,lind,lind,1.0));
-		renderData.push_back(Vertex(absX+1.0, y    , absZ+1.0, 1,0,0 , texX	    ,texY+16.0, lind,lind,lind,1.0));
-		renderData.push_back(Vertex(absX+1.0, y    , absZ    , 1,0,0 , texX+16.0,texY+16.0, lind,lind,lind,1.0));
-		renderData.push_back(Vertex(absX+1.0, y+1.0, absZ    , 1,0,0 , texX+16.0,texY     , lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ+1.0, 1,0,0 , texX     ,texY     , lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX+1.0, absY    , absZ+1.0, 1,0,0 , texX	    ,texY+16.0, lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX+1.0, absY    , absZ    , 1,0,0 , texX+16.0,texY+16.0, lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ    , 1,0,0 , texX+16.0,texY     , lind,lind,lind,1.0));
 	}
 	if(getCube(x-1,y,z).id == 0) { // right face
 		lind = getCube(x-1,y,z).light/LIGHTMAX;
 		texX = (textureIndexes[cubeID][3] % 32)*16;
 		texY = (textureIndexes[cubeID][3] / 32)*16;
-		renderData.push_back(Vertex(absX    , y+1.0, absZ    , -1,0,0, texX     ,texY     , lind,lind,lind,1.0));
-		renderData.push_back(Vertex(absX    , y    , absZ    , -1,0,0, texX	    ,texY+16.0, lind,lind,lind,1.0));
-		renderData.push_back(Vertex(absX    , y    , absZ+1.0, -1,0,0, texX+16.0,texY+16.0, lind,lind,lind,1.0));
-		renderData.push_back(Vertex(absX    , y+1.0, absZ+1.0, -1,0,0, texX+16.0,texY     , lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX    , absY+1.0, absZ    , -1,0,0, texX     ,texY     , lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX    , absY    , absZ    , -1,0,0, texX	    ,texY+16.0, lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX    , absY    , absZ+1.0, -1,0,0, texX+16.0,texY+16.0, lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX    , absY+1.0, absZ+1.0, -1,0,0, texX+16.0,texY     , lind,lind,lind,1.0));
 	}
 	if(getCube(x,y-1,z).id == 0) { // bottom face
 		lind = getCube(x,y-1,z).light/LIGHTMAX;
 		texX = (textureIndexes[cubeID][4] % 32)*16;
 		texY = (textureIndexes[cubeID][4] / 32)*16;
-		renderData.push_back(Vertex(absX+1.0, y    , absZ+1.0, 0,-1,0, texX     ,texY     , lind,lind,lind,1.0));
-		renderData.push_back(Vertex(absX    , y    , absZ+1.0, 0,-1,0, texX     ,texY+16.0, lind,lind,lind,1.0));
-		renderData.push_back(Vertex(absX    , y    , absZ    , 0,-1,0, texX+16.0,texY+16.0, lind,lind,lind,1.0));
-		renderData.push_back(Vertex(absX+1.0, y    , absZ    , 0,-1,0, texX+16.0,texY     , lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX+1.0, absY    , absZ+1.0, 0,-1,0, texX     ,texY     , lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX    , absY    , absZ+1.0, 0,-1,0, texX     ,texY+16.0, lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX    , absY    , absZ    , 0,-1,0, texX+16.0,texY+16.0, lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX+1.0, absY    , absZ    , 0,-1,0, texX+16.0,texY     , lind,lind,lind,1.0));
 	}
 	if(getCube(x,y+1,z).id == 0) { // top face
 		lind = getCube(x,y+1,z).light/LIGHTMAX;
 		texX = (textureIndexes[cubeID][5] % 32)*16;
 		texY = (textureIndexes[cubeID][5] / 32)*16;
-		renderData.push_back(Vertex(absX    , y+1.0, absZ+1.0, 0,1,0 , texX     ,texY     , lind,lind,lind,1.0));
-		renderData.push_back(Vertex(absX+1.0, y+1.0, absZ+1.0, 0,1,0 , texX     ,texY+16.0, lind,lind,lind,1.0));
-		renderData.push_back(Vertex(absX+1.0, y+1.0, absZ    , 0,1,0 , texX+16.0,texY+16.0, lind,lind,lind,1.0));
-		renderData.push_back(Vertex(absX    , y+1.0, absZ    , 0,1,0 , texX+16.0,texY     , lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX    , absY+1.0, absZ+1.0, 0,1,0 , texX     ,texY     , lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ+1.0, 0,1,0 , texX     ,texY+16.0, lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ    , 0,1,0 , texX+16.0,texY+16.0, lind,lind,lind,1.0));
+        renderData.push_back(Vertex(absX    , absY+1.0, absZ    , 0,1,0 , texX+16.0,texY     , lind,lind,lind,1.0));
 	}
 }
 
@@ -265,20 +262,19 @@ void Chunk::makeVbo() {
 }
 
 bool Chunk::checkCulling(const Camera& cam) {
-	sf::Vector2f point(XPOS*CHUNKWIDTH+CHUNKWIDTH/2, ZPOS*CHUNKWIDTH+CHUNKWIDTH/2);
+    sf::Vector2f point(XPOS*CHUNKSIZE+CHUNKSIZE/2, ZPOS*CHUNKSIZE+CHUNKSIZE/2);
 	sf::Vector2f dir(-sin(-cam.rot.y*DEG_TO_RAD), -cos(-cam.rot.y*DEG_TO_RAD));
 	sf::Vector2f pos(cam.pos.x,cam.pos.z);
-
 	float distance = (dir.x*point.x + dir.y*point.y - dir.x*pos.x - dir.y*pos.y);
-	return distance < -CHUNKWIDTH;
+    return distance < -CHUNKSIZE;
 }
 
 void Chunk::updateGrass(float deltaTime) { //only to be called by main update()
 	if (grassTimer >= 0.01) {
 		grassTimer -= 0.01;
-		int x = rand()%CHUNKWIDTH;
-		int y = rand()%CHUNKHEIGHT;
-		int z = rand()%CHUNKWIDTH;
+        int x = rand()%CHUNKSIZE;
+        int y = rand()%CHUNKSIZE;
+        int z = rand()%CHUNKSIZE;
 		if (getCube(x,y+1,z).id != 0 && getCube(x,y,z).id == 3) {
 			getCube(x,y,z).id = 1;
 			updateCube(x,y,z);

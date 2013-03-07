@@ -20,7 +20,7 @@ class World {
 		~World();
 		Cube &getCubeAbs(int x, int y, int z) const;
 		void updateCubeAbs(int x, int y, int z);
-		void regenChunk(int x, int z, int seed);
+        void regenChunk(int x, int y, int z, int seed);
 		void draw() const;
 		void drawWireCube(const sf::Vector3f& pos) const;
 		void update(float deltaTime, const Camera &camera);
@@ -33,7 +33,7 @@ class World {
 		static Cube empty;
 		static const int vertexPoints[8][3];
 		static const int indexes[24];
-		std::vector<std::vector<Chunk*> > chunks;
+        std::vector<std::vector<std::vector<Chunk*> > > chunks;
 };
 
 #endif // WORLD_HPP

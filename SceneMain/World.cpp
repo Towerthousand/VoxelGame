@@ -3,9 +3,10 @@
 #include "Camera.hpp"
 
 World::World() {
-    chunks = std::vector<std::vector<Chunk*> > //init chunks to 0, will never be used like this.
-            (WORLDSIZE,std::vector<Chunk*>
-			 (WORLDSIZE,NULL));
+    chunks = std::vector<std::vector<std::vector<Chunk*> > >
+            (WORLDSIZE,std::vector<std::vector<Chunk*> >
+             (WORLDSIZE,std::vector<Chunk*>
+              (WORLDSIZE,NULL)));
     targetedBlock = sf::Vector3f(0,0,0);
     playerTargetsBlock = false;
     last = sf::Vector3f(0,0,0);
@@ -14,54 +15,61 @@ World::World() {
 
 World::~World() {
     for (int x = 0; x < WORLDSIZE; ++x) {
-        for (int z = 0; z < WORLDSIZE; ++z) {
-            delete chunks[x][z];
-            chunks[x][z] = NULL;
+        for (int y = 0; y < WORLDSIZE; ++y) {
+            for (int z = 0; z < WORLDSIZE; ++z) {
+                delete chunks[x][y][z];
+                chunks[x][y][z] = NULL;
+            }
         }
     }
 }
 
 Cube &World::getCubeAbs(int x, int y, int z) const {
-    if (   x/CHUNKWIDTH >= WORLDSIZE || x/CHUNKWIDTH < 0
-           || z/CHUNKWIDTH >= WORLDSIZE || z/CHUNKWIDTH < 0
-           || y >= CHUNKHEIGHT
-           || x%CHUNKWIDTH < 0
-           || z%CHUNKWIDTH < 0
-           || y < 0)
-		return World::empty;
-	else return chunks[x/CHUNKWIDTH][z/CHUNKWIDTH]->cubes[x%CHUNKWIDTH][y][z%CHUNKWIDTH];
+    if (      x/CHUNKSIZE >= WORLDSIZE || x/CHUNKSIZE < 0
+              || z/CHUNKSIZE >= WORLDSIZE || z/CHUNKSIZE < 0
+              || y/CHUNKSIZE >= WORLDSIZE || y/CHUNKSIZE < 0
+              || x%CHUNKSIZE < 0
+              || z%CHUNKSIZE < 0
+              || y%CHUNKSIZE < 0)
+        return World::empty;
+    else return chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE];
 }
 
 void World::updateCubeAbs(int x, int y, int z) {
-    if (   x/CHUNKWIDTH >= WORLDSIZE || x/CHUNKWIDTH < 0
-           || z/CHUNKWIDTH >= WORLDSIZE || z/CHUNKWIDTH < 0
-           || y >= CHUNKHEIGHT
-           || x%CHUNKWIDTH < 0
-           || z%CHUNKWIDTH < 0
-           || y < 0 )
-		return;
-	chunks[x/CHUNKWIDTH][z/CHUNKWIDTH]->markedForRedraw = true;
-	if(x%CHUNKWIDTH == 0 && x/CHUNKWIDTH > 0)
-		chunks[x/CHUNKWIDTH - 1][z/CHUNKWIDTH]->markedForRedraw = true;
-	if(x%CHUNKWIDTH == CHUNKWIDTH-1 && x/CHUNKWIDTH < WORLDSIZE-1)
-		chunks[x/CHUNKWIDTH + 1][z/CHUNKWIDTH]->markedForRedraw = true;
-	if(z%CHUNKWIDTH == 0 && z/CHUNKWIDTH > 0)
-		chunks[x/CHUNKWIDTH][z/CHUNKWIDTH - 1]->markedForRedraw = true;
-	if(z%CHUNKWIDTH == CHUNKWIDTH-1 && z/CHUNKWIDTH < WORLDSIZE-1)
-		chunks[x/CHUNKWIDTH][z/CHUNKWIDTH + 1]->markedForRedraw = true;
+    if (      x/CHUNKSIZE >= WORLDSIZE || x/CHUNKSIZE < 0
+              || z/CHUNKSIZE >= WORLDSIZE || z/CHUNKSIZE < 0
+              || y/CHUNKSIZE >= WORLDSIZE || y/CHUNKSIZE < 0
+              || x%CHUNKSIZE < 0
+              || z%CHUNKSIZE < 0
+              || y%CHUNKSIZE < 0 )
+        return;
+    chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->markedForRedraw = true;
+
+    if(x%CHUNKSIZE == 0 && x/CHUNKSIZE > 0)
+        chunks[x/CHUNKSIZE-1][y/CHUNKSIZE][z/CHUNKSIZE]->markedForRedraw = true;
+    if(x%CHUNKSIZE == CHUNKSIZE-1 && x/CHUNKSIZE < WORLDSIZE-1)
+        chunks[x/CHUNKSIZE+1][y/CHUNKSIZE][z/CHUNKSIZE]->markedForRedraw = true;
+    if(z%CHUNKSIZE == 0 && z/CHUNKSIZE > 0)
+        chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE-1]->markedForRedraw = true;
+    if(z%CHUNKSIZE == CHUNKSIZE-1 && z/CHUNKSIZE < WORLDSIZE-1)
+        chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE+1]->markedForRedraw = true;
+    if(y%CHUNKSIZE == 0 && y/CHUNKSIZE > 0)
+        chunks[x/CHUNKSIZE][y/CHUNKSIZE-1][z/CHUNKSIZE]->markedForRedraw = true;
+    if(y%CHUNKSIZE == CHUNKSIZE-1 && y/CHUNKSIZE < WORLDSIZE-1)
+        chunks[x/CHUNKSIZE][y/CHUNKSIZE+1][z/CHUNKSIZE]->markedForRedraw = true;
 }
 
-void World::regenChunk(int x, int z, int seed) {
-    if (chunks[x][z] != NULL)
-        delete chunks[x][z];
-	chunks[x][z] = new Chunk(x,z,seed,*this);
+void World::regenChunk(int x, int y, int z, int seed) {
+    if (chunks[x][y][z] != NULL)
+        delete chunks[x][y][z];
+    chunks[x][y][z] = new Chunk(x,y,z,seed,*this);
 }
 
 void World::drawWireCube(const sf::Vector3f &pos) const {
     glPushMatrix();
     glLineWidth(1.5);
     glEnableClientState(GL_VERTEX_ARRAY);
-	glColor4f(0.0,0.0,0.0,0.5);
+    glColor4f(0.0,0.0,0.0,0.5);
     glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
     glTranslatef(pos.x-0.0025,pos.y-0.0025,pos.z-0.0025);
     glScalef(1.005,1.005,1.005);
@@ -73,9 +81,11 @@ void World::drawWireCube(const sf::Vector3f &pos) const {
 
 void World::draw() const {
     for (int x = 0; x < WORLDSIZE; ++x)  {
-        for (int z = 0; z < WORLDSIZE; ++z) {
-            if(!chunks[x][z]->outOfView) {
-                chunks[x][z]->draw();
+        for (int y = 0; y < WORLDSIZE; ++y) {
+            for (int z = 0; z < WORLDSIZE; ++z) {
+                if(!chunks[x][y][z]->outOfView) {
+                    chunks[x][y][z]->draw();
+                }
             }
         }
     }
@@ -87,15 +97,17 @@ void World::draw() const {
 void World::update(float deltaTime, const Camera& camera) {
     chunksDrawn = 0;
     for (int x = 0; x < WORLDSIZE; ++x)  {
-        for (int z = 0; z < WORLDSIZE; ++z) {
-            if (chunks[x][z]->checkCulling(camera)){
-                chunks[x][z]->outOfView = true;
+        for (int y = 0; y < WORLDSIZE; ++y) {
+            for (int z = 0; z < WORLDSIZE; ++z) {
+                if (chunks[x][y][z]->checkCulling(camera)){
+                    chunks[x][y][z]->outOfView = true;
+                }
+                else {
+                    ++chunksDrawn;
+                    chunks[x][y][z]->outOfView = false;
+                }
+                chunks[x][y][z]->update(deltaTime);
             }
-            else {
-                ++chunksDrawn;
-                chunks[x][z]->outOfView = false;
-            }
-            chunks[x][z]->update(deltaTime);
         }
     }
 }
@@ -104,7 +116,7 @@ void World::update(float deltaTime, const Camera& camera) {
 //By: John Amanatides et al.
 //Implemented by Jordi "BuD" Santiago Provencio
 void World::traceView(const Camera& player, float tMax) {
-	if (getCubeAbs(floor(player.pos.x),floor(player.pos.y),floor(player.pos.z)).id != 0) {
+    if (getCubeAbs(floor(player.pos.x),floor(player.pos.y),floor(player.pos.z)).id != 0) {
         playerTargetsBlock = true;
         targetedBlock = sf::Vector3f(floor(player.pos.x),floor(player.pos.y),floor(player.pos.z));
         return;
@@ -176,7 +188,7 @@ void World::traceView(const Camera& player, float tMax) {
                 tMaxc.z= tMaxc.z + tDelta.z;
             }
         }
-		if(getCubeAbs(vox.x,vox.y,vox.z).id != 0) {
+        if(getCubeAbs(vox.x,vox.y,vox.z).id != 0) {
             playerTargetsBlock = true;
             targetedBlock = vox;
             return;

@@ -6,7 +6,7 @@
 class World;
 class Chunk { //16*16*128
 	public:
-		Chunk(int x, int z, int seed, World &world);
+        Chunk(int x, int y, int z, int seed, World &world);
 		~Chunk();
 
 		void populate();
@@ -29,6 +29,7 @@ class Chunk { //16*16*128
 
 		int XPOS; //x pos of chunk inside world matrix
 		int ZPOS; //z pos of chunk inside world matrix
+        int YPOS; //y pos of chunk inside world matrix
 		int SEED; //constant across chunks
 		uint VBOID;
 
