@@ -35,27 +35,13 @@ bool World::outOfBounds(int x, int y, int z){
 	return false;
 }
 
-Cube &World::getCubeAbs(int x, int y, int z) const {
-	return chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE];
+Cube World::getCubeAbs(int x, int y, int z) const {
+    return chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE];
 }
 
-void World::updateCubeAbs(int x, int y, int z) {
-	if (outOfBounds(x,y,z))
-		return;
-	int cX = x/CHUNKSIZE;
-	int cY = y/CHUNKSIZE;
-	int cZ = z/CHUNKSIZE;
-	for (int a = cX-1; a <= cX+1; ++a) {
-		for (int b = cY-1; b <= cY+1; ++b) {
-			for (int c = cZ-1; c <= cZ+1; ++c) {
-				if(a >= 0 && a < WORLDWIDTH &&
-				   b >= 0 && b < WORLDHEIGHT &&
-				   c >= 0 && c < WORLDWIDTH){
-					chunks[a][b][c]->markedForRedraw = true;
-				}
-			}
-		}
-	}
+void World::setCubeAbs(int x, int y, int z, Cube c) {
+    chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE] = c;
+    chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->markedForRedraw = true;
 }
 
 void World::regenChunk(int x, int y, int z, int seed) {

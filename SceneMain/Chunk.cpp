@@ -20,7 +20,7 @@ void Chunk::populate() {
 	for(int x = CHUNKSIZE*(0.5/4.0); x < CHUNKSIZE*(3.5/4.0); ++x) {
 		for(int z = CHUNKSIZE*(0.5/4.0); z < CHUNKSIZE*(3.5/4.0); ++z) {
 			for(int y = CHUNKSIZE*(0.5/4.0); y < CHUNKSIZE*(3.5/4.0); ++y) {
-				cubes[x][y][z].id = rand()%3+1;
+                cubes[x][y][z].id = rand()%3+1;
 			}
 		}
 	}
@@ -31,61 +31,53 @@ bool Chunk::outOfBounds(int x, int y, int z) {
 	return parentWorld.outOfBounds(x+(XPOS*CHUNKSIZE),y+(YPOS*CHUNKSIZE),z+(ZPOS*CHUNKSIZE));
 }
 
-void Chunk::updateCube(int x, int y, int z) {
-	parentWorld.updateCubeAbs(x+(XPOS*CHUNKSIZE),y+(YPOS*CHUNKSIZE),z+(ZPOS*CHUNKSIZE));
-}
-
-Cube &Chunk::getCube(int x, int y, int z) {
+Cube Chunk::getCube(int x, int y, int z) {
 	if (x >= CHUNKSIZE || y >= CHUNKSIZE || z >= CHUNKSIZE || x < 0 || z < 0 || y < 0)//outside of this chunk
 		return parentWorld.getCubeAbs(x+(XPOS*CHUNKSIZE),y+(YPOS*CHUNKSIZE),z+(ZPOS*CHUNKSIZE));
 	return cubes[x][y][z]; //inside current chunk
 }
 
 void Chunk::calculateLight() {
-	//BFS TO THE MAX, bug: I don't know how to preserve light across chunks, since every chunk only looks
-	//					   for its own light blocks
-	std::queue<sf::Vector3i> blocksToCheck;
-	for(int z = -10; z < CHUNKSIZE+10; ++z) {
-		for(int y = -10; y < CHUNKSIZE+10; ++y) {
-			for(int x = -10; x < CHUNKSIZE+10; ++x) {
-				if (!outOfBounds(x,y,z) && getCube(x,y,z).id == 4) { //light block
-					getCube(x,y,z).light = LIGHTMAX;
-					blocksToCheck.push(sf::Vector3i(x,y,z));
-				}
-				else if (!outOfBounds(x,y,z) && getCube(x,y,z).id == 0){
-					getCube(x,y,z).light = 1;
-				}
-			}
-		}
-	}
-	while(!blocksToCheck.empty()) {
-		sf::Vector3i source = blocksToCheck.front();
-		if(getCube(source.x,source.y,source.z).light == 2) {
-			blocksToCheck.pop();
-		}
-		else {
-			processCubeLighting(source,sf::Vector3i(1,0,0),blocksToCheck);
-			processCubeLighting(source,sf::Vector3i(-1,0,0),blocksToCheck);
-			processCubeLighting(source,sf::Vector3i(0,1,0),blocksToCheck);
-			processCubeLighting(source,sf::Vector3i(0,-1,0),blocksToCheck);
-			processCubeLighting(source,sf::Vector3i(0,0,1),blocksToCheck);
-			processCubeLighting(source,sf::Vector3i(0,0,-1),blocksToCheck);
-			blocksToCheck.pop();
-		}
-	}
+//    //BFS TO THE MAX
+//	std::queue<sf::Vector3i> blocksToCheck;
+//	for(int z = -10; z < CHUNKSIZE+10; ++z) {
+//		for(int y = -10; y < CHUNKSIZE+10; ++y) {
+//			for(int x = -10; x < CHUNKSIZE+10; ++x) {
+//                if (!outOfBounds(x,y,z) && getCube(x,y,z).id == 4) { //light block
+//                    setCube(x,y,z,Cube(4,LIGHTMAX));
+//                    blocksToCheck.push(sf::Vector3i(x,y,z));
+//				}
+//				else if (!outOfBounds(x,y,z) && getCube(x,y,z).id == 0){
+//                    setCube(x,y,z,Cube(0,1));
+//				}
+//			}
+//		}
+//	}
+//	while(!blocksToCheck.empty()) {
+//		sf::Vector3i source = blocksToCheck.front();
+//		if(getCube(source.x,source.y,source.z).light == 2) {
+//			blocksToCheck.pop();
+//		}
+//		else {
+//            processCubeLighting(source,sf::Vector3i(1,0,0),blocksToCheck);
+//            processCubeLighting(source,sf::Vector3i(-1,0,0),blocksToCheck);
+//            processCubeLighting(source,sf::Vector3i(0,1,0),blocksToCheck);
+//            processCubeLighting(source,sf::Vector3i(0,-1,0),blocksToCheck);
+//            processCubeLighting(source,sf::Vector3i(0,0,1),blocksToCheck);
+//            processCubeLighting(source,sf::Vector3i(0,0,-1),blocksToCheck);
+//			blocksToCheck.pop();
+//		}
+//	}
 }
 
-void Chunk::processCubeLighting(sf::Vector3i source, sf::Vector3i offset, std::queue<sf::Vector3i> &queue) {
-	sf::Vector3i subject = source+offset;
-	if(!outOfBounds(subject.x,subject.y,subject.z) && getCube(subject.x,subject.y,subject.z).id == 0) {
-		if(getCube(subject.x,subject.y,subject.z).light == getCube(source.x,source.y,source.z).light-1) {
-			queue.push(subject);
-		}
-		else if(getCube(subject.x,subject.y,subject.z).light < getCube(source.x,source.y,source.z).light-1) {
-			queue.push(subject);
-			getCube(subject.x,subject.y,subject.z).light = getCube(source.x,source.y,source.z).light-1;
-		}
-	}
+void Chunk::processCubeLighting(sf::Vector3i source, sf::Vector3i offset, std::queue<sf::Vector3i> &queue) { //BFS node processing
+//	sf::Vector3i subject = source+offset;
+//    if(!outOfBounds(subject.x,subject.y,subject.z) && getCube(subject.x,subject.y,subject.z).id == 0) {
+//        if(getCube(subject.x,subject.y,subject.z).light < getCube(source.x,source.y,source.z).light-1) {
+//            queue.push(subject);
+//            setCube(subject.x,subject.y,subject.z,Cube(0,),getCube(source.x,source.y,source.z).light-1);
+//        }
+//	}
 }
 
 void Chunk::update(float deltaTime) {
@@ -93,7 +85,7 @@ void Chunk::update(float deltaTime) {
 	if (markedForRedraw) { //empty arrays and re-do them
 		markedForRedraw = false;
 		DBG_UPDATES++;
-		calculateLight();
+        calculateLight();
 		renderData.resize(0);
 		int cubeID;
 		for(int z = 0; z < CHUNKSIZE; ++z) {
@@ -218,18 +210,18 @@ bool Chunk::checkCulling(const Camera& cam) {
 }
 
 void Chunk::updateGrass(float deltaTime) { //only to be called by main update()
-	if (grassTimer >= 0.01) {
-		grassTimer -= 0.01;
-		int x = rand()%CHUNKSIZE;
-		int y = rand()%CHUNKSIZE;
-		int z = rand()%CHUNKSIZE;
-		if (getCube(x,y+1,z).id != 0 && getCube(x,y,z).id == 3) {
-			getCube(x,y,z).id = 1;
-			updateCube(x,y,z);
-			markedForRedraw = true;
-		}
-	}
-	grassTimer += deltaTime;
+//	if (grassTimer >= 0.01) {
+//		grassTimer -= 0.01;
+//		int x = rand()%CHUNKSIZE;
+//		int y = rand()%CHUNKSIZE;
+//		int z = rand()%CHUNKSIZE;
+//		if (getCube(x,y+1,z).id != 0 && getCube(x,y,z).id == 3) {
+//			getCube(x,y,z).id = 1;
+//			updateCube(x,y,z);
+//			markedForRedraw = true;
+//		}
+//	}
+//	grassTimer += deltaTime;
 }
 
 const int Chunk::textureIndexes[5][6] = { //order is front, back, left, right, bottom, top

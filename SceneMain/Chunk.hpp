@@ -20,7 +20,7 @@ class Chunk { //16*16*128
 
 		void populate();
 		void calculateLight();
-		void processCubeLighting(sf::Vector3i source, sf::Vector3i offset, std::queue<sf::Vector3i> &queue);
+        void processCubeLighting(sf::Vector3i source, sf::Vector3i offset, std::queue<sf::Vector3i> &queue);
 		void update(float deltaTime);
 		void pushCubeToArray(int x, int y, int z, int cubeID);
 		void pushCubeFace(sf::Vector3f n, int x, int y, int z, int cubeID); //n = normal of the face to be pushed
@@ -28,9 +28,8 @@ class Chunk { //16*16*128
 		bool checkCulling(const Camera &cam);
 		void makeVbo();
 
-		bool outOfBounds(int x, int y, int z);
-		void updateCube(int x, int y, int z);
-		Cube &getCube(int x, int y, int z);
+        bool outOfBounds(int x, int y, int z);
+        Cube getCube(int x, int y, int z);
 
 		void updateGrass(float deltaTime);
 
