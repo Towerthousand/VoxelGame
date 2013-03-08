@@ -37,7 +37,7 @@ Cube Chunk::getCube(int x, int y, int z) {
 	return cubes[x][y][z]; //inside current chunk
 }
 
-void Chunk::calculateLight() {
+//void Chunk::calculateLight() {
 //    //BFS TO THE MAX
 //	std::queue<sf::Vector3i> blocksToCheck;
 //	for(int z = -10; z < CHUNKSIZE+10; ++z) {
@@ -68,24 +68,13 @@ void Chunk::calculateLight() {
 //			blocksToCheck.pop();
 //		}
 //	}
-}
-
-void Chunk::processCubeLighting(sf::Vector3i source, sf::Vector3i offset, std::queue<sf::Vector3i> &queue) { //BFS node processing
-//	sf::Vector3i subject = source+offset;
-//    if(!outOfBounds(subject.x,subject.y,subject.z) && getCube(subject.x,subject.y,subject.z).id == 0) {
-//        if(getCube(subject.x,subject.y,subject.z).light < getCube(source.x,source.y,source.z).light-1) {
-//            queue.push(subject);
-//            setCube(subject.x,subject.y,subject.z,Cube(0,),getCube(source.x,source.y,source.z).light-1);
-//        }
-//	}
-}
+//}
 
 void Chunk::update(float deltaTime) {
 	//updateGrass(deltaTime);
 	if (markedForRedraw) { //empty arrays and re-do them
 		markedForRedraw = false;
 		DBG_UPDATES++;
-        calculateLight();
 		renderData.resize(0);
 		int cubeID;
 		for(int z = 0; z < CHUNKSIZE; ++z) {
@@ -101,6 +90,53 @@ void Chunk::update(float deltaTime) {
 		makeVbo();
 	}
 }
+
+
+void Chunk::draw() const {
+	glPushMatrix();
+	glBindBuffer(GL_ARRAY_BUFFER, VBOID);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+
+	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), 0);
+	glNormalPointer(GL_FLOAT, sizeof(Vertex),(GLvoid*)(3*sizeof(float)));
+	glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (GLvoid*)(6*sizeof(float)));
+	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (GLvoid*)(8*sizeof(float)));
+
+	glDrawArrays(GL_QUADS, 0, renderData.size());
+
+	glDisableClientState(GL_COLOR_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glPopMatrix();
+}
+
+bool Chunk::checkCulling(const Camera& cam) {
+	sf::Vector2f point(XPOS*CHUNKSIZE+CHUNKSIZE/2, ZPOS*CHUNKSIZE+CHUNKSIZE/2);
+	sf::Vector2f dir(-sin(-cam.rot.y*DEG_TO_RAD), -cos(-cam.rot.y*DEG_TO_RAD));
+	sf::Vector2f pos(cam.pos.x,cam.pos.z);
+	float distance = (dir.x*point.x + dir.y*point.y - dir.x*pos.x - dir.y*pos.y);
+	return distance < -CHUNKSIZE;
+}
+
+//void Chunk::updateGrass(float deltaTime) { //only to be called by main update()
+//	if (grassTimer >= 0.01) {
+//		grassTimer -= 0.01;
+//		int x = rand()%CHUNKSIZE;
+//		int y = rand()%CHUNKSIZE;
+//		int z = rand()%CHUNKSIZE;
+//		if (getCube(x,y+1,z).id != 0 && getCube(x,y,z).id == 3) {
+//			getCube(x,y,z).id = 1;
+//			updateCube(x,y,z);
+//			markedForRedraw = true;
+//		}
+//	}
+//	grassTimer += deltaTime;
+//}
 
 void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) {
 	int absX = x+CHUNKSIZE*XPOS;
@@ -168,60 +204,10 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) {
 	}
 }
 
-void Chunk::pushCubeFace(sf::Vector3f n, int x, int y, int z, int cubeID) {
-
-}
-
-void Chunk::draw() const {
-	glPushMatrix();
-	glBindBuffer(GL_ARRAY_BUFFER, VBOID);
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-
-	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), 0);
-	glNormalPointer(GL_FLOAT, sizeof(Vertex),(GLvoid*)(3*sizeof(float)));
-	glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (GLvoid*)(6*sizeof(float)));
-	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (GLvoid*)(8*sizeof(float)));
-
-	glDrawArrays(GL_QUADS, 0, renderData.size());
-
-	glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glPopMatrix();
-}
-
 void Chunk::makeVbo() {
 	glGenBuffers(1, (GLuint*) &VBOID);
 	glBindBuffer(GL_ARRAY_BUFFER, VBOID);
 	glBufferData(GL_ARRAY_BUFFER, renderData.size()*sizeof(Vertex), &renderData[0], GL_STATIC_DRAW);
-}
-
-bool Chunk::checkCulling(const Camera& cam) {
-	sf::Vector2f point(XPOS*CHUNKSIZE+CHUNKSIZE/2, ZPOS*CHUNKSIZE+CHUNKSIZE/2);
-	sf::Vector2f dir(-sin(-cam.rot.y*DEG_TO_RAD), -cos(-cam.rot.y*DEG_TO_RAD));
-	sf::Vector2f pos(cam.pos.x,cam.pos.z);
-	float distance = (dir.x*point.x + dir.y*point.y - dir.x*pos.x - dir.y*pos.y);
-	return distance < -CHUNKSIZE;
-}
-
-void Chunk::updateGrass(float deltaTime) { //only to be called by main update()
-//	if (grassTimer >= 0.01) {
-//		grassTimer -= 0.01;
-//		int x = rand()%CHUNKSIZE;
-//		int y = rand()%CHUNKSIZE;
-//		int z = rand()%CHUNKSIZE;
-//		if (getCube(x,y+1,z).id != 0 && getCube(x,y,z).id == 3) {
-//			getCube(x,y,z).id = 1;
-//			updateCube(x,y,z);
-//			markedForRedraw = true;
-//		}
-//	}
-//	grassTimer += deltaTime;
 }
 
 const int Chunk::textureIndexes[5][6] = { //order is front, back, left, right, bottom, top

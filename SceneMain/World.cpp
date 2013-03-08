@@ -24,6 +24,12 @@ World::~World() {
 	}
 }
 
+void World::regenChunk(int x, int y, int z, int seed) {
+	if (chunks[x][y][z] != NULL)
+		delete chunks[x][y][z];
+	chunks[x][y][z] = new Chunk(x,y,z,*this);
+}
+
 bool World::outOfBounds(int x, int y, int z){
 	if (x/CHUNKSIZE >= WORLDWIDTH || x/CHUNKSIZE < 0
 		|| y/CHUNKSIZE >= WORLDHEIGHT || y/CHUNKSIZE < 0
@@ -42,26 +48,6 @@ Cube World::getCubeAbs(int x, int y, int z) const {
 void World::setCubeAbs(int x, int y, int z, Cube c) {
     chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE] = c;
     chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->markedForRedraw = true;
-}
-
-void World::regenChunk(int x, int y, int z, int seed) {
-	if (chunks[x][y][z] != NULL)
-		delete chunks[x][y][z];
-	chunks[x][y][z] = new Chunk(x,y,z,*this);
-}
-
-void World::drawWireCube(const sf::Vector3f &pos) const {
-	glPushMatrix();
-	glLineWidth(1.5);
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glColor4f(0.0,0.0,0.0,0.5);
-	glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
-	glTranslatef(pos.x-0.0025,pos.y-0.0025,pos.z-0.0025);
-	glScalef(1.005,1.005,1.005);
-	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glColor4f(1.0,1.0,1.0,1.0);
-	glPopMatrix();
 }
 
 void World::draw() const {
@@ -183,6 +169,30 @@ void World::traceView(const Camera& player, float tMax) {
 	playerTargetsBlock = false;
 }
 
+void World::processCubeLighting(sf::Vector3i source, sf::Vector3i offset, std::queue<sf::Vector3i> &queue) { //BFS node processing
+	sf::Vector3i subject = source+offset;
+	if(!outOfBounds(subject.x,subject.y,subject.z) && getCubeAbs(subject.x,subject.y,subject.z).id == 0) {
+		if(getCubeAbs(subject.x,subject.y,subject.z).light < getCubeAbs(source.x,source.y,source.z).light-1) {
+			queue.push(subject);
+			setCubeAbs(subject.x,subject.y,subject.z,Cube(0,getCubeAbs(source.x,source.y,source.z).light-1));
+		}
+	}
+}
+
+void World::drawWireCube(const sf::Vector3f &pos) const {
+	glPushMatrix();
+	glLineWidth(1.5);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glColor4f(0.0,0.0,0.0,0.5);
+	glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
+	glTranslatef(pos.x-0.0025,pos.y-0.0025,pos.z-0.0025);
+	glScalef(1.005,1.005,1.005);
+	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glColor4f(1.0,1.0,1.0,1.0);
+	glPopMatrix();
+}
+
 const int World::vertexPoints[8][3] = {
 	{0,0,1},
 	{1,0,1},
@@ -208,5 +218,3 @@ const int World::indexes[24] = {
 	2,6,
 	3,7,
 };
-
-const Cube World::empty(0,10);

@@ -15,26 +15,34 @@
 class Chunk;
 class Camera;
 class World {
-public:
-    World();
-    ~World();
-    bool outOfBounds(int x, int y, int z);
-    Cube getCubeAbs(int x, int y, int z) const;
-    void setCubeAbs(int x, int y, int z, Cube c);
-    void regenChunk(int x, int y, int z, int seed);
-    void draw() const;
-    void drawWireCube(const sf::Vector3f& pos) const;
-    void update(float deltaTime, const Camera &camera);
-    void traceView(const Camera& player, float tMax);
+	public:
+		World();
+		~World();
+		//generators
+		void regenChunk(int x, int y, int z, int seed);
 
-    bool playerTargetsBlock;
-    int chunksDrawn;
-    sf::Vector3f targetedBlock;
-    sf::Vector3f last;
-    static const Cube empty;
-    static const int vertexPoints[8][3];
-    static const int indexes[24];
-    std::vector<std::vector<std::vector<Chunk*> > > chunks;
+		//Getters and setters
+		bool outOfBounds(int x, int y, int z);
+		Cube getCubeAbs(int x, int y, int z) const;
+		void setCubeAbs(int x, int y, int z, Cube c);
+
+		//main
+		void draw() const;
+		void update(float deltaTime, const Camera &camera);
+		void traceView(const Camera& player, float tMax);
+
+		bool playerTargetsBlock;
+		int chunksDrawn;
+		sf::Vector3f targetedBlock;
+		sf::Vector3f last;
+		std::vector<std::vector<std::vector<Chunk*> > > chunks;
+
+	private:
+		void drawWireCube(const sf::Vector3f& pos) const;
+		void processCubeLighting(sf::Vector3i source, sf::Vector3i offset, std::queue<sf::Vector3i> &queue);
+
+		static const int vertexPoints[8][3];
+		static const int indexes[24];
 };
 
 #endif // WORLD_HPP
