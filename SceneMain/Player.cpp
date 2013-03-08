@@ -1,7 +1,8 @@
+
 #include "Player.hpp"
 #include "World.hpp"
 
-Player::Player(const World &world) : Camera(world) {
+Player::Player(World &world) : Camera(world) {
 	vel = sf::Vector3f(0, 0, 0);
 }
 

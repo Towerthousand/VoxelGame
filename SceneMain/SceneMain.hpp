@@ -25,6 +25,7 @@ class SceneMain : public Scene {
 		sf::Mouse mouse;
 		float grassTimer;
 		World world;
+		float debugCounter;
 };
 
 #endif // SCENEMAIN_HPP

@@ -4,13 +4,13 @@
 
 
 //chunk grid coords:
-//0 <= x < WORLDSIZE*CHUNKWIDTH
-//0 <= z < WORLDSIZE*CHUNKWIDTH
-//0 <= y < CHUNKHEIGHT
+//0 <= x < WORLDWIDTH*CHUNKSIZE
+//0 <= z < WORLDWIDTH*CHUNKSIZE
+//0 <= y < WORLDHEIGHT*CHUNKSIZE
 //
 //infdev coordinates (Work In Progress):
 //MIN_INT <= x,z <= MAX_INT
-//0 <= y < CHUNKHEIGHT
+//0 <= y < WORLDHEIGHT*CHUNKSIZE
 
 class Chunk;
 class Camera;
@@ -18,6 +18,7 @@ class World {
 	public:
 		World();
 		~World();
+		bool outOfBounds(int x, int y, int z);
 		Cube &getCubeAbs(int x, int y, int z) const;
 		void updateCubeAbs(int x, int y, int z);
         void regenChunk(int x, int y, int z, int seed);
@@ -30,7 +31,7 @@ class World {
 		int chunksDrawn;
 		sf::Vector3f targetedBlock;
 		sf::Vector3f last;
-		static Cube empty;
+		static const Cube empty;
 		static const int vertexPoints[8][3];
 		static const int indexes[24];
         std::vector<std::vector<std::vector<Chunk*> > > chunks;

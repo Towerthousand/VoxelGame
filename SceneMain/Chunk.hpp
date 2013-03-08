@@ -6,7 +6,7 @@
 class World;
 class Chunk { //16*16*128
 	public:
-        Chunk(int x, int y, int z, int seed, World &world);
+		Chunk(int x, int y, int z, World &world);
 		~Chunk();
 
 		void populate();
@@ -18,6 +18,7 @@ class Chunk { //16*16*128
 		bool checkCulling(const Camera &cam);
 		void makeVbo();
 
+		bool outOfBounds(int x, int y, int z);
 		void updateCube(int x, int y, int z);
 		Cube &getCube(int x, int y, int z);
 

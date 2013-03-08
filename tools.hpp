@@ -19,6 +19,7 @@
 extern int SCRWIDTH; //1366
 extern int SCRHEIGHT; //768
 extern bool WINDOWFOCUS;
+extern int DBG_UPDATES;
 
 struct Vertex {
 		Vertex(float vx = 0.0, float vy = 0.0, float vz = 0.0,
@@ -51,8 +52,9 @@ std::string toString(float num);
 
 #define WINDOW_TITLE "VoxelGame"
 #define CONTEXT_SETTINGS_OPENGL sf::ContextSettings(32,32,0,3,0)
-#define WORLDSIZE 5 //worldsize in CHUNKSxCHUNKS
-#define CHUNKSIZE 16 //worldsize in CHUNKSxCHUNKS
+#define WORLDWIDTH 5 //worldwidth in CHUNKS
+#define WORLDHEIGHT 5 //worldheight in CHUNKS
+#define CHUNKSIZE 16
 #define SEALEVEL 64
 #define PLAYER_HEIGHT -1.8
 #define LIGHTMAX 10.0

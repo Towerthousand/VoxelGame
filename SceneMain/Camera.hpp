@@ -5,7 +5,7 @@
 class World;
 class Camera {
 	public:
-		Camera(const World &world);
+		Camera(World &world);
 		~Camera();
         void movePos(sf::Vector3f disp);
 		void rotateX(float deg);
@@ -13,7 +13,7 @@ class Camera {
 
 		sf::Vector3f pos;
 		sf::Vector3f rot;
-		const World& parentWorld;
+		World& parentWorld;
 };
 
 #endif // CAMERA_HPP

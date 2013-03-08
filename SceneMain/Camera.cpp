@@ -6,7 +6,7 @@
 // and is thougt of as a no-fly, fps kind of view. Tweak it!
 //
 
-Camera::Camera(const World &world) :
+Camera::Camera(World &world) :
   pos(sf::Vector3f(0,75,0)),
   rot(sf::Vector3f(0,0,0)),
   parentWorld(world) {
@@ -16,12 +16,20 @@ Camera::~Camera() {
 }
 
 void Camera::movePos(sf::Vector3f disp) {
-	if(parentWorld.getCubeAbs(floor(pos.x + disp.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z)).id == 0)
-        pos.x += disp.x;
-	if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + disp.y + PLAYER_HEIGHT),floor(pos.z)).id == 0)
-        pos.y += disp.y;
-	if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z + disp.z)).id == 0)
-        pos.z += disp.z;
+	if(parentWorld.outOfBounds(floor(pos.x + disp.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z)))
+		pos.x += disp.x;
+	else if(parentWorld.getCubeAbs(floor(pos.x + disp.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z)).id == 0)
+		pos.x += disp.x;
+
+	if(parentWorld.outOfBounds(floor(pos.x),floor(pos.y + disp.y + PLAYER_HEIGHT),floor(pos.z)))
+		pos.y += disp.y;
+	else if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + disp.y + PLAYER_HEIGHT),floor(pos.z)).id == 0)
+		pos.y += disp.y;
+
+	if(parentWorld.outOfBounds(floor(pos.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z + disp.z)))
+		pos.z += disp.z;
+	else if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z + disp.z)).id == 0)
+		pos.z += disp.z;
 }
 
 void Camera::rotateX(float deg) {

@@ -4,7 +4,7 @@
 
 class Player : public Camera {
 	public:
-		Player(const World &world);
+		Player(World &world);
 		~Player();
 		void update(float deltaTime);
 		void draw() const;

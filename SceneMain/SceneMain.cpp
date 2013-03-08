@@ -23,6 +23,7 @@ bool SceneMain::init() {
         return false;
     parent.audio().musicBank["troll"]->getTrack().play();
     parent.audio().musicBank["troll"]->getTrack().setLoop(true);
+	parent.font().makeText("Updates","",20,sf::Vector2f(10,130),sf::Color::White,sf::Text::Bold,false);
     parent.font().makeText("Chunks","",20,sf::Vector2f(10,110),sf::Color::White,sf::Text::Bold,false);
     parent.font().makeText("posX","",20,sf::Vector2f(10,10),sf::Color::White,sf::Text::Bold,false);
     parent.font().makeText("posY","",20,sf::Vector2f(10,30),sf::Color::White,sf::Text::Bold,false);
@@ -38,31 +39,39 @@ bool SceneMain::init() {
     gluPerspective(60.0f, float(SCRWIDTH)/float(SCRHEIGHT), 0.01f, 500.0f);
 
     outLog("* Loading chunks" );
-    for (int x = 0; x < WORLDSIZE; ++x) {
-        for (int y = 0; y < WORLDSIZE; ++y) {
-            for (int z = 0; z < WORLDSIZE; ++z) {
+	for (int x = 0; x < WORLDWIDTH; ++x) {
+		for (int y = 0; y < WORLDHEIGHT; ++y) {
+			for (int z = 0; z < WORLDWIDTH; ++z) {
                 world.regenChunk(x,y,z,WORLDSEED);
             }
         }
     }
-    world.update(0.1,player); //first update renders basic stuff, but has bugs in lightning
+	world.update(0.1,player); //first update renders basic stuff, but has bugs in lightning
     //since other chunks aren't lit yet. Once all chunks are lit
     //individually, relighting everything will fix chunk sides
-    for (int x = 0; x < WORLDSIZE; ++x) {
-        for (int y = 0; y < WORLDSIZE; ++y) {
-            for (int z = 0; z < WORLDSIZE; ++z) {
-                world.chunks[x][y][z]->markedForRedraw = true;
+	for (int x = 0; x < WORLDWIDTH; ++x) {
+		for (int y = 0; y < WORLDHEIGHT; ++y) {
+			for (int z = 0; z < WORLDWIDTH; ++z) {
+				world.chunks[x][y][z]->markedForRedraw = true;
             }
         }
     }
+
+	debugCounter = 0.0;
 
     outLog("* Init was succesful" );
     return true;
 }
 
 void SceneMain::update(float deltaTime) {
+	if (debugCounter > 1) {
+		parent.font().getText("Updates").setString("Updates: " + toString(DBG_UPDATES));
+		DBG_UPDATES = 0;
+		debugCounter -= 1;
+	}
+	debugCounter += deltaTime;
     player.vel = sf::Vector3f(0, 0, 0);
-    world.update(deltaTime,player);
+	world.update(deltaTime,player);
     world.traceView(player,5);
     //Constant input (done every frame)
     //Rotate camera according to mouse input
@@ -98,7 +107,7 @@ void SceneMain::update(float deltaTime) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
         player.pos = sf::Vector3f(0,70,0);
 
-    player.update(deltaTime);
+	 player.update(deltaTime);
 }
 
 void SceneMain::draw() const {
@@ -110,11 +119,11 @@ void SceneMain::draw() const {
     glTranslatef(-player.pos.x, -player.pos.y, -player.pos.z);
 
     parent.textures().useTexture("lolwtf");
-    world.draw();
+	world.draw();
     player.draw();
     glFlush();
 
-    //Debug tags
+	//Debug tags
     parent.font().getText("Chunks").setString("Chunks drawn: " + toString(world.chunksDrawn));
     parent.font().getText("posX").setString("X: " + toString(player.pos.x));
     parent.font().getText("posY").setString("Y: " + toString(player.pos.y));
@@ -122,8 +131,10 @@ void SceneMain::draw() const {
     parent.font().getText("rotY").setString("Rot Y: " + toString(player.rot.y));
     parent.font().getText("rotX").setString("Rot X: " + toString(player.rot.x));
     glDisable(GL_CULL_FACE);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
     parent.getWindow().pushGLStates();
     //SFML draws (until window.popGLStates())
+	parent.getWindow().draw(parent.font().getText("Updates"));
     parent.getWindow().draw(parent.font().getText("Chunks"));
     parent.getWindow().draw(parent.font().getText("posX"));
     parent.getWindow().draw(parent.font().getText("posY"));
@@ -141,7 +152,7 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Event& event) {
     switch(event.mouseButton.button) {
     case sf::Mouse::Left:
         if(world.playerTargetsBlock) {
-            world.getCubeAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z) = Cube(0,0);
+			world.getCubeAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z).id = 0;
             world.updateCubeAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z);
         }
         break;

@@ -1,6 +1,6 @@
 TEMPLATE = app
 CONFIG -= qt
-LIBS += -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lGLU -lnoise
+LIBS += -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lGLU
 INCLUDEPATH += $$PWD/
 QMAKE_CXXFLAGS += -std=c++11
 CXX_FLAGS += -D_GLIBCXX_DEBUG
@@ -11,7 +11,6 @@ SOURCES += \
     $$PWD/SceneMain/SceneMain.cpp \
     $$PWD/SceneMain/Camera.cpp \
     $$PWD/SceneMain/Chunk.cpp \
-    $$PWD/SceneMain/noiseutils.cpp \
     $$PWD/SceneMain/World.cpp \
     $$PWD/SceneMain/Player.cpp \
     $$PWD/graphics/FontManager.cpp \
@@ -28,7 +27,6 @@ HEADERS += \
     $$PWD/SceneMain/SceneMain.hpp \
     $$PWD/SceneMain/Camera.hpp \
     $$PWD/SceneMain/Chunk.hpp \
-    $$PWD/SceneMain/noiseutils.h \
     $$PWD/SceneMain/World.hpp \
     $$PWD/SceneMain/Player.hpp \
     $$PWD/graphics/FontManager.hpp \
