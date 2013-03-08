@@ -45,7 +45,6 @@ void World::updateCubeAbs(int x, int y, int z) {
 	int cX = x/CHUNKSIZE;
 	int cY = y/CHUNKSIZE;
 	int cZ = z/CHUNKSIZE;
-	//chunks[cX][cY][cZ]->markedForRedraw = true;
 	for (int a = cX-1; a <= cX+1; ++a) {
 		for (int b = cY-1; b <= cY+1; ++b) {
 			for (int c = cZ-1; c <= cZ+1; ++c) {

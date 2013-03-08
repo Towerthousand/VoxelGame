@@ -151,13 +151,13 @@ void SceneMain::onKeyPressed(float deltaTime, const sf::Event& event) {
 void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Event& event) {
     switch(event.mouseButton.button) {
     case sf::Mouse::Left:
-        if(world.playerTargetsBlock) {
+		if(world.playerTargetsBlock) {
 			world.getCubeAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z).id = 0;
             world.updateCubeAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z);
         }
         break;
     case sf::Mouse::Right:
-        if(world.playerTargetsBlock) {
+		if(world.playerTargetsBlock && !world.outOfBounds(world.last.x,world.last.y,world.last.z)) {
             world.getCubeAbs(world.last.x,world.last.y,world.last.z).id = 4;
             world.updateCubeAbs(world.last.x,world.last.y,world.last.z);
         }

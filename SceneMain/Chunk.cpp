@@ -17,9 +17,9 @@ Chunk::~Chunk() {
 }
 
 void Chunk::populate() {
-	for(int x = CHUNKSIZE*(1.0/4.0); x < CHUNKSIZE*(3.0/4.0); ++x) {
-		for(int z = CHUNKSIZE*(1.0/4.0); z < CHUNKSIZE*(3.0/4.0); ++z) {
-			for(int y = CHUNKSIZE*(1.0/4.0); y < CHUNKSIZE*(3.0/4.0); ++y) {
+	for(int x = CHUNKSIZE*(0.5/4.0); x < CHUNKSIZE*(3.5/4.0); ++x) {
+		for(int z = CHUNKSIZE*(0.5/4.0); z < CHUNKSIZE*(3.5/4.0); ++z) {
+			for(int y = CHUNKSIZE*(0.5/4.0); y < CHUNKSIZE*(3.5/4.0); ++y) {
 				cubes[x][y][z].id = rand()%3+1;
 			}
 		}
@@ -28,7 +28,7 @@ void Chunk::populate() {
 }
 
 bool Chunk::outOfBounds(int x, int y, int z) {
-	parentWorld.outOfBounds(x+(XPOS*CHUNKSIZE),y+(YPOS*CHUNKSIZE),z+(ZPOS*CHUNKSIZE));
+	return parentWorld.outOfBounds(x+(XPOS*CHUNKSIZE),y+(YPOS*CHUNKSIZE),z+(ZPOS*CHUNKSIZE));
 }
 
 void Chunk::updateCube(int x, int y, int z) {
@@ -45,9 +45,9 @@ void Chunk::calculateLight() {
 	//BFS TO THE MAX, bug: I don't know how to preserve light across chunks, since every chunk only looks
 	//					   for its own light blocks
 	std::queue<sf::Vector3i> blocksToCheck;
-	for(int z = -9; z < CHUNKSIZE+9; ++z) {
-		for(int y = -9; y < CHUNKSIZE+9; ++y) {
-			for(int x = -9; x < CHUNKSIZE+9; ++x) {
+	for(int z = -10; z < CHUNKSIZE+10; ++z) {
+		for(int y = -10; y < CHUNKSIZE+10; ++y) {
+			for(int x = -10; x < CHUNKSIZE+10; ++x) {
 				if (!outOfBounds(x,y,z) && getCube(x,y,z).id == 4) { //light block
 					getCube(x,y,z).light = LIGHTMAX;
 					blocksToCheck.push(sf::Vector3i(x,y,z));
@@ -174,6 +174,10 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) {
 		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ    , 0,1,0 , texX+16.0,texY+16.0, lind,lind,lind,1.0));
 		renderData.push_back(Vertex(absX    , absY+1.0, absZ    , 0,1,0 , texX+16.0,texY     , lind,lind,lind,1.0));
 	}
+}
+
+void Chunk::pushCubeFace(sf::Vector3f n, int x, int y, int z, int cubeID) {
+
 }
 
 void Chunk::draw() const {
