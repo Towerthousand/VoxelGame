@@ -14,7 +14,7 @@ class SceneMain : public Scene {
 		void draw() const;
 		void onKeyPressed(float deltaTime, const sf::Event& event);
 		void onMouseButtonPressed(float deltaTime, const sf::Event& event);
-		void onMouseMoved(float deltaTime, const sf::Event &event);
+		void onMouseMoved(float deltaTime, const sf::Event& event);
 		void onClose(); //close scene-wide stuff
 			
 	private:

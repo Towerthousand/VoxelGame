@@ -7,7 +7,7 @@ class Camera {
 	public:
 		Camera(World &world);
 		~Camera();
-        void movePos(sf::Vector3f disp);
+		void movePos(const sf::Vector3f& disp);
 		void rotateX(float deg);
 		void rotateY(float deg);
 

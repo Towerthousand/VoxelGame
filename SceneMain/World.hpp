@@ -22,15 +22,15 @@ class World {
 		void regenChunk(int x, int y, int z, int seed);
 
 		//Getters and setters
-		bool outOfBounds(int x, int y, int z);
+		bool outOfBounds(int x, int y, int z) const;
 		Cube getCubeAbs(int x, int y, int z) const;
-		void setCubeAbs(int x, int y, int z, Cube c);
+		void setCubeAbs(int x, int y, int z, const Cube& c);
 
 		//main
 		void draw() const;
-		void update(float deltaTime, const Camera &camera);
+		void update(float deltaTime, const Camera& camera);
 		void traceView(const Camera& player, float tMax);
-        void calculateLight(sf::Vector3i source, sf::Vector3i radius);
+		void calculateLight(sf::Vector3i source, const sf::Vector3i& radius);
 
 		bool playerTargetsBlock;
 		int chunksDrawn;
@@ -39,11 +39,11 @@ class World {
 		std::vector<std::vector<std::vector<Chunk*> > > chunks;
 
 	private:
-        float grassTimer;
 		void drawWireCube(const sf::Vector3f& pos) const;
-        void processCubeLighting(sf::Vector3i source, sf::Vector3i offset, std::queue<sf::Vector3i> &queue);
-        void pdateGrass(float deltaTime);
+		void processCubeLighting(const sf::Vector3i& source, const sf::Vector3i& offset, std::queue<sf::Vector3i> &queue);
+		void updateGrass(float deltaTime);
 
+		float updateStuffTimer;
 		static const int vertexPoints[8][3];
 		static const int indexes[24];
 };

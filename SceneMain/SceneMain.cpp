@@ -146,6 +146,22 @@ void SceneMain::draw() const {
 }
 
 void SceneMain::onKeyPressed(float deltaTime, const sf::Event& event) {
+	switch(event.key.code) {
+		case sf::Keyboard::Num1:
+			player.selectedID = 1;
+			break;
+		case sf::Keyboard::Num2:
+			player.selectedID = 2;
+			break;
+		case sf::Keyboard::Num3:
+			player.selectedID = 3;
+			break;
+		case sf::Keyboard::Num4:
+			player.selectedID = 4;
+			break;
+		default:
+			break;
+	}
 }
 
 void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Event& event) {
@@ -158,8 +174,8 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Event& event) {
         break;
     case sf::Mouse::Right:
 		if(world.playerTargetsBlock && !world.outOfBounds(world.last.x,world.last.y,world.last.z)) {
-            world.setCubeAbs(world.last.x,world.last.y,world.last.z,Cube(4,1));
-            world.calculateLight(sf::Vector3i(world.last.x,world.last.y,world.last.z),sf::Vector3i(20,20,20));
+			world.setCubeAbs(world.last.x,world.last.y,world.last.z,Cube(player.selectedID,0));
+			world.calculateLight(sf::Vector3i(world.last.x,world.last.y,world.last.z),sf::Vector3i(UPDATERADIUS,UPDATERADIUS,UPDATERADIUS));
         }
         break;
     default:

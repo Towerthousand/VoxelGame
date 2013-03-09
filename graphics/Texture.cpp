@@ -6,7 +6,7 @@ Texture::Texture(): handle(0), size(0,0){
 Texture::~Texture(){
 }
 
-bool Texture::load(std::string filePath) {
+bool Texture::load(const std::string &filePath) {
 	//load image
 	sf::Image image;
 	if (!image.loadFromFile(filePath)) {

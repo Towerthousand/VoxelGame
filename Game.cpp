@@ -14,11 +14,11 @@ Game::~Game() {
     //game about metagame. Nais. GAME CONSTRUCTOR is not a good hero name, though.
 }
 
-// Init non-resource, general game frame stuff here. It calls loadResources()
+// Init non-resource, general game frame stuff here.
 bool Game::init() {
     outLog("* INIT GAME" );
 
-    //Load game resources
+	//Load game-wide resources
     if (!loadResources())
         return false;
     isRunning = true;
@@ -28,7 +28,7 @@ bool Game::init() {
     glEnable(GL_ALPHA_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
-    //glDepthFunc(GL_LEQUAL);
+	glDepthFunc(GL_LEQUAL);
     glEnable(GL_TEXTURE_2D);
     //glEnable(GL_LINE_SMOOTH);
     glEnable(GL_CULL_FACE); //enable backface culling
@@ -64,7 +64,7 @@ void Game::run() {
 // 4: Update scene
 void Game::update(float deltaTime) {
 
-    //Change scene, initialise it and close if it fails to initialise
+	//Change scene, initialize it and close if it fails to initialize
     if (nextScene != NULL) {
         if (currentScene != NULL)
             delete currentScene;
@@ -141,24 +141,24 @@ void Game::draw() {
 }
 
 // Pass the time elapsed to scene so it can handle key input
-void Game::onKeyPressed(float deltaTime, sf::Event event) {
+void Game::onKeyPressed(float deltaTime,const sf::Event& event) {
     if (currentScene != NULL)
         currentScene->onKeyPressed(deltaTime, event);
 }
 
 // Pass the time elapsed and mouse event to scene so it can handle mouse button input
-void Game::onMouseButtonPressed(float deltaTime, sf::Event event) {
+void Game::onMouseButtonPressed(float deltaTime,const sf::Event& event) {
     if (currentScene != NULL)
         currentScene->onMouseButtonPressed(deltaTime, event);
 }
 
 // Pass the time elapsed and mouse event to scene so it can handle mouse movement input
-void Game::onMouseMoved(float deltaTime, sf::Event event) {
+void Game::onMouseMoved(float deltaTime,const sf::Event& event) {
     if (currentScene != NULL)
         currentScene->onMouseMoved(deltaTime,event);
 }
 
-// Whenever you wnat to ende the game, you must call this function, not the Scene's onClose(); method
+// Whenever you wnat to end the game, you must call this function, not the Scene's onClose(); method
 // End game-wide stuff here
 void Game::close() {
     if (currentScene != NULL)
@@ -172,7 +172,7 @@ void Game::close() {
     isRunning = false;
 }
 
-// Change scene so that on next Game::update(), currentScene will be replaced
+// Change scene so that on next this->update(), this->currentScene will be replaced
 void Game::setScene (Scene * scene) {
     if(nextScene != NULL)
         delete nextScene;

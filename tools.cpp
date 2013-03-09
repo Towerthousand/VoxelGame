@@ -7,7 +7,6 @@ bool WINDOWFOCUS = false;
 int DBG_UPDATES = 0;
 
 //implement random functions here
-
 std::string toString(float num) {
 	std::stringstream ss;
 	ss << num;

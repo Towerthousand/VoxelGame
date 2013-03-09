@@ -4,6 +4,7 @@
 
 Player::Player(World &world) : Camera(world) {
 	vel = sf::Vector3f(0, 0, 0);
+	selectedID = 1;
 }
 
 Player::~Player() {

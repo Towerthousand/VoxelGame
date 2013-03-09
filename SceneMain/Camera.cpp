@@ -7,28 +7,20 @@
 //
 
 Camera::Camera(World &world) :
-  pos(sf::Vector3f(0,75,0)),
-  rot(sf::Vector3f(0,0,0)),
-  parentWorld(world) {
+	pos(sf::Vector3f(0,75,0)),
+	rot(sf::Vector3f(0,0,0)),
+	parentWorld(world) {
 }
 
 Camera::~Camera() {
 }
 
-void Camera::movePos(sf::Vector3f disp) {
-	if(parentWorld.outOfBounds(floor(pos.x + disp.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z)))
+void Camera::movePos(const sf::Vector3f &disp) {
+	if(parentWorld.getCubeAbs(floor(pos.x + disp.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z)).ID == 0)
 		pos.x += disp.x;
-	else if(parentWorld.getCubeAbs(floor(pos.x + disp.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z)).id == 0)
-		pos.x += disp.x;
-
-	if(parentWorld.outOfBounds(floor(pos.x),floor(pos.y + disp.y + PLAYER_HEIGHT),floor(pos.z)))
+	if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + disp.y + PLAYER_HEIGHT),floor(pos.z)).ID == 0)
 		pos.y += disp.y;
-	else if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + disp.y + PLAYER_HEIGHT),floor(pos.z)).id == 0)
-		pos.y += disp.y;
-
-	if(parentWorld.outOfBounds(floor(pos.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z + disp.z)))
-		pos.z += disp.z;
-	else if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z + disp.z)).id == 0)
+	if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z + disp.z)).ID == 0)
 		pos.z += disp.z;
 }
 

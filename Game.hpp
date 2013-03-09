@@ -37,13 +37,13 @@ class Game {
         void draw(); // calls currentScene.draw()
 		bool loadResources (); // loads game-wide resources. only called
 									 // by init() once
-		void onKeyPressed(float deltaTime, sf::Event event);
+		void onKeyPressed(float deltaTime,const sf::Event& event);
 									 	// currentScene.onKeyPressed
 										// (deltaTime, event)
-		void onMouseButtonPressed(float deltaTime, sf::Event event);
+		void onMouseButtonPressed(float deltaTime,const sf::Event& event);
 									 	// currentScene.onMouseButtonPressed
 										// (deltaTime, event)
-		void onMouseMoved(float deltaTime, sf::Event event);
+		void onMouseMoved(float deltaTime,const sf::Event& event);
 
 		//context
 		sf::RenderWindow window;

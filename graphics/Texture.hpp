@@ -8,7 +8,7 @@ class Texture
 		Texture();
 		~Texture();
 
-		bool load(std::string filePath);
+		bool load(const std::string& filePath);
 		void bind();
 		void setFilter(GLenum filter);
 		void setWrap(GLenum wrap);
