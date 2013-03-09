@@ -16,11 +16,9 @@ class Game {
 									  // move into currentScene on next update()
 									  // so that there is no update() of one
 									  // scene followed by a draw() method
-									  // of a different scene.
-		void onClose(); // calls currentScene.onClose(), and then Game::close()
-						// currentScene.onClose() will save scene specific stuff
-						// and then call for the whole game to save game-wide
-						// stuff and shut down
+                                      // of a different scene.
+        void close(); // closes app completely, closing the current scene (if there is)
+                      // first, saves game-wide stuff first.
 
 		sf::RenderWindow &getWindow() { return window; }
 		TextureManager &textures() { return texManager; }
@@ -36,9 +34,7 @@ class Game {
 									  // Game::onMouseButtonPressed(); and
 									  // Game::onKeyPressed();
 									  // calls currentScene.update(deltaTime)
-		void draw(); // calls currentScene.draw()
-		void close(); // closes app completely, saves game-wide stuff first.
-					  // should only be called by onClose();
+        void draw(); // calls currentScene.draw()
 		bool loadResources (); // loads game-wide resources. only called
 									 // by init() once
 		void onKeyPressed(float deltaTime, sf::Event event);

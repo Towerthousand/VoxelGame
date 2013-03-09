@@ -27,9 +27,8 @@ class Chunk { //16*16*128
 		bool outOfView;
 	private:
 		void pushCubeToArray(int x, int y, int z, int cubeID);
-		void makeVbo();
+        void makeVbo();
 
-		float grassTimer;
 		uint VBOID;
 		int XPOS; //x pos of chunk inside world matrix
 		int ZPOS; //z pos of chunk inside world matrix

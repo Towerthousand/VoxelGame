@@ -153,11 +153,13 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Event& event) {
     case sf::Mouse::Left:
 		if(world.playerTargetsBlock) {
             world.setCubeAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z,Cube(0,1));
+            world.calculateLight(sf::Vector3i(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z),sf::Vector3i(20,20,20));
         }
         break;
     case sf::Mouse::Right:
 		if(world.playerTargetsBlock && !world.outOfBounds(world.last.x,world.last.y,world.last.z)) {
             world.setCubeAbs(world.last.x,world.last.y,world.last.z,Cube(4,1));
+            world.calculateLight(sf::Vector3i(world.last.x,world.last.y,world.last.z),sf::Vector3i(20,20,20));
         }
         break;
     default:
