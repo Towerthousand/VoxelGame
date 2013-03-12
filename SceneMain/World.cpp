@@ -70,6 +70,9 @@ bool World::loadDirbaio(const std::string filePath) {
 		}
 	}
 
+	sf::Clock c;
+	c.restart();
+	float t = 0.0;
 	outLog(" - Lighting chunks...");
 
 //	for (int x = 0; x < WORLDWIDTH; ++x) {
@@ -84,6 +87,8 @@ bool World::loadDirbaio(const std::string filePath) {
 								CHUNKSIZE*WORLDWIDTH/2),
 				   sf::Vector2i(WORLDWIDTH*CHUNKSIZE/2 + 1,WORLDHEIGHT*CHUNKSIZE/2 + 1),
 				   false);
+	t = c.restart().asSeconds();
+	outLog("- Finished lighting. Time: " + toString(t) + " seconds");
 	return true;
 }
 
