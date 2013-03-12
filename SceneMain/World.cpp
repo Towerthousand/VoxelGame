@@ -71,13 +71,19 @@ bool World::loadDirbaio(const std::string filePath) {
 	}
 
 	outLog(" - Lighting chunks...");
-	for (int x = 0; x < WORLDWIDTH; ++x) {
-		for (int y = 0; y < WORLDHEIGHT; ++y) {
-			for (int z = 0; z < WORLDWIDTH; ++z) {
-				initChunkLight(x,y,z);
-			}
-		}
-	}
+
+//	for (int x = 0; x < WORLDWIDTH; ++x) {
+//		for (int y = 0; y < WORLDHEIGHT; ++y) {
+//			for (int z = 0; z < WORLDWIDTH; ++z) {
+//				initChunkLight(x,y,z);
+//			}
+//		}
+//	}
+	calculateLight(sf::Vector3i(CHUNKSIZE*WORLDWIDTH/2,
+								CHUNKSIZE*WORLDHEIGHT/2,
+								CHUNKSIZE*WORLDWIDTH/2),
+				   sf::Vector2i(WORLDWIDTH*CHUNKSIZE/2 + 1,WORLDHEIGHT*CHUNKSIZE/2 + 1),
+				   false);
 	return true;
 }
 
@@ -88,7 +94,7 @@ void World::regenChunk(int x, int y, int z, int seed) {
 }
 
 void World::initChunkLight(int x,int y, int z) { //should only be called if upper chunks are loaded. Coords in chunk system.
-	calculateLight(sf::Vector3i(x*CHUNKSIZE+(CHUNKSIZE/2),y*CHUNKSIZE+(CHUNKSIZE/2),z*CHUNKSIZE+(CHUNKSIZE/2)),sf::Vector2i(CHUNKSIZE,CHUNKSIZE),false);
+	calculateLight(sf::Vector3i(x*CHUNKSIZE+(CHUNKSIZE/2),y*CHUNKSIZE+(CHUNKSIZE/2),z*CHUNKSIZE+(CHUNKSIZE/2)),sf::Vector2i(CHUNKSIZE/2 +1,CHUNKSIZE/2 +1),false);
 }
 
 bool World::getOutOfBounds(int x, int y, int z) const{
