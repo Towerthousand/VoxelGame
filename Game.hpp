@@ -57,7 +57,7 @@ class Game {
 
 		//logic
 		float fpsTime;
-		int fpsCount;
+		uint fpsCount;
 };
 
 #endif //GAME_HPP

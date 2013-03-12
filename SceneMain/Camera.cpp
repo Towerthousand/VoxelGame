@@ -7,7 +7,7 @@
 //
 
 Camera::Camera(World &world) :
-	pos(sf::Vector3f(0,75,0)),
+	pos(sf::Vector3f(0,0,0)),
 	rot(sf::Vector3f(0,0,0)),
 	parentWorld(world) {
 }

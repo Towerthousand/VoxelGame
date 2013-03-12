@@ -8,6 +8,7 @@
 #include <SFML/Audio.hpp>
 #include <SFML/OpenGL.hpp>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <sstream>
 #include <map>
@@ -20,6 +21,8 @@ extern int SCRWIDTH; //1366
 extern int SCRHEIGHT; //768
 extern bool WINDOWFOCUS;
 extern int DBG_UPDATES;
+extern int WORLDHEIGHT;
+extern int WORLDWIDTH;
 
 struct Vertex {
 		Vertex(float vx = 0.0, float vy = 0.0, float vz = 0.0,
@@ -51,14 +54,13 @@ std::string toString(float num);
 
 #define WINDOW_TITLE "VoxelGame"
 #define CONTEXT_SETTINGS_OPENGL sf::ContextSettings(32,32,0,3,0)
-#define WORLDWIDTH 10 //worldwidth in CHUNKS
-#define WORLDHEIGHT 8 //worldheight in CHUNKS
 #define CHUNKSIZE 16
-#define SEALEVEL 64
 #define PLAYER_HEIGHT -1.8
+#define UPDATERADIUS 16.0 //How many potential light blocks does changing a block affect?
 #define MAXLIGHT 16.0
-#define UPDATERADIUS 18.0 //CHANGES DEPENDING ON LIGHT DECREASE FACTOR
-#define MINLIGHT 1.0
+#define MINLIGHT ((MAXLIGHT)/16.0) //decrease or increase the 16.0 to change minimum light
+								 //level. 1 = everything lit to max, but buggy
+#define LIGHTFACTOR 0.8
 #define DEG_TO_RAD ((2*M_PI)/360.0)
 
 #endif // TOOLS_HPP

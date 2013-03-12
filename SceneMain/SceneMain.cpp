@@ -39,26 +39,9 @@ bool SceneMain::init() {
     gluPerspective(60.0f, float(SCRWIDTH)/float(SCRHEIGHT), 0.01f, 500.0f);
 
     outLog("* Loading chunks" );
-	for (int x = 0; x < WORLDWIDTH; ++x) {
-		for (int y = 0; y < WORLDHEIGHT; ++y) {
-			for (int z = 0; z < WORLDWIDTH; ++z) {
-                world.regenChunk(x,y,z,WORLDSEED);
-            }
-        }
-    }
-	world.update(0.1,player); //first update renders basic stuff, but has bugs in lightning
-    //since other chunks aren't lit yet. Once all chunks are lit
-    //individually, relighting everything will fix chunk sides
-	for (int x = 0; x < WORLDWIDTH; ++x) {
-		for (int y = 0; y < WORLDHEIGHT; ++y) {
-			for (int z = 0; z < WORLDWIDTH; ++z) {
-				world.chunks[x][y][z]->markedForRedraw = true;
-            }
-        }
-    }
+	world.loadDirbaio("resources/out.bin");
 
 	debugCounter = 0.0;
-
     outLog("* Init was succesful" );
     return true;
 }
@@ -105,7 +88,7 @@ void SceneMain::update(float deltaTime) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
         player.vel.y -= vel*deltaTime;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
-        player.pos = sf::Vector3f(0,70,0);
+		player.pos = sf::Vector3f(0,128,0);
 
 	 player.update(deltaTime);
 }
@@ -159,6 +142,18 @@ void SceneMain::onKeyPressed(float deltaTime, const sf::Event& event) {
 		case sf::Keyboard::Num4:
 			player.selectedID = 4;
 			break;
+		case sf::Keyboard::Num5:
+			player.selectedID = 5;
+			break;
+		case sf::Keyboard::Num6:
+			player.selectedID = 6;
+			break;
+		case sf::Keyboard::Num7:
+			player.selectedID = 7;
+			break;
+		case sf::Keyboard::Num8:
+			player.selectedID = 8;
+			break;
 		default:
 			break;
 	}
@@ -169,13 +164,13 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Event& event) {
     case sf::Mouse::Left:
 		if(world.playerTargetsBlock) {
             world.setCubeAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z,Cube(0,1));
-            world.calculateLight(sf::Vector3i(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z),sf::Vector3i(20,20,20));
+			world.calculateLight(sf::Vector3i(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z),sf::Vector2i(UPDATERADIUS,UPDATERADIUS),true);
         }
         break;
     case sf::Mouse::Right:
-		if(world.playerTargetsBlock && !world.outOfBounds(world.last.x,world.last.y,world.last.z)) {
+		if(world.playerTargetsBlock && !world.getOutOfBounds(world.last.x,world.last.y,world.last.z)) {
 			world.setCubeAbs(world.last.x,world.last.y,world.last.z,Cube(player.selectedID,0));
-			world.calculateLight(sf::Vector3i(world.last.x,world.last.y,world.last.z),sf::Vector3i(UPDATERADIUS,UPDATERADIUS,UPDATERADIUS));
+			world.calculateLight(sf::Vector3i(world.last.x,world.last.y,world.last.z),sf::Vector2i(UPDATERADIUS,UPDATERADIUS),true);
         }
         break;
     default:

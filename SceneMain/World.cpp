@@ -4,9 +4,9 @@
 
 World::World() {
 	chunks = std::vector<std::vector<std::vector<Chunk*> > >
-			 (WORLDWIDTH,std::vector<std::vector<Chunk*> >
-			  (WORLDHEIGHT,std::vector<Chunk*>
-			   (WORLDWIDTH,NULL)));
+			 (0,std::vector<std::vector<Chunk*> >
+			  (0,std::vector<Chunk*>
+			   (0,NULL)));
 	targetedBlock = sf::Vector3f(0,0,0);
 	playerTargetsBlock = false;
 	last = sf::Vector3f(0,0,0);
@@ -25,13 +25,68 @@ World::~World() {
 	}
 }
 
+
+void World::loadDirbaio(const std::string filePath) {
+	std::ifstream file(filePath.c_str());
+	int sizeX = int(file.get()) << 24 | int(file.get()) << 16 | int(file.get()) << 8 | int(file.get());
+	int sizeY = int(file.get()) << 24 | int(file.get()) << 16 | int(file.get()) << 8 | int(file.get());
+	int sizeZ = int(file.get()) << 24 | int(file.get()) << 16 | int(file.get()) << 8 | int(file.get());
+	WORLDWIDTH = sizeX/CHUNKSIZE;
+	WORLDHEIGHT = sizeY/CHUNKSIZE;
+	chunks.resize(WORLDWIDTH);
+	for(int i = 0; i < WORLDWIDTH; ++i)
+		chunks[i].resize(WORLDHEIGHT);
+	for(int i = 0; i < WORLDWIDTH; ++i)
+		for(int j = 0; j < WORLDHEIGHT; ++j)
+			chunks[i][j].resize(WORLDWIDTH);
+
+	outLog(" - Creating chunks...");
+	for (int x = 0; x < WORLDWIDTH; ++x) {
+		for (int y = 0; y < WORLDHEIGHT; ++y) {
+			for (int z = 0; z < WORLDWIDTH; ++z) {
+				regenChunk(x,y,z,0);
+			}
+		}
+	}
+	outLog(" - Loading chunk data...");
+	for(int y = 0; y < sizeY; ++y) {
+		for(int x = 0; x < sizeX; ++x) {
+			for(int z = 0; z < sizeZ; ++z) {
+				setCubeAbs(x,y,z,Cube(file.get(),0));
+			}
+		}
+	}
+	outLog(" - Calculating sky levels...");
+	skyValues = std::vector<std::vector<int> >(CHUNKSIZE*WORLDWIDTH,
+											   std::vector<int>(CHUNKSIZE*WORLDWIDTH,-1));
+	for(int x = 0; x < CHUNKSIZE*WORLDWIDTH; ++x) {
+		for(int z = 0; z < CHUNKSIZE*WORLDWIDTH; ++z) {
+			skyValues[x][z] = getSkylightLevel(x,z);
+		}
+	}
+
+	outLog(" - Lighting chunks...");
+	for (int x = 0; x < WORLDWIDTH; ++x) {
+		for (int y = 0; y < WORLDHEIGHT; ++y) {
+			for (int z = 0; z < WORLDWIDTH; ++z) {
+				initChunkLight(x,y,z);
+			}
+		}
+	}
+
+}
+
 void World::regenChunk(int x, int y, int z, int seed) {
 	if (chunks[x][y][z] != NULL)
 		delete chunks[x][y][z];
 	chunks[x][y][z] = new Chunk(x,y,z,*this);
 }
 
-bool World::outOfBounds(int x, int y, int z) const{
+void World::initChunkLight(int x,int y, int z) { //should only be called if upper chunks are loaded. Coords in chunk system.
+	calculateLight(sf::Vector3i(x*CHUNKSIZE+(CHUNKSIZE/2),y*CHUNKSIZE+(CHUNKSIZE/2),z*CHUNKSIZE+(CHUNKSIZE/2)),sf::Vector2i(CHUNKSIZE,CHUNKSIZE),false);
+}
+
+bool World::getOutOfBounds(int x, int y, int z) const{
 	if (x/CHUNKSIZE >= WORLDWIDTH || x/CHUNKSIZE < 0
 		|| y/CHUNKSIZE >= WORLDHEIGHT || y/CHUNKSIZE < 0
 		|| z/CHUNKSIZE >= WORLDWIDTH || z/CHUNKSIZE < 0
@@ -43,14 +98,31 @@ bool World::outOfBounds(int x, int y, int z) const{
 }
 
 Cube World::getCubeAbs(int x, int y, int z) const {
-	if (outOfBounds(x,y,z))
-		return Cube(0,1);
+	if (getOutOfBounds(x,y,z))
+		return Cube(0,MINLIGHT);
 	return chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE];
 }
 
 void World::setCubeAbs(int x, int y, int z, const Cube &c) {
+	if (getOutOfBounds(x,y,z))
+		return;
 	chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE] = c;
 	chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->markedForRedraw = true;
+}
+
+int World::getSkylightLevel(int x, int z) { //X and Z in cube coords
+	for(int y = CHUNKSIZE*WORLDHEIGHT-1; y >= 0; --y) {
+		if(getCubeAbs(x,y,z).ID != 0) {
+			return y;
+		}
+	}
+	return -1;
+}
+
+bool World::getSkyAccess(int x, int y, int z) {
+	if (y <= skyValues[x][z])
+		return false;
+	return true;
 }
 
 void World::draw() const {
@@ -90,7 +162,7 @@ void World::update(float deltaTime, const Camera& camera) {
 //By: John Amanatides et al.
 //Implemented by Jordi "BuD" Santiago Provencio
 void World::traceView(const Camera& player, float tMax) {
-	if (!outOfBounds(floor(player.pos.x),floor(player.pos.y),floor(player.pos.z)) &&
+	if (!getOutOfBounds(floor(player.pos.x),floor(player.pos.y),floor(player.pos.z)) &&
 		getCubeAbs(floor(player.pos.x),floor(player.pos.y),floor(player.pos.z)).ID != 0) {
 		playerTargetsBlock = true;
 		targetedBlock = sf::Vector3f(floor(player.pos.x),floor(player.pos.y),floor(player.pos.z));
@@ -163,7 +235,7 @@ void World::traceView(const Camera& player, float tMax) {
 				tMaxc.z= tMaxc.z + tDelta.z;
 			}
 		}
-		if(!outOfBounds(vox.x,vox.y,vox.z) && getCubeAbs(vox.x,vox.y,vox.z).ID != 0) {
+		if(!getOutOfBounds(vox.x,vox.y,vox.z) && getCubeAbs(vox.x,vox.y,vox.z).ID != 0) {
 			playerTargetsBlock = true;
 			targetedBlock = vox;
 			return;
@@ -173,28 +245,50 @@ void World::traceView(const Camera& player, float tMax) {
 }
 
 
-void World::calculateLight(sf::Vector3i source, const sf::Vector3i &radius) {
+void World::calculateLight(sf::Vector3i source, sf::Vector2i radius, bool changedBlock) {
 	//BFS TO THE MAX
+	if (source.y > skyValues[source.x][source.z] && changedBlock) { // calculate "shadow" of the new block
+		int previousSkyValue = skyValues[source.x][source.z];
+		skyValues[source.x][source.z] = getSkylightLevel(source.x,source.z);
+		calculateLight(sf::Vector3i(source.x,
+									((source.y - previousSkyValue	)/2) + previousSkyValue,
+									source.z),
+					   sf::Vector2i(UPDATERADIUS,(source.y - previousSkyValue)/2 + UPDATERADIUS),false);
+		return;
+	}
+	else if (source.y == skyValues[source.x][source.z] && changedBlock) { //propagate skylight downwards
+		skyValues[source.x][source.z] = getSkylightLevel(source.x,source.z);
+		calculateLight(sf::Vector3i(source.x,
+									((source.y - skyValues[source.x][source.z])/2) + skyValues[source.x][source.z],
+									source.z),
+					   sf::Vector2i(UPDATERADIUS,(source.y - skyValues[source.x][source.z])/2 + UPDATERADIUS),false);
+		return;
+	}
 	std::queue<sf::Vector3i> blocksToCheck;
 	for(int x = source.x-radius.x; x <= source.x+radius.x; ++x) {
 		for(int y = source.y-radius.y; y <= source.y+radius.y; ++y) {
-			for(int z = source.z-radius.z; z <= source.z+radius.z; ++z) {
-				if (!outOfBounds(x,y,z)){
+			for(int z = source.z-radius.x; z <= source.z+radius.x; ++z) {
+				if (!getOutOfBounds(x,y,z)){
 					switch(getCubeAbs(x,y,z).ID) {
 						case 0: //air
-							if (	  x == source.x-radius.x || x == source.x+radius.x
-									  ||y == source.y-radius.y || y == source.y+radius.y
-									  ||z == source.z-radius.z || z == source.z+radius.z){
+							if (x == source.x-radius.x || x == source.x+radius.x
+								||y == source.y-radius.y || y == source.y+radius.y
+								||z == source.z-radius.x || z == source.z+radius.x){
 								//if it is on border, mark it as node
-								if (getCubeAbs(x,y,z).light > 1) {
+								if (getCubeAbs(x,y,z).light > MINLIGHT) {
 									blocksToCheck.push(sf::Vector3i(x,y,z));
 								}
 							}
-							else
-								setCubeAbs(x,y,z,Cube(0,MINLIGHT));
+							else {
+								if (getSkyAccess(x,y,z)) {
+									setCubeAbs(x,y,z,Cube(0,MAXLIGHT));
+									blocksToCheck.push(sf::Vector3i(x,y,z));
+								}
+								else setCubeAbs(x,y,z,Cube(0,MINLIGHT));
+							}
 							break;
 						case 4: //lightblock
-							setCubeAbs(x,y,z,Cube(4,MAXLIGHT));
+							setCubeAbs(x,y,z,Cube(4,MAXLIGHT+5));
 							blocksToCheck.push(sf::Vector3i(x,y,z));
 							break;
 						default:
@@ -207,8 +301,9 @@ void World::calculateLight(sf::Vector3i source, const sf::Vector3i &radius) {
 	}
 	while(!blocksToCheck.empty()) {
 		sf::Vector3i source = blocksToCheck.front();
-		if(getCubeAbs(source.x,source.y,source.z).light < 1.1) { //THIS NUMBER (1.1( CHANGES DEPENDING									 //DECREASE FACTOR!
-			blocksToCheck.pop();								 //ON LIGHT DECREASE FACTOR
+		if(getCubeAbs(source.x,source.y,source.z).light*LIGHTFACTOR <= MINLIGHT) {
+			setCubeAbs(source.x,source.y,source.z,Cube(0,MINLIGHT));
+			blocksToCheck.pop();
 		}
 		else {
 			processCubeLighting(source,sf::Vector3i(1,0,0),blocksToCheck);
@@ -224,16 +319,16 @@ void World::calculateLight(sf::Vector3i source, const sf::Vector3i &radius) {
 
 void World::processCubeLighting(const sf::Vector3i& source, const sf::Vector3i& offset, std::queue<sf::Vector3i> &queue) { //BFS node processing
 	sf::Vector3i subject = source+offset;
-	if(!outOfBounds(subject.x,subject.y,subject.z) && getCubeAbs(subject.x,subject.y,subject.z).ID == 0) {
-		if(getCubeAbs(subject.x,subject.y,subject.z).light < getCubeAbs(source.x,source.y,source.z).light*0.85) {
+	if(!getOutOfBounds(subject.x,subject.y,subject.z) && getCubeAbs(subject.x,subject.y,subject.z).ID == 0) {
+		if(getCubeAbs(subject.x,subject.y,subject.z).light < getCubeAbs(source.x,source.y,source.z).light*LIGHTFACTOR) {
 			queue.push(subject);
 			setCubeAbs(subject.x,subject.y,subject.z,
-					   Cube(0,getCubeAbs(source.x,source.y,source.z).light*0.85)); //0.85 is the light decrease factor
+					   Cube(0,getCubeAbs(source.x,source.y,source.z).light*LIGHTFACTOR));
 		}
 	}
 }
 
-void World::updateGrass(float deltaTime) { //only to be called by main update()
+void World::updateGrass(float deltaTime) { //only to be called by world.update()
 	if (updateStuffTimer >= 0.01) {
 		updateStuffTimer-= 0.01;
 		for(int i = 0; i < 10; ++i) {

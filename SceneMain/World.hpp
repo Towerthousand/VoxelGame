@@ -19,18 +19,22 @@ class World {
 		World();
 		~World();
 		//generators
+		void loadDirbaio(const std::string filePath);
 		void regenChunk(int x, int y, int z, int seed);
+		void initChunkLight(int x,int y, int z);
 
 		//Getters and setters
-		bool outOfBounds(int x, int y, int z) const;
+		bool getOutOfBounds(int x, int y, int z) const;
 		Cube getCubeAbs(int x, int y, int z) const;
 		void setCubeAbs(int x, int y, int z, const Cube& c);
+		int getSkylightLevel(int x, int z);
+		bool getSkyAccess(int x, int y, int z);
 
 		//main
 		void draw() const;
 		void update(float deltaTime, const Camera& camera);
 		void traceView(const Camera& player, float tMax);
-		void calculateLight(sf::Vector3i source, const sf::Vector3i& radius);
+		void calculateLight(sf::Vector3i source, sf::Vector2i radius, bool changedBlock);
 
 		bool playerTargetsBlock;
 		int chunksDrawn;
@@ -44,6 +48,7 @@ class World {
 		void updateGrass(float deltaTime);
 
 		float updateStuffTimer;
+		std::vector<std::vector<int> > skyValues;
 		static const int vertexPoints[8][3];
 		static const int indexes[24];
 };

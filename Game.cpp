@@ -70,7 +70,7 @@ void Game::update(float deltaTime) {
             delete currentScene;
         currentScene = nextScene;
         nextScene = NULL;
-        if (!currentScene->init()) {
+		if (!currentScene->init()) {
             delete currentScene;
             currentScene = NULL;
             close();

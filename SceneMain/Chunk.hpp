@@ -9,12 +9,10 @@ class Chunk { //16*16*128
 		Chunk(int x, int y, int z, World &world);
 		~Chunk();
 
-		//generator
-		void populate();
-
 		//Getters & consultors
-		bool outOfBounds(int x, int y, int z);
+		bool getOutOfBounds(int x, int y, int z);
 		Cube getCube(int x, int y, int z);
+		bool getSkyAccess(int x,int y, int z);
 
 		//main
 		void update(float deltaTime);
@@ -22,20 +20,19 @@ class Chunk { //16*16*128
 		bool checkCulling(const Camera &cam);
 
 		std::vector<std::vector<std::vector<Cube> > > cubes;
-
 		bool markedForRedraw;
 		bool outOfView;
 	private:
 		void pushCubeToArray(int x, int y, int z, int cubeID);
         void makeVbo();
 
-		uint VBOID;
+		int VBOID;
 		int XPOS; //x pos of chunk inside world matrix
 		int ZPOS; //z pos of chunk inside world matrix
 		int YPOS; //y pos of chunk inside world matrix
 		World& parentWorld;
 		int SEED; //constant across chunks
-		static const int textureIndexes[5][6];
+		static const int textureIndexes[9][6];
 		std::vector<Vertex> renderData;
 };
 
