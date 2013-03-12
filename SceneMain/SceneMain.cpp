@@ -39,7 +39,8 @@ bool SceneMain::init() {
     gluPerspective(60.0f, float(SCRWIDTH)/float(SCRHEIGHT), 0.01f, 500.0f);
 
     outLog("* Loading chunks" );
-	world.loadDirbaio("resources/out.bin");
+	if (!world.loadDirbaio("resources/out.bin"))
+		return false;
 
 	debugCounter = 0.0;
     outLog("* Init was succesful" );

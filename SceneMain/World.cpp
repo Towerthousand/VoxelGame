@@ -26,8 +26,12 @@ World::~World() {
 }
 
 
-void World::loadDirbaio(const std::string filePath) {
+bool World::loadDirbaio(const std::string filePath) {
 	std::ifstream file(filePath.c_str());
+	if(!file) {
+		outLog("#ERROR Could not load dirbaio \"" + filePath + "\"");
+		return false;
+	}
 	int sizeX = int(file.get()) << 24 | int(file.get()) << 16 | int(file.get()) << 8 | int(file.get());
 	int sizeY = int(file.get()) << 24 | int(file.get()) << 16 | int(file.get()) << 8 | int(file.get());
 	int sizeZ = int(file.get()) << 24 | int(file.get()) << 16 | int(file.get()) << 8 | int(file.get());
@@ -56,6 +60,7 @@ void World::loadDirbaio(const std::string filePath) {
 			}
 		}
 	}
+	file.close();
 	outLog(" - Calculating sky levels...");
 	skyValues = std::vector<std::vector<int> >(CHUNKSIZE*WORLDWIDTH,
 											   std::vector<int>(CHUNKSIZE*WORLDWIDTH,-1));
@@ -73,7 +78,7 @@ void World::loadDirbaio(const std::string filePath) {
 			}
 		}
 	}
-
+	return true;
 }
 
 void World::regenChunk(int x, int y, int z, int seed) {
