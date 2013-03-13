@@ -26,6 +26,9 @@ class SceneMain : public Scene {
 		float grassTimer;
 		World world;
 		float debugCounter;
+        float fpsTime; //FIX
+        float fpsCount;//THIS
+        float FPS; //NOW
 };
 
 #endif // SCENEMAIN_HPP

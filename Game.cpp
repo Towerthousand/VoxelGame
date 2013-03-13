@@ -1,10 +1,10 @@
 #include "Game.hpp"
 
 Game::Game() : currentScene(NULL), nextScene(NULL) {
-    window.create(sf::VideoMode(SCRWIDTH,SCRHEIGHT,32), WINDOW_TITLE ,sf::Style::Default,CONTEXT_SETTINGS_OPENGL);
+    window.create(sf::VideoMode(SCRWIDTH,SCRHEIGHT,32), WINDOW_TITLE ,sf::Style::Fullscreen,CONTEXT_SETTINGS_OPENGL);
     window.setMouseCursorVisible(false);
     window.setKeyRepeatEnabled(false);
-    window.setVerticalSyncEnabled(false);
+    window.setVerticalSyncEnabled(true);
     WINDOWFOCUS = true;
     glClearColor(180.0/255.0,205.0/255.0,205.0/255.0,1);
 }
@@ -35,8 +35,6 @@ bool Game::init() {
     glCullFace(GL_BACK);
 
     //initialise game-wide logic and objects
-    fpsTime = 0.0;
-    fpsCount = 0;
     outLog("* INIT GAME SUCCESFUL" );
     return true;
 }
@@ -76,15 +74,6 @@ void Game::update(float deltaTime) {
             close();
         }
     }
-
-    //FPS Count and title (game-wide logic)
-    if (fpsTime > 1) {
-        window.setTitle(std::string(WINDOW_TITLE) + ", fps: " + toString(fpsCount));
-        fpsTime = 0;
-        fpsCount = 0;
-    }
-    fpsTime += deltaTime;
-    ++fpsCount;
 
     //Scene logic updating
     if (currentScene != NULL)

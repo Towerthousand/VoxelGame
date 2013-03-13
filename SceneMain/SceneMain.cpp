@@ -23,7 +23,8 @@ bool SceneMain::init() {
         return false;
     parent.audio().musicBank["troll"]->getTrack().play();
     parent.audio().musicBank["troll"]->getTrack().setLoop(true);
-	parent.font().makeText("Updates","",20,sf::Vector2f(10,130),sf::Color::White,sf::Text::Bold,false);
+    parent.font().makeText("FPS","",20,sf::Vector2f(10,150),sf::Color::White,sf::Text::Bold,false);
+    parent.font().makeText("Updates","",20,sf::Vector2f(10,130),sf::Color::White,sf::Text::Bold,false);
     parent.font().makeText("Chunks","",20,sf::Vector2f(10,110),sf::Color::White,sf::Text::Bold,false);
     parent.font().makeText("posX","",20,sf::Vector2f(10,10),sf::Color::White,sf::Text::Bold,false);
     parent.font().makeText("posY","",20,sf::Vector2f(10,30),sf::Color::White,sf::Text::Bold,false);
@@ -42,12 +43,23 @@ bool SceneMain::init() {
 	if (!world.loadDirbaio("resources/out.bin"))
 		return false;
 
+    fpsTime = 0;
+    fpsCount = 0;
+    FPS = 0;
 	debugCounter = 0.0;
     outLog("* Init was succesful" );
     return true;
 }
 
 void SceneMain::update(float deltaTime) {
+
+    if (fpsTime > 1) {
+        fpsTime -= 1;
+        FPS = fpsCount;
+        fpsCount = 0;
+    }
+    fpsTime += deltaTime;
+    ++fpsCount;
 
 	if (debugCounter > 1) {
 		parent.font().getText("Updates").setString("Updates: " + toString(DBG_UPDATES));
@@ -109,6 +121,7 @@ void SceneMain::draw() const {
     glFlush();
 
 	//Debug tags
+    parent.font().getText("FPS").setString("FPS: " + toString(FPS));
     parent.font().getText("Chunks").setString("Chunks drawn: " + toString(world.chunksDrawn));
     parent.font().getText("posX").setString("X: " + toString(player.pos.x));
     parent.font().getText("posY").setString("Y: " + toString(player.pos.y));
@@ -119,6 +132,7 @@ void SceneMain::draw() const {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
     parent.getWindow().pushGLStates();
     //SFML draws (until window.popGLStates())
+    parent.getWindow().draw(parent.font().getText("FPS"));
 	parent.getWindow().draw(parent.font().getText("Updates"));
     parent.getWindow().draw(parent.font().getText("Chunks"));
     parent.getWindow().draw(parent.font().getText("posX"));
