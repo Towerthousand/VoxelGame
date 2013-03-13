@@ -29,23 +29,22 @@ bool Chunk::getSkyAccess(int x,int y, int z) {
 }
 
 void Chunk::update(float deltaTime) {
-	if (markedForRedraw) { //empty arrays and re-do them
-		markedForRedraw = false;
-		DBG_UPDATES++; //I'm a global extern. FIX ME PLS
-		renderData.resize(0);
-		int cubeID;
-		for(int z = 0; z < CHUNKSIZE; ++z) {
-			for(int y = 0; y < CHUNKSIZE; ++y) {
-				for(int x = 0; x < CHUNKSIZE; ++x) {
-					cubeID = getCube(x,y,z).ID;
-					if (cubeID != 0) { // only draw if it's not air
-						pushCubeToArray(x,y,z,cubeID);
-					}
+	//empty arrays and re-do them
+	markedForRedraw = false;
+	DBG_UPDATES++; //I'm a global extern. FIX ME PLS
+	renderData.resize(0);
+	int cubeID;
+	for(int z = 0; z < CHUNKSIZE; ++z) {
+		for(int y = 0; y < CHUNKSIZE; ++y) {
+			for(int x = 0; x < CHUNKSIZE; ++x) {
+				cubeID = getCube(x,y,z).ID;
+				if (cubeID != 0) { // only draw if it's not air
+					pushCubeToArray(x,y,z,cubeID);
 				}
 			}
 		}
-		makeVbo();
 	}
+	makeVbo();
 }
 
 

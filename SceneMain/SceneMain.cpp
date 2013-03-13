@@ -48,6 +48,7 @@ bool SceneMain::init() {
 }
 
 void SceneMain::update(float deltaTime) {
+
 	if (debugCounter > 1) {
 		parent.font().getText("Updates").setString("Updates: " + toString(DBG_UPDATES));
 		DBG_UPDATES = 0;

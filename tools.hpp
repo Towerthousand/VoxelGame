@@ -16,6 +16,7 @@
 #include <cmath>
 #include <exception>
 #include <queue>
+#include <thread>
 
 extern int SCRWIDTH; //1366
 extern int SCRHEIGHT; //768
@@ -41,9 +42,15 @@ struct Vertex {
 };
 
 struct Cube {
-	Cube (int ID, float light) : ID(ID), light(light) {}
-	int ID;
+	Cube (short ID, float light) : ID(ID), light(light) {}
+	short ID;
 	float light;
+};
+
+struct lightBox {
+	sf::Vector3i source;
+	sf::Vector2i radius;
+	bool blockChanged;
 };
 
 //prototype random functions here (define in tools.cpp). Inlines go here too
@@ -56,7 +63,7 @@ std::string toString(float num);
 #define CONTEXT_SETTINGS_OPENGL sf::ContextSettings(32,32,0,3,0)
 #define CHUNKSIZE 16
 #define PLAYER_HEIGHT -1.8
-#define UPDATERADIUS 16.0 //How many potential light blocks does changing a block affect?
+#define UPDATERADIUS 14.0 //How many potential light blocks does changing a block affect?
 #define MAXLIGHT 16.0
 #define MINLIGHT ((MAXLIGHT)/16.0) //decrease or increase the 16.0 to change minimum light
 								 //level. 1 = everything lit to max, but buggy

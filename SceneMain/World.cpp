@@ -27,6 +27,8 @@ World::~World() {
 
 
 bool World::loadDirbaio(const std::string filePath) {
+	sf::Clock clock;
+	clock.restart();
 	std::ifstream file(filePath.c_str());
 	if(!file) {
 		outLog("#ERROR Could not load dirbaio \"" + filePath + "\"");
@@ -69,26 +71,13 @@ bool World::loadDirbaio(const std::string filePath) {
 			skyValues[x][z] = getSkylightLevel(x,z);
 		}
 	}
-
-	sf::Clock c;
-	c.restart();
-	float t = 0.0;
 	outLog(" - Lighting chunks...");
-
-//	for (int x = 0; x < WORLDWIDTH; ++x) {
-//		for (int y = 0; y < WORLDHEIGHT; ++y) {
-//			for (int z = 0; z < WORLDWIDTH; ++z) {
-//				initChunkLight(x,y,z);
-//			}
-//		}
-//	}
 	calculateLight(sf::Vector3i(CHUNKSIZE*WORLDWIDTH/2,
 								CHUNKSIZE*WORLDHEIGHT/2,
 								CHUNKSIZE*WORLDWIDTH/2),
 				   sf::Vector2i(WORLDWIDTH*CHUNKSIZE/2 + 1,WORLDHEIGHT*CHUNKSIZE/2 + 1),
 				   false);
-	t = c.restart().asSeconds();
-	outLog("- Finished lighting. Time: " + toString(t) + " seconds");
+	outLog(" - Finished lighting. Time: " + toString((float)clock.restart().asSeconds()) + " seconds");
 	return true;
 }
 
@@ -158,6 +147,7 @@ void World::draw() const {
 void World::update(float deltaTime, const Camera& camera) {
 	chunksDrawn = 0;
 	updateGrass(deltaTime);
+	int updateMax = 0; //maximum number of chunk redraws
 	for (int x = 0; x < WORLDWIDTH; ++x)  {
 		for (int y = 0; y < WORLDHEIGHT; ++y) {
 			for (int z = 0; z < WORLDWIDTH; ++z) {
@@ -168,7 +158,10 @@ void World::update(float deltaTime, const Camera& camera) {
 					++chunksDrawn;
 					chunks[x][y][z]->outOfView = false;
 				}
-				chunks[x][y][z]->update(deltaTime);
+				if (chunks[x][y][z]->markedForRedraw == true && updateMax < 10) {
+					updateMax++;
+					chunks[x][y][z]->update(deltaTime);
+				}
 			}
 		}
 	}
@@ -267,9 +260,9 @@ void World::calculateLight(sf::Vector3i source, sf::Vector2i radius, bool change
 		int previousSkyValue = skyValues[source.x][source.z];
 		skyValues[source.x][source.z] = getSkylightLevel(source.x,source.z);
 		calculateLight(sf::Vector3i(source.x,
-									((source.y - previousSkyValue	)/2) + previousSkyValue,
+									((source.y - previousSkyValue	)/2) + previousSkyValue - UPDATERADIUS/2,
 									source.z),
-					   sf::Vector2i(UPDATERADIUS,(source.y - previousSkyValue)/2 + UPDATERADIUS),false);
+					   sf::Vector2i(UPDATERADIUS,(source.y - previousSkyValue)/2 + UPDATERADIUS/2),false);
 		return;
 	}
 	else if (source.y == skyValues[source.x][source.z] && changedBlock) { //propagate skylight downwards
@@ -315,6 +308,7 @@ void World::calculateLight(sf::Vector3i source, sf::Vector2i radius, bool change
 			}
 		}
 	}
+
 	while(!blocksToCheck.empty()) {
 		sf::Vector3i source = blocksToCheck.front();
 		if(getCubeAbs(source.x,source.y,source.z).light*LIGHTFACTOR <= MINLIGHT) {
@@ -334,12 +328,23 @@ void World::calculateLight(sf::Vector3i source, sf::Vector2i radius, bool change
 }
 
 void World::processCubeLighting(const sf::Vector3i& source, const sf::Vector3i& offset, std::queue<sf::Vector3i> &queue) { //BFS node processing
+	//The speed of this function is crucial. That's why it's fucking ugly.
 	sf::Vector3i subject = source+offset;
-	if(!getOutOfBounds(subject.x,subject.y,subject.z) && getCubeAbs(subject.x,subject.y,subject.z).ID == 0) {
-		if(getCubeAbs(subject.x,subject.y,subject.z).light < getCubeAbs(source.x,source.y,source.z).light*LIGHTFACTOR) {
-			queue.push(subject);
-			setCubeAbs(subject.x,subject.y,subject.z,
-					   Cube(0,getCubeAbs(source.x,source.y,source.z).light*LIGHTFACTOR));
+	if(!getOutOfBounds(subject.x,subject.y,subject.z)) {
+		float invCHUNKSIZE = 1.0/float(CHUNKSIZE); //multiplying by inverse is faster than dividing
+		Cube subjectCube = chunks[subject.x*invCHUNKSIZE][subject.y*invCHUNKSIZE][subject.z*invCHUNKSIZE]
+						   ->cubes[subject.x%CHUNKSIZE][subject.y%CHUNKSIZE][subject.z%CHUNKSIZE];
+		if (subjectCube.ID == 0) {
+			Cube sourceCube = chunks[source.x*invCHUNKSIZE][source.y*invCHUNKSIZE][source.z*invCHUNKSIZE]
+							  ->cubes[source.x%CHUNKSIZE][source.y%CHUNKSIZE][source.z%CHUNKSIZE];
+			if(subjectCube.light < sourceCube.light*LIGHTFACTOR) {
+				queue.push(subject);
+				//setCube without getOutOfBounds check
+				chunks[subject.x*invCHUNKSIZE][subject.y*invCHUNKSIZE ][subject.z*invCHUNKSIZE ]
+						->cubes[subject.x%CHUNKSIZE][subject.y%CHUNKSIZE][subject.z%CHUNKSIZE] =
+						Cube(0,sourceCube.light*LIGHTFACTOR);
+				chunks[subject.x*invCHUNKSIZE][subject.y*invCHUNKSIZE][subject.z*invCHUNKSIZE]->markedForRedraw = true;
+			}
 		}
 	}
 }

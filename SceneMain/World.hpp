@@ -2,7 +2,6 @@
 #define WORLD_HPP
 #include "tools.hpp"
 
-
 //chunk grid coords:
 //0 <= x < WORLDWIDTH*CHUNKSIZE
 //0 <= z < WORLDWIDTH*CHUNKSIZE

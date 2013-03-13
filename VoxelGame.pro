@@ -18,7 +18,8 @@ SOURCES += \
     $$PWD/graphics/TextureManager.cpp \
     $$PWD/audio/AudioManager.cpp \
     $$PWD/audio/Effect.cpp \
-    $$PWD/audio/Music.cpp
+    $$PWD/audio/Music.cpp \
+    SceneMain/LightManager.cpp
 
 HEADERS += \
     $$PWD/Scene.hpp \
@@ -34,4 +35,5 @@ HEADERS += \
     $$PWD/graphics/TextureManager.hpp \
     $$PWD/audio/AudioManager.hpp \
     $$PWD/audio/Effect.hpp \
-    $$PWD/audio/Music.hpp
+    $$PWD/audio/Music.hpp \
+    SceneMain/LightManager.hpp
