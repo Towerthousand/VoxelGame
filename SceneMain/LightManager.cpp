@@ -1,6 +1,6 @@
 #include "LightManager.hpp"
 
-LightManager::LightManager() {
+LightManager::LightManager(World& world) : parentWorld(world) {
 }
 
 LightManager::~LightManager() {

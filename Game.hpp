@@ -54,10 +54,6 @@ class Game {
 		TextureManager texManager;
 		FontManager fontManager;
 		AudioManager audioManager;
-
-		//logic
-		float fpsTime;
-		uint fpsCount;
 };
 
 #endif //GAME_HPP
