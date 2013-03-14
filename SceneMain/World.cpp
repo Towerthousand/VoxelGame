@@ -181,7 +181,7 @@ void World::update(float deltaTime, const Camera& camera) {
                     ++chunksDrawn;
                     chunks[x][y][z]->outOfView = false;
                 }
-                if (chunks[x][y][z]->markedForRedraw == true && updateMax < 10) {
+                if (chunks[x][y][z]->markedForRedraw == true && updateMax < 30) {
                     updateMax++;
                     chunks[x][y][z]->update(deltaTime);
                 }
@@ -281,7 +281,7 @@ void World::calculateLight(sf::Vector3i source, sf::Vector2i radius) {
     int size = radius.x*radius.x*radius.y*8;
     //std::cout<<"====== UPDATE "<<size << " "<<radius.x<<" "<<radius.y << std::endl;
     //BFS TO THE MAX
-    std::queue<sf::Vector3i> blocksToCheck[MAXLIGHT+1];
+    std::vector<sf::Vector3i> blocksToCheck[MAXLIGHT+1];
     short* ID = 0;
     short* light = 0;
     for(int x = source.x-radius.x; x <= source.x+radius.x; ++x) {
@@ -297,13 +297,13 @@ void World::calculateLight(sf::Vector3i source, sf::Vector2i radius) {
                                 ||z == source.z-radius.x || z == source.z+radius.x){
                             //if it is on border, mark it as node
                             if (*light > MINLIGHT) {
-                                blocksToCheck[*light].push(sf::Vector3i(x,y,z));
+                                blocksToCheck[*light].push_back(sf::Vector3i(x,y,z));
                             }
                         }
                         else {
                             if (getSkyAccess(x,y,z)) {
                                 *light = MAXLIGHT;
-                                blocksToCheck[MAXLIGHT].push(sf::Vector3i(x,y,z));
+                                blocksToCheck[MAXLIGHT].push_back(sf::Vector3i(x,y,z));
                             }
                             else
                                 *light = MINLIGHT;
@@ -313,7 +313,7 @@ void World::calculateLight(sf::Vector3i source, sf::Vector2i radius) {
                     case 4: //lightblock
                         *light = MAXLIGHT;
                         chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->markedForRedraw = true;
-                        blocksToCheck[MAXLIGHT].push(sf::Vector3i(x,y,z));
+                        blocksToCheck[MAXLIGHT].push_back(sf::Vector3i(x,y,z));
                         break;
                     default:
                         *light = 0;
@@ -325,9 +325,8 @@ void World::calculateLight(sf::Vector3i source, sf::Vector2i radius) {
         }
     }
     for (int i = MAXLIGHT; i > MINLIGHT; --i)  {
-        while(!blocksToCheck[i].empty()) {
-            sf::Vector3i source = blocksToCheck[i].front();
-            blocksToCheck[i].pop();
+        for(int j = 0; j < blocksToCheck[i].size(); ++j) {
+            sf::Vector3i source = blocksToCheck[i][j];
             processCubeLighting(source,sf::Vector3i(1,0,0),blocksToCheck[i-1]);
             processCubeLighting(source,sf::Vector3i(-1,0,0),blocksToCheck[i-1]);
             processCubeLighting(source,sf::Vector3i(0,1,0),blocksToCheck[i-1]);
@@ -338,13 +337,13 @@ void World::calculateLight(sf::Vector3i source, sf::Vector2i radius) {
     }
 }
 
-void World::processCubeLighting(const sf::Vector3i& source, const sf::Vector3i& offset, std::queue<sf::Vector3i> &queue) { //BFS node processing
+void World::processCubeLighting(const sf::Vector3i& source, const sf::Vector3i& offset, std::vector<sf::Vector3i> &queue) { //BFS node processing
     sf::Vector3i subject = source+offset;
     if(!getOutOfBounds(subject.x,subject.y,subject.z) &&
             chunks[subject.x/CHUNKSIZE][subject.y/CHUNKSIZE][subject.z/CHUNKSIZE]->cubes[subject.x%CHUNKSIZE][subject.y%CHUNKSIZE][subject.z%CHUNKSIZE].ID == 0) {
         if(chunks[subject.x/CHUNKSIZE][subject.y/CHUNKSIZE][subject.z/CHUNKSIZE]->cubes[subject.x%CHUNKSIZE][subject.y%CHUNKSIZE][subject.z%CHUNKSIZE].light
                 < chunks[source.x/CHUNKSIZE][source.y/CHUNKSIZE][source.z/CHUNKSIZE]->cubes[source.x%CHUNKSIZE][source.y%CHUNKSIZE][source.z%CHUNKSIZE].light-1) {
-            queue.push(subject);
+            queue.push_back(subject);
             setCubeLightAbs(subject.x,subject.y,subject.z,chunks[source.x/CHUNKSIZE][source.y/CHUNKSIZE][source.z/CHUNKSIZE]->cubes[source.x%CHUNKSIZE][source.y%CHUNKSIZE][source.z%CHUNKSIZE].light-1);
         }
     }

@@ -63,11 +63,13 @@ std::string toString(float num);
 #define CONTEXT_SETTINGS_OPENGL sf::ContextSettings(32,32,0,3,0)
 #define CHUNKSIZE 16
 #define PLAYER_HEIGHT -1.8
-#define UPDATERADIUS 14.0 //How many potential light blocks does changing a block affect?
+#define UPDATERADIUS 12.0 //How many potential light blocks does changing a block affect? Not taking into account skylight.
+                          //Usually UPDATERADIUS = MAXLIGHT-MINLIGHT-1
 #define MAXLIGHT 15
-#define MINLIGHT 1 //decrease or increase the 16.0 to change minimum light
-								 //level. 1 = everything lit to max, but buggy
-#define LIGHTFACTOR 0.8
+#define MINLIGHT 1
 #define DEG_TO_RAD ((2*M_PI)/360.0)
+#define FOV 60.0 //degrees
+#define ZNEAR 0.01f
+#define ZFAR 500.0f
 
 #endif // TOOLS_HPP

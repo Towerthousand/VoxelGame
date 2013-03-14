@@ -1,7 +1,7 @@
 #include "Game.hpp"
 
 Game::Game() : currentScene(NULL), nextScene(NULL) {
-    window.create(sf::VideoMode(SCRWIDTH,SCRHEIGHT,32), WINDOW_TITLE ,sf::Style::Default,CONTEXT_SETTINGS_OPENGL);
+    window.create(sf::VideoMode(SCRWIDTH,SCRHEIGHT,32), WINDOW_TITLE ,sf::Style::Fullscreen,CONTEXT_SETTINGS_OPENGL);
     window.setMouseCursorVisible(false);
     window.setKeyRepeatEnabled(false);
     window.setVerticalSyncEnabled(true);
@@ -96,7 +96,7 @@ void Game::update(float deltaTime) {
             glViewport(0, 0, SCRWIDTH, SCRHEIGHT);
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
-            gluPerspective(60.0f, float(SCRWIDTH)/float(SCRHEIGHT), 0.01f, 500.0f);
+            gluPerspective(FOV, float(SCRWIDTH)/float(SCRHEIGHT), ZNEAR, ZFAR);
             break;
         case sf::Event::GainedFocus:
             WINDOWFOCUS = true;

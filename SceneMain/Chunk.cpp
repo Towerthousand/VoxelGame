@@ -72,11 +72,13 @@ void Chunk::draw() const {
 }
 
 bool Chunk::checkCulling(const Camera& cam) {
-	sf::Vector2f point(XPOS*CHUNKSIZE+CHUNKSIZE/2, ZPOS*CHUNKSIZE+CHUNKSIZE/2);
-	sf::Vector2f dir(-sin(-cam.rot.y*DEG_TO_RAD), -cos(-cam.rot.y*DEG_TO_RAD));
-	sf::Vector2f pos(cam.pos.x,cam.pos.z);
-	float distance = (dir.x*point.x + dir.y*point.y - dir.x*pos.x - dir.y*pos.y);
-	return distance < -CHUNKSIZE;
+    sf::Vector2f point(XPOS*CHUNKSIZE+CHUNKSIZE/2, ZPOS*CHUNKSIZE+CHUNKSIZE/2);
+    sf::Vector2f dir(-sin(-cam.rot.y*DEG_TO_RAD), -cos(-cam.rot.y*DEG_TO_RAD));
+    sf::Vector2f pos(cam.pos.x,cam.pos.z);
+//	float distance = (dir.x*point.x + dir.y*point.y - dir.x*pos.x - dir.y*pos.y);
+//	return distance < -CHUNKSIZE;
+    return false;
+
 }
 
 void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) {

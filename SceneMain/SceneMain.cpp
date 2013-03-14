@@ -37,7 +37,7 @@ bool SceneMain::init() {
     glScalef(1.0/512.0f,1.0/512.0f,1); //now textures are in pixel coords
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60.0f, float(SCRWIDTH)/float(SCRHEIGHT), 0.01f, 500.0f);
+    gluPerspective(FOV, float(SCRWIDTH)/float(SCRHEIGHT), ZNEAR, ZFAR);
 
     outLog("* Loading chunks" );
 	if (!world.loadDirbaio("resources/out.bin"))
@@ -169,7 +169,7 @@ void SceneMain::onKeyPressed(float deltaTime, const sf::Event& event) {
 			break;
 		case sf::Keyboard::Num8:
 			player.selectedID = 8;
-			break;
+            break;
 		default:
 			break;
 	}

@@ -13,6 +13,7 @@ Player::~Player() {
 void Player::update(float deltaTime) {
 	vel.y -= 15.0f*deltaTime;
     movePos(vel);
+    //calculate frustrum
 }
 
 void Player::draw() const {

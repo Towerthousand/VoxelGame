@@ -44,7 +44,7 @@ class World {
 
 	private:
 		void drawWireCube(const sf::Vector3f& pos) const;
-		void processCubeLighting(const sf::Vector3i& source, const sf::Vector3i& offset, std::queue<sf::Vector3i> &queue);
+        void processCubeLighting(const sf::Vector3i& source, const sf::Vector3i& offset, std::vector<sf::Vector3i> &queue);
 		void updateGrass(float deltaTime);
 
 		float updateStuffTimer;
