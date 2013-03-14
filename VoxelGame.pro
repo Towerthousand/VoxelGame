@@ -19,7 +19,7 @@ SOURCES += \
     $$PWD/audio/AudioManager.cpp \
     $$PWD/audio/Effect.cpp \
     $$PWD/audio/Music.cpp \
-    SceneMain/LightManager.cpp
+    $$PWD/SceneMain/LightManager.cpp
 
 HEADERS += \
     $$PWD/Scene.hpp \
@@ -36,4 +36,4 @@ HEADERS += \
     $$PWD/audio/AudioManager.hpp \
     $$PWD/audio/Effect.hpp \
     $$PWD/audio/Music.hpp \
-    SceneMain/LightManager.hpp
+    $$PWD/SceneMain/LightManager.hpp

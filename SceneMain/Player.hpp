@@ -10,7 +10,7 @@ class Player : public Camera {
 		void draw() const;
 
 		sf::Vector3f vel;
-		int selectedID;
+        short selectedID;
 };
 
 #endif // PLAYER_HPP

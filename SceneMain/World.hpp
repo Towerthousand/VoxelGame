@@ -25,7 +25,8 @@ class World {
 		//Getters and setters
 		bool getOutOfBounds(int x, int y, int z) const;
 		Cube getCubeAbs(int x, int y, int z) const;
-		void setCubeAbs(int x, int y, int z, const Cube& c);
+        void setCubeIDAbs(int x, int y, int z, short ID);
+        void setCubeLightAbs(int x, int y, int z, short light);
 		int getSkylightLevel(int x, int z);
 		bool getSkyAccess(int x, int y, int z);
 
@@ -33,7 +34,7 @@ class World {
 		void draw() const;
 		void update(float deltaTime, const Camera& camera);
 		void traceView(const Camera& player, float tMax);
-		void calculateLight(sf::Vector3i source, sf::Vector2i radius, bool changedBlock);
+        void calculateLight(sf::Vector3i source, sf::Vector2i radius);
 
 		bool playerTargetsBlock;
 		int chunksDrawn;

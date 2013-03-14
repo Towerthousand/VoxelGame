@@ -42,9 +42,9 @@ struct Vertex {
 };
 
 struct Cube {
-	Cube (short ID, float light) : ID(ID), light(light) {}
+    Cube (short ID, short light) : ID(ID), light(light) {}
 	short ID;
-	float light;
+    short light;
 };
 
 struct lightBox {
@@ -64,8 +64,8 @@ std::string toString(float num);
 #define CHUNKSIZE 16
 #define PLAYER_HEIGHT -1.8
 #define UPDATERADIUS 14.0 //How many potential light blocks does changing a block affect?
-#define MAXLIGHT 16.0
-#define MINLIGHT ((MAXLIGHT)/16.0) //decrease or increase the 16.0 to change minimum light
+#define MAXLIGHT 15
+#define MINLIGHT 1 //decrease or increase the 16.0 to change minimum light
 								 //level. 1 = everything lit to max, but buggy
 #define LIGHTFACTOR 0.8
 #define DEG_TO_RAD ((2*M_PI)/360.0)

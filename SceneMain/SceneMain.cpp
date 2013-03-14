@@ -179,14 +179,12 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Event& event) {
     switch(event.mouseButton.button) {
     case sf::Mouse::Left:
 		if(world.playerTargetsBlock) {
-            world.setCubeAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z,Cube(0,1));
-			world.calculateLight(sf::Vector3i(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z),sf::Vector2i(UPDATERADIUS,UPDATERADIUS),true);
+            world.setCubeIDAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z,0);
         }
         break;
     case sf::Mouse::Right:
-		if(world.playerTargetsBlock && !world.getOutOfBounds(world.last.x,world.last.y,world.last.z)) {
-			world.setCubeAbs(world.last.x,world.last.y,world.last.z,Cube(player.selectedID,0));
-			world.calculateLight(sf::Vector3i(world.last.x,world.last.y,world.last.z),sf::Vector2i(UPDATERADIUS,UPDATERADIUS),true);
+        if(world.playerTargetsBlock) {
+            world.setCubeIDAbs(world.last.x,world.last.y,world.last.z,player.selectedID);
         }
         break;
     default:
