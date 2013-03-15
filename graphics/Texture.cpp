@@ -13,7 +13,7 @@ bool Texture::load(const std::string &filePath) {
 		outLog("#ERROR " + filePath + " didn't load");
 		return false;
 	}
-	size = sf::Vector2i(image.getSize().x,image.getSize().y);
+    size = vec2i(image.getSize().x,image.getSize().y);
 
 	//get handle
 	GLuint tex_handle;

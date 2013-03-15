@@ -7,7 +7,7 @@
 //}
 
 
-//void LightManager::submitLightBox(sf::Vector3i source, sf::Vector2i radius, bool blockChanged) {
+//void LightManager::submitLightBox(sf::Vector3i source, vec2i radius, bool blockChanged) {
 
 //}
 

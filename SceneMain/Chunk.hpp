@@ -1,8 +1,8 @@
 #ifndef CHUNK_HPP
 #define CHUNK_HPP
 #include "tools.hpp"
-#include "Camera.hpp"
 
+class Player;
 class World;
 class Chunk { //16*16*128
 	public:
@@ -17,7 +17,7 @@ class Chunk { //16*16*128
 		//main
 		void update(float deltaTime);
 		void draw() const;
-		bool checkCulling(const Camera &cam);
+        bool checkCulling(Player &cam);
 
 		std::vector<std::vector<std::vector<Cube> > > cubes;
 		bool markedForRedraw;

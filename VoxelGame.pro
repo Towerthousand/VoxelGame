@@ -36,4 +36,5 @@ HEADERS += \
     $$PWD/audio/AudioManager.hpp \
     $$PWD/audio/Effect.hpp \
     $$PWD/audio/Music.hpp \
-    $$PWD/SceneMain/LightManager.hpp
+    $$PWD/SceneMain/LightManager.hpp \
+    Math.h

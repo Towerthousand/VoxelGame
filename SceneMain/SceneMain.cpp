@@ -23,15 +23,15 @@ bool SceneMain::init() {
         return false;
     parent.audio().musicBank["troll"]->getTrack().play();
     parent.audio().musicBank["troll"]->getTrack().setLoop(true);
-    parent.font().makeText("FPS","",20,sf::Vector2f(10,150),sf::Color::White,sf::Text::Bold,false);
-    parent.font().makeText("Updates","",20,sf::Vector2f(10,130),sf::Color::White,sf::Text::Bold,false);
-    parent.font().makeText("Chunks","",20,sf::Vector2f(10,110),sf::Color::White,sf::Text::Bold,false);
-    parent.font().makeText("posX","",20,sf::Vector2f(10,10),sf::Color::White,sf::Text::Bold,false);
-    parent.font().makeText("posY","",20,sf::Vector2f(10,30),sf::Color::White,sf::Text::Bold,false);
-    parent.font().makeText("posZ","",20,sf::Vector2f(10,50),sf::Color::White,sf::Text::Bold,false);
-    parent.font().makeText("rotX","",20,sf::Vector2f(10,90),sf::Color::White,sf::Text::Bold,false);
-    parent.font().makeText("rotY","",20,sf::Vector2f(10,70),sf::Color::White,sf::Text::Bold,false);
-    mouse.setPosition(sf::Vector2i(SCRWIDTH/2,SCRHEIGHT/2),parent.getWindow());
+    parent.font().makeText("FPS","",20,vec2f(10,150),sf::Color::White,sf::Text::Bold,false);
+    parent.font().makeText("Updates","",20,vec2f(10,130),sf::Color::White,sf::Text::Bold,false);
+    parent.font().makeText("Chunks","",20,vec2f(10,110),sf::Color::White,sf::Text::Bold,false);
+    parent.font().makeText("posX","",20,vec2f(10,10),sf::Color::White,sf::Text::Bold,false);
+    parent.font().makeText("posY","",20,vec2f(10,30),sf::Color::White,sf::Text::Bold,false);
+    parent.font().makeText("posZ","",20,vec2f(10,50),sf::Color::White,sf::Text::Bold,false);
+    parent.font().makeText("rotX","",20,vec2f(10,90),sf::Color::White,sf::Text::Bold,false);
+    parent.font().makeText("rotY","",20,vec2f(10,70),sf::Color::White,sf::Text::Bold,false);
+    mouse.setPosition(vec2i(SCRWIDTH/2,SCRHEIGHT/2),parent.getWindow());
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
     glScalef(1.0/512.0f,1.0/512.0f,1); //now textures are in pixel coords
@@ -39,48 +39,45 @@ bool SceneMain::init() {
     glLoadIdentity();
     gluPerspective(FOV, float(SCRWIDTH)/float(SCRHEIGHT), ZNEAR, ZFAR);
 
-    outLog("* Loading chunks" );
-	if (!world.loadDirbaio("resources/out.bin"))
-		return false;
+    frustum = std::vector<std::vector<vec3f> >
+            (6,std::vector<vec3f>
+             (4,vec3f(0,0,0)));
 
-    fpsTime = 0;
+    outLog("* Loading chunks" );
+    if (!world.loadDirbaio("resources/out.bin"))
+        return false;
+
     fpsCount = 0;
-    FPS = 0;
-	debugCounter = 0.0;
+    debugCounter = 0.0;
     outLog("* Init was succesful" );
     return true;
 }
 
 void SceneMain::update(float deltaTime) {
 
-    if (fpsTime > 1) {
-        fpsTime -= 1;
-        FPS = fpsCount;
+    ++fpsCount;
+    debugCounter += deltaTime;
+    if (debugCounter > 1) {
+        parent.font().getText("FPS").setString("FPS: " + toString(fpsCount));
+        parent.font().getText("Updates").setString("Updates: " + toString(DBG_UPDATES));
+        DBG_UPDATES = 0;
+        debugCounter -= 1;
         fpsCount = 0;
     }
-    fpsTime += deltaTime;
-    ++fpsCount;
-
-	if (debugCounter > 1) {
-		parent.font().getText("Updates").setString("Updates: " + toString(DBG_UPDATES));
-		DBG_UPDATES = 0;
-		debugCounter -= 1;
-	}
-	debugCounter += deltaTime;
-    player.vel = sf::Vector3f(0, 0, 0);
-	world.update(deltaTime,player);
+    player.vel = vec3f(0, 0, 0);
+    world.update(deltaTime,player);
     world.traceView(player,5);
     //Constant input (done every frame)
     //Rotate camera according to mouse input
-    sf::Vector2i mousePos = mouse.getPosition(parent.getWindow());//sf::Vector2i(event.mouseMove.x,event.mouseMove.y);
+    vec2i mousePos = mouse.getPosition(parent.getWindow());//vec2i(event.mouseMove.x,event.mouseMove.y);
     if ((mousePos.x != SCRHEIGHT/2 || mousePos.y != SCRWIDTH/2) && WINDOWFOCUS){
         player.rotateX(((float)mousePos.y - SCRHEIGHT/2));
         player.rotateY(((float)mousePos.x - SCRWIDTH/2));
-        mouse.setPosition(sf::Vector2i(SCRWIDTH/2, SCRHEIGHT/2),parent.getWindow());
+        mouse.setPosition(vec2i(SCRWIDTH/2, SCRHEIGHT/2),parent.getWindow());
     }
     //Move player
     const float vel = 5.0f;
-    sf::Vector2f dir(-sin(-player.rot.y*DEG_TO_RAD), -cos(player.rot.y*DEG_TO_RAD));
+    vec2f dir(-sin(-player.rot.y*DEG_TO_RAD), -cos(player.rot.y*DEG_TO_RAD));
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
         player.vel.x += dir.x*vel*deltaTime;
         player.vel.z += dir.y*vel*deltaTime;
@@ -102,9 +99,9 @@ void SceneMain::update(float deltaTime) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
         player.vel.y -= vel*deltaTime;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
-		player.pos = sf::Vector3f(0,128,0);
+        player.pos = vec3f(0,128,0);
 
-	 player.update(deltaTime);
+    player.update(deltaTime);
 }
 
 void SceneMain::draw() const {
@@ -116,12 +113,26 @@ void SceneMain::draw() const {
     glTranslatef(-player.pos.x, -player.pos.y, -player.pos.z);
 
     parent.textures().useTexture("lolwtf");
-	world.draw();
+    world.draw();
     player.draw();
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    for (int i = 0; i < 6; ++i) {
+        glPushMatrix();
+        glColor4f(0.0,0.0,0.0,1);
+        glBegin(GL_LINE_STRIP);
+        glVertex3f(frustum[i][0].x,frustum[i][0].y,frustum[i][0].z);
+        glVertex3f(frustum[i][1].x,frustum[i][1].y,frustum[i][1].z);
+        glVertex3f(frustum[i][2].x,frustum[i][2].y,frustum[i][2].z);
+        glVertex3f(frustum[i][3].x,frustum[i][3].y,frustum[i][3].z);
+        glVertex3f(frustum[i][0].x,frustum[i][0].y,frustum[i][0].z);
+        glEnd();
+        glColor4f(1.0,1.0,1.0,1.0);
+        glPopMatrix();
+    }
     glFlush();
 
-	//Debug tags
-    parent.font().getText("FPS").setString("FPS: " + toString(FPS));
+    //Debug tags
     parent.font().getText("Chunks").setString("Chunks drawn: " + toString(world.chunksDrawn));
     parent.font().getText("posX").setString("X: " + toString(player.pos.x));
     parent.font().getText("posY").setString("Y: " + toString(player.pos.y));
@@ -129,11 +140,10 @@ void SceneMain::draw() const {
     parent.font().getText("rotY").setString("Rot Y: " + toString(player.rot.y));
     parent.font().getText("rotX").setString("Rot X: " + toString(player.rot.x));
     glDisable(GL_CULL_FACE);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
     parent.getWindow().pushGLStates();
     //SFML draws (until window.popGLStates())
     parent.getWindow().draw(parent.font().getText("FPS"));
-	parent.getWindow().draw(parent.font().getText("Updates"));
+    parent.getWindow().draw(parent.font().getText("Updates"));
     parent.getWindow().draw(parent.font().getText("Chunks"));
     parent.getWindow().draw(parent.font().getText("posX"));
     parent.getWindow().draw(parent.font().getText("posY"));
@@ -145,40 +155,43 @@ void SceneMain::draw() const {
 }
 
 void SceneMain::onKeyPressed(float deltaTime, const sf::Event& event) {
-	switch(event.key.code) {
-		case sf::Keyboard::Num1:
-			player.selectedID = 1;
-			break;
-		case sf::Keyboard::Num2:
-			player.selectedID = 2;
-			break;
-		case sf::Keyboard::Num3:
-			player.selectedID = 3;
-			break;
-		case sf::Keyboard::Num4:
-			player.selectedID = 4;
-			break;
-		case sf::Keyboard::Num5:
-			player.selectedID = 5;
-			break;
-		case sf::Keyboard::Num6:
-			player.selectedID = 6;
-			break;
-		case sf::Keyboard::Num7:
-			player.selectedID = 7;
-			break;
-		case sf::Keyboard::Num8:
-			player.selectedID = 8;
-            break;
-		default:
-			break;
-	}
+    switch(event.key.code) {
+    case sf::Keyboard::Num1:
+        player.selectedID = 1;
+        break;
+    case sf::Keyboard::Num2:
+        player.selectedID = 2;
+        break;
+    case sf::Keyboard::Num3:
+        player.selectedID = 3;
+        break;
+    case sf::Keyboard::Num4:
+        player.selectedID = 4;
+        break;
+    case sf::Keyboard::Num5:
+        player.selectedID = 5;
+        break;
+    case sf::Keyboard::Num6:
+        player.selectedID = 6;
+        break;
+    case sf::Keyboard::Num7:
+        player.selectedID = 7;
+        break;
+    case sf::Keyboard::Num8:
+        player.selectedID = 8;
+        break;
+    case sf::Keyboard::Q:
+        frustum = player.frustumPlanes;
+        break;
+    default:
+        break;
+    }
 }
 
 void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Event& event) {
     switch(event.mouseButton.button) {
     case sf::Mouse::Left:
-		if(world.playerTargetsBlock) {
+        if(world.playerTargetsBlock) {
             world.setCubeIDAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z,0);
         }
         break;

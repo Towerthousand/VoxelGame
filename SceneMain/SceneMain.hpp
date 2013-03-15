@@ -25,10 +25,9 @@ class SceneMain : public Scene {
 		sf::Mouse mouse;
 		float grassTimer;
 		World world;
-		float debugCounter;
-        float fpsTime; //FIX
-        float fpsCount;//THIS
-        float FPS; //NOW
+        float debugCounter;
+        float fpsCount;
+        std::vector<std::vector<vec3f> > frustum;
 };
 
 #endif // SCENEMAIN_HPP

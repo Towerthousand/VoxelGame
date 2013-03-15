@@ -4,7 +4,7 @@ Game::Game() : currentScene(NULL), nextScene(NULL) {
     window.create(sf::VideoMode(SCRWIDTH,SCRHEIGHT,32), WINDOW_TITLE ,sf::Style::Fullscreen,CONTEXT_SETTINGS_OPENGL);
     window.setMouseCursorVisible(false);
     window.setKeyRepeatEnabled(false);
-    window.setVerticalSyncEnabled(true);
+    window.setVerticalSyncEnabled(false);
     WINDOWFOCUS = true;
     glClearColor(180.0/255.0,205.0/255.0,205.0/255.0,1);
 }
@@ -30,7 +30,7 @@ bool Game::init() {
     glEnable(GL_BLEND);
 	glDepthFunc(GL_LEQUAL);
     glEnable(GL_TEXTURE_2D);
-    //glEnable(GL_LINE_SMOOTH);
+    glEnable(GL_LINE_SMOOTH);
     glEnable(GL_CULL_FACE); //enable backface culling
     glCullFace(GL_BACK);
 

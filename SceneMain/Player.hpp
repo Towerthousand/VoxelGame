@@ -17,10 +17,10 @@ class Player : public Camera {
 		~Player();
 		void update(float deltaTime);
 		void draw() const;
-        bool inFrustrum(sf::Vector3f position, float radius); //sphere-plane check for frustrum culling
+        bool insideFrustum(vec3f position, float radius); //sphere-plane check for frustum culling
 
-        sf::Vector3f frustrumPlanes[6];
-		sf::Vector3f vel;
+        std::vector<std::vector<vec3f> > frustumPlanes;
+        vec3f vel;
         short selectedID;
 };
 

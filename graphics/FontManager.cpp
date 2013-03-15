@@ -8,7 +8,7 @@ FontManager::~FontManager() {
 
 
 bool FontManager::makeText(const std::string& textID, const std::string& textString,
-							int size, const sf::Vector2f& position,
+                            int size, const vec2f& position,
 							const sf::Color& color, const sf::Text::Style& style,
 							const bool& center_origin) {
 	if (texts.count(textID) != 0)

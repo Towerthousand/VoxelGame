@@ -8,7 +8,7 @@
 //	public:
 //		LightManager(World& world);
 //		~LightManager();
-//        void submitLightBox(sf::Vector3i source, sf::Vector2i radius, bool blockChanged);
+//        void submitLightBox(sf::Vector3i source, vec2i radius, bool blockChanged);
 //		void threadedLight(std::queue<lightBox>& queue, bool& status); //will set status to false when done.
 
 //		World& parentWorld;

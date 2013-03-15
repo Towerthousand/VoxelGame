@@ -7,7 +7,7 @@ class FontManager {
 		~FontManager();
 
 		bool makeText(const std::string& textID, const std::string& textString,
-					  int size, const sf::Vector2f& position,
+					  int size, const vec2f& position,
 					  const sf::Color& color, const sf::Text::Style& style, const bool& center_origin);
 		sf::Text& getText(const std::string& textID);
 		void deleteText(const std::string& textID);

@@ -19,7 +19,7 @@ class Texture
 		int getHeight();
 	private:
 		GLuint handle;
-		sf::Vector2i size;
+		vec2i size;
 };
 
 #endif // Texture_HPP

@@ -12,6 +12,7 @@
 //0 <= y < WORLDHEIGHT*CHUNKSIZE
 
 class Chunk;
+class Player;
 class Camera;
 class World {
 	public:
@@ -32,18 +33,18 @@ class World {
 
 		//main
 		void draw() const;
-		void update(float deltaTime, const Camera& camera);
+        void update(float deltaTime,Player &camera);
 		void traceView(const Camera& player, float tMax);
-        void calculateLight(sf::Vector3i source, sf::Vector2i radius);
+        void calculateLight(sf::Vector3i source, vec2i radius);
 
 		bool playerTargetsBlock;
 		int chunksDrawn;
-		sf::Vector3f targetedBlock;
-		sf::Vector3f last;
+        vec3f targetedBlock;
+        vec3f last;
 		std::vector<std::vector<std::vector<Chunk*> > > chunks;
 
 	private:
-		void drawWireCube(const sf::Vector3f& pos) const;
+        void drawWireCube(const vec3f& pos) const;
         void processCubeLighting(const sf::Vector3i& source, const sf::Vector3i& offset, std::vector<sf::Vector3i> &queue);
 		void updateGrass(float deltaTime);
 

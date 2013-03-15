@@ -1,5 +1,6 @@
 #include "Chunk.hpp"
 #include "World.hpp"
+#include "Player.hpp"
 
 Chunk::Chunk(int x, int y, int z, World &world) : XPOS(x), ZPOS(z), YPOS(y), parentWorld(world){
 	cubes = std::vector<std::vector<std::vector<Cube> > >
@@ -71,14 +72,8 @@ void Chunk::draw() const {
 	glPopMatrix();
 }
 
-bool Chunk::checkCulling(const Camera& cam) {
-    sf::Vector2f point(XPOS*CHUNKSIZE+CHUNKSIZE/2, ZPOS*CHUNKSIZE+CHUNKSIZE/2);
-    sf::Vector2f dir(-sin(-cam.rot.y*DEG_TO_RAD), -cos(-cam.rot.y*DEG_TO_RAD));
-    sf::Vector2f pos(cam.pos.x,cam.pos.z);
-//	float distance = (dir.x*point.x + dir.y*point.y - dir.x*pos.x - dir.y*pos.y);
-//	return distance < -CHUNKSIZE;
-    return false;
-
+bool Chunk::checkCulling(Player& cam) {
+    return cam.insideFrustum(vec3f(XPOS*CHUNKSIZE+8,YPOS*CHUNKSIZE+8,ZPOS*CHUNKSIZE+8),sqrt(8*8+8*8+8*8));
 }
 
 void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) {
