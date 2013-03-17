@@ -16,18 +16,16 @@ class SceneMain : public Scene {
 		void onMouseButtonPressed(float deltaTime, const sf::Event& event);
 		void onMouseMoved(float deltaTime, const sf::Event& event);
 		void onClose(); //close scene-wide stuff
-			
+
 	private:
 		bool loadResources();
 
 		int WORLDSEED;
 		Player player;
 		sf::Mouse mouse;
-		float grassTimer;
 		World world;
         float debugCounter;
-        float fpsCount;
-        std::vector<std::vector<vec3f> > frustum;
+		int fpsCount;
 };
 
 #endif // SCENEMAIN_HPP

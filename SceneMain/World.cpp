@@ -2,16 +2,12 @@
 #include "Chunk.hpp"
 #include "Player.hpp"
 
-World::World() {
-    chunks = std::vector<std::vector<std::vector<Chunk*> > >
-            (0,std::vector<std::vector<Chunk*> >
-             (0,std::vector<Chunk*>
-              (0,NULL)));
-    targetedBlock = vec3f(0,0,0);
-    playerTargetsBlock = false;
-    last = vec3f(0,0,0);
-    chunksDrawn = 0;
-    updateStuffTimer = 0.0;
+World::World() :
+	playerTargetsBlock(false), chunksDrawn(0), targetedBlock(0,0,0),
+	last(0,0,0), chunks(0,std::vector<std::vector<Chunk*> >
+						(0,std::vector<Chunk*>
+						 (0,NULL))),
+	updateStuffTimer(0.0){
 }
 
 World::~World() {
@@ -169,12 +165,13 @@ void World::draw() const {
 
 void World::update(float deltaTime, Player& camera) {
     chunksDrawn = 0;
-    //updateGrass(deltaTime);
+	updateGrass(deltaTime);
     int updateMax = 0; //maximum number of chunk redraws
     for (int x = 0; x < WORLDWIDTH; ++x)  {
         for (int y = 0; y < WORLDHEIGHT; ++y) {
             for (int z = 0; z < WORLDWIDTH; ++z) {
-                if (chunks[x][y][z]->checkCulling(camera)){
+				if (camera.insideFrustum(vec3f(x*CHUNKSIZE+8,y*CHUNKSIZE+8,z*CHUNKSIZE+8)
+										 ,sqrt(3*(8*8)))) {
                     chunks[x][y][z]->outOfView = false;
                     ++chunksDrawn;
                 }
@@ -183,6 +180,7 @@ void World::update(float deltaTime, Player& camera) {
                 }
                 if (chunks[x][y][z]->markedForRedraw == true && updateMax < 30) {
                     updateMax++;
+					DBG_UPDATES++; //I'm a global extern. FIX ME PLS
                     chunks[x][y][z]->update(deltaTime);
                 }
             }
@@ -278,7 +276,7 @@ void World::traceView(const Camera& player, float tMax) {
 
 
 void World::calculateLight(sf::Vector3i source, vec2i radius) {
-    int size = radius.x*radius.x*radius.y*8;
+	//int size = radius.x*radius.x*radius.y*8;
     //std::cout<<"====== UPDATE "<<size << " "<<radius.x<<" "<<radius.y << std::endl;
     //BFS TO THE MAX
     std::vector<sf::Vector3i> blocksToCheck[MAXLIGHT+1];
@@ -288,8 +286,8 @@ void World::calculateLight(sf::Vector3i source, vec2i radius) {
         for(int y = source.y-radius.y; y <= source.y+radius.y; ++y) {
             for(int z = source.z-radius.x; z <= source.z+radius.x; ++z) {
                 if (!getOutOfBounds(x,y,z)){
-                    short* ID = &chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE].ID;
-                    short* light = &chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE].light;
+					ID = &chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE].ID;
+					light = &chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE].light;
                     switch(*ID) {
                     case 0: //air
                         if (x == source.x-radius.x || x == source.x+radius.x

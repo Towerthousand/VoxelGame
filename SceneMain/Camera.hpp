@@ -5,14 +5,14 @@
 class World;
 class Camera {
 	public:
-		Camera(World &world);
+		Camera(World &world); //Player is bind to a world on creation, and will use it for collisions.
 		~Camera();
         void movePos(const vec3f& disp);
 		void rotateX(float deg);
 		void rotateY(float deg);
 
         vec3f pos;
-        vec3f rot;
+		vec3f rot;
 		World& parentWorld;
 };
 

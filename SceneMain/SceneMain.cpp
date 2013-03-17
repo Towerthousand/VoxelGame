@@ -2,7 +2,9 @@
 #include "Game.hpp"
 #include "Chunk.hpp"
 
-SceneMain::SceneMain(Game &parent) : Scene(parent), WORLDSEED(std::time(0)%1000), player(world){
+SceneMain::SceneMain(Game &parent) :
+	Scene(parent), WORLDSEED(std::time(0)%1000), player(world),
+	debugCounter(0.0), fpsCount(0) {
 }
 
 SceneMain::~SceneMain() {
@@ -21,8 +23,10 @@ bool SceneMain::init() {
 
     if (!loadResources())
         return false;
+	//Init music
     parent.audio().musicBank["troll"]->getTrack().play();
     parent.audio().musicBank["troll"]->getTrack().setLoop(true);
+	//Init debug tags
     parent.font().makeText("FPS","",20,vec2f(10,150),sf::Color::White,sf::Text::Bold,false);
     parent.font().makeText("Updates","",20,vec2f(10,130),sf::Color::White,sf::Text::Bold,false);
     parent.font().makeText("Chunks","",20,vec2f(10,110),sf::Color::White,sf::Text::Bold,false);
@@ -30,31 +34,27 @@ bool SceneMain::init() {
     parent.font().makeText("posY","",20,vec2f(10,30),sf::Color::White,sf::Text::Bold,false);
     parent.font().makeText("posZ","",20,vec2f(10,50),sf::Color::White,sf::Text::Bold,false);
     parent.font().makeText("rotX","",20,vec2f(10,90),sf::Color::White,sf::Text::Bold,false);
-    parent.font().makeText("rotY","",20,vec2f(10,70),sf::Color::White,sf::Text::Bold,false);
-    mouse.setPosition(vec2i(SCRWIDTH/2,SCRHEIGHT/2),parent.getWindow());
+	parent.font().makeText("rotY","",20,vec2f(10,70),sf::Color::White,sf::Text::Bold,false);
+	//Set up textures
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glScalef(1.0/512.0f,1.0/512.0f,1); //now textures are in pixel coords
+	glScalef(1.0/512.0f,1.0/512.0f,1); //now textures are in pixel coords (only works for world texture)
+	//Set up GL view
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(FOV, float(SCRWIDTH)/float(SCRHEIGHT), ZNEAR, ZFAR);
-
-    frustum = std::vector<std::vector<vec3f> >
-            (6,std::vector<vec3f>
-             (4,vec3f(0,0,0)));
-
+	//Load world from file
     outLog("* Loading chunks" );
     if (!world.loadDirbaio("resources/out.bin"))
         return false;
+	//Center mouse
+	mouse.setPosition(vec2i(SCRWIDTH/2,SCRHEIGHT/2),parent.getWindow());
 
-    fpsCount = 0;
-    debugCounter = 0.0;
     outLog("* Init was succesful" );
     return true;
 }
 
 void SceneMain::update(float deltaTime) {
-
     ++fpsCount;
     debugCounter += deltaTime;
     if (debugCounter > 1) {
@@ -64,12 +64,13 @@ void SceneMain::update(float deltaTime) {
         debugCounter -= 1;
         fpsCount = 0;
     }
-    player.vel = vec3f(0, 0, 0);
     world.update(deltaTime,player);
-    world.traceView(player,5);
-    //Constant input (done every frame)
+	world.traceView(player,5);
+	player.update(deltaTime);
+
+	//Constant input (done every frame) TODO: START USING FUCKING OIS
     //Rotate camera according to mouse input
-    vec2i mousePos = mouse.getPosition(parent.getWindow());//vec2i(event.mouseMove.x,event.mouseMove.y);
+	vec2i mousePos = mouse.getPosition(parent.getWindow());//vec2i(event.mouseMove.x,event.mouseMove.y);
     if ((mousePos.x != SCRHEIGHT/2 || mousePos.y != SCRWIDTH/2) && WINDOWFOCUS){
         player.rotateX(((float)mousePos.y - SCRHEIGHT/2));
         player.rotateY(((float)mousePos.x - SCRWIDTH/2));
@@ -77,13 +78,13 @@ void SceneMain::update(float deltaTime) {
     }
     //Move player
     const float vel = 5.0f;
-    vec2f dir(-sin(-player.rot.y*DEG_TO_RAD), -cos(player.rot.y*DEG_TO_RAD));
+	vec2f dir(sin(player.rot.y*DEG_TO_RAD), -cos(player.rot.y*DEG_TO_RAD));
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
         player.vel.x += dir.x*vel*deltaTime;
         player.vel.z += dir.y*vel*deltaTime;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-        player.vel.x += -dir.x*vel*deltaTime;
+		player.vel.x += -dir.x*vel*deltaTime;
         player.vel.z += -dir.y*vel*deltaTime;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
@@ -100,8 +101,6 @@ void SceneMain::update(float deltaTime) {
         player.vel.y -= vel*deltaTime;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
         player.pos = vec3f(0,128,0);
-
-    player.update(deltaTime);
 }
 
 void SceneMain::draw() const {
@@ -114,22 +113,8 @@ void SceneMain::draw() const {
 
     parent.textures().useTexture("lolwtf");
     world.draw();
-    player.draw();
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    for (int i = 0; i < 6; ++i) {
-        glPushMatrix();
-        glColor4f(0.0,0.0,0.0,1);
-        glBegin(GL_LINE_STRIP);
-        glVertex3f(frustum[i][0].x,frustum[i][0].y,frustum[i][0].z);
-        glVertex3f(frustum[i][1].x,frustum[i][1].y,frustum[i][1].z);
-        glVertex3f(frustum[i][2].x,frustum[i][2].y,frustum[i][2].z);
-        glVertex3f(frustum[i][3].x,frustum[i][3].y,frustum[i][3].z);
-        glVertex3f(frustum[i][0].x,frustum[i][0].y,frustum[i][0].z);
-        glEnd();
-        glColor4f(1.0,1.0,1.0,1.0);
-        glPopMatrix();
-    }
+	player.draw();
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
     glFlush();
 
     //Debug tags
@@ -139,9 +124,9 @@ void SceneMain::draw() const {
     parent.font().getText("posZ").setString("Z: " + toString(player.pos.z));
     parent.font().getText("rotY").setString("Rot Y: " + toString(player.rot.y));
     parent.font().getText("rotX").setString("Rot X: " + toString(player.rot.x));
+	//SFML draws (until window.popGLStates())
     glDisable(GL_CULL_FACE);
     parent.getWindow().pushGLStates();
-    //SFML draws (until window.popGLStates())
     parent.getWindow().draw(parent.font().getText("FPS"));
     parent.getWindow().draw(parent.font().getText("Updates"));
     parent.getWindow().draw(parent.font().getText("Chunks"));
@@ -179,10 +164,7 @@ void SceneMain::onKeyPressed(float deltaTime, const sf::Event& event) {
         break;
     case sf::Keyboard::Num8:
         player.selectedID = 8;
-        break;
-    case sf::Keyboard::Q:
-        frustum = player.frustumPlanes;
-        break;
+		break;
     default:
         break;
     }
@@ -190,12 +172,12 @@ void SceneMain::onKeyPressed(float deltaTime, const sf::Event& event) {
 
 void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Event& event) {
     switch(event.mouseButton.button) {
-    case sf::Mouse::Left:
+	case sf::Mouse::Left: //delete block
         if(world.playerTargetsBlock) {
             world.setCubeIDAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z,0);
         }
         break;
-    case sf::Mouse::Right:
+	case sf::Mouse::Right: //place block
         if(world.playerTargetsBlock) {
             world.setCubeIDAbs(world.last.x,world.last.y,world.last.z,player.selectedID);
         }
@@ -210,6 +192,7 @@ void SceneMain::onMouseMoved(float deltaTime, const sf::Event& event) {
 
 void SceneMain::onClose() {
     outLog("* Closing scene: Main" );
+
     parent.textures().deleteTexture("lolwtf");
     parent.audio().deleteMusic("troll");
 }

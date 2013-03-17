@@ -1,15 +1,14 @@
 #include "Chunk.hpp"
 #include "World.hpp"
-#include "Player.hpp"
 
-Chunk::Chunk(int x, int y, int z, World &world) : XPOS(x), ZPOS(z), YPOS(y), parentWorld(world){
-	cubes = std::vector<std::vector<std::vector<Cube> > >
-			(CHUNKSIZE,std::vector<std::vector<Cube> >
-			 (CHUNKSIZE,std::vector<Cube>
-			  (CHUNKSIZE,Cube(0,MINLIGHT))));
-	VBOID = XPOS*WORLDWIDTH+ZPOS*WORLDWIDTH+YPOS*WORLDHEIGHT+1;
-	outOfView = false;
-	markedForRedraw = false;
+Chunk::Chunk(int x, int y, int z, World &world) :
+	outOfView(false), markedForRedraw(false),
+	cubes(CHUNKSIZE,std::vector<std::vector<Cube> >
+		  (CHUNKSIZE,std::vector<Cube>
+		   (CHUNKSIZE,Cube(0,MINLIGHT)))),
+	XPOS(x), YPOS(y), ZPOS(z),
+	VBOID(XPOS*WORLDWIDTH+ZPOS*WORLDWIDTH+YPOS*WORLDHEIGHT+1),
+	parentWorld(world) {
 }
 
 Chunk::~Chunk() {
@@ -32,7 +31,6 @@ bool Chunk::getSkyAccess(int x,int y, int z) {
 void Chunk::update(float deltaTime) {
 	//empty arrays and re-do them
 	markedForRedraw = false;
-	DBG_UPDATES++; //I'm a global extern. FIX ME PLS
 	renderData.resize(0);
 	int cubeID;
 	for(int z = 0; z < CHUNKSIZE; ++z) {
@@ -50,8 +48,8 @@ void Chunk::update(float deltaTime) {
 
 
 void Chunk::draw() const {
-	glPushMatrix();
 	glBindBuffer(GL_ARRAY_BUFFER, VBOID);
+	glPushMatrix();
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -68,15 +66,11 @@ void Chunk::draw() const {
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glPopMatrix();
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-bool Chunk::checkCulling(Player& cam) {
-    return cam.insideFrustum(vec3f(XPOS*CHUNKSIZE+8,YPOS*CHUNKSIZE+8,ZPOS*CHUNKSIZE+8),sqrt(8*8+8*8+8*8));
-}
-
-void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) {
+void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) { //I DON'T KNOW HOW TO MAKE THIS COMPACT
 	int absX = x+CHUNKSIZE*XPOS;
 	int absY = y+CHUNKSIZE*YPOS;
 	int absZ = z+CHUNKSIZE*ZPOS;

@@ -48,8 +48,8 @@ class World {
         void processCubeLighting(const sf::Vector3i& source, const sf::Vector3i& offset, std::vector<sf::Vector3i> &queue);
 		void updateGrass(float deltaTime);
 
-		float updateStuffTimer;
 		std::vector<std::vector<int> > skyValues;
+		float updateStuffTimer;
 		static const int vertexPoints[8][3];
 		static const int indexes[24];
 };
