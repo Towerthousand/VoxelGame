@@ -24,9 +24,10 @@ bool SceneMain::init() {
 	if (!loadResources())
 		return false;
 	//Init music
-	parent.audio().musicBank["troll"]->getTrack().play();
-	parent.audio().musicBank["troll"]->getTrack().setLoop(true);
+	//parent.audio().musicBank["troll"]->getTrack().play();
+	//parent.audio().musicBank["troll"]->getTrack().setLoop(true);
 	//Init debug tags
+	parent.font().makeText("LOL","SDADASDAS",20,vec2f(10,170),sf::Color::White,sf::Text::Bold,false);
 	parent.font().makeText("FPS","",20,vec2f(10,150),sf::Color::White,sf::Text::Bold,false);
 	parent.font().makeText("Updates","",20,vec2f(10,130),sf::Color::White,sf::Text::Bold,false);
 	parent.font().makeText("Chunks","",20,vec2f(10,110),sf::Color::White,sf::Text::Bold,false);
@@ -67,15 +68,6 @@ void SceneMain::update(float deltaTime) {
 	world.update(deltaTime,player);
 	world.traceView(player,5);
 	player.update(deltaTime);
-
-	//Constant input (done every frame) TODO: PUT THIS IN THE INPUT MANAGER
-	//Rotate camera according to mouse input
-	vec2i mousePos = mouse.getPosition(parent.getWindow());//vec2i(event.mouseMove.x,event.mouseMove.y);
-	if ((mousePos.x != SCRHEIGHT/2 || mousePos.y != SCRWIDTH/2) && WINDOWFOCUS){
-		player.rotateX(((float)mousePos.y - SCRHEIGHT/2));
-		player.rotateY(((float)mousePos.x - SCRWIDTH/2));
-		mouse.setPosition(vec2i(SCRWIDTH/2, SCRHEIGHT/2),parent.getWindow());
-	}
 }
 
 void SceneMain::draw() const {
@@ -102,6 +94,7 @@ void SceneMain::draw() const {
 	//SFML draws (until window.popGLStates())
 	glDisable(GL_CULL_FACE);
 	parent.getWindow().pushGLStates();
+	parent.getWindow().draw(parent.font().getText("LOL"));
 	parent.getWindow().draw(parent.font().getText("FPS"));
 	parent.getWindow().draw(parent.font().getText("Updates"));
 	parent.getWindow().draw(parent.font().getText("Chunks"));
@@ -116,6 +109,15 @@ void SceneMain::draw() const {
 
 void SceneMain::onKeyPressed(float deltaTime, const sf::Keyboard::Key& key) {
 	switch(key) {
+		case sf::Keyboard::E: {
+			vec3f newPos;
+			newPos.x = rand()%(WORLDWIDTH*CHUNKSIZE);
+			newPos.z = rand()%(WORLDWIDTH*CHUNKSIZE);
+			newPos.y = world.getSkylightLevel(newPos.x,newPos.z) + 1 - PLAYER_HEIGHT;
+			parent.font().getText("LOL").setString(toString(world.getSkylightLevel(newPos.x,newPos.z)));
+			player.pos = newPos + vec3f(0.5,0,0.5);
+			break;
+		}
 		case sf::Keyboard::Num1:
 			player.selectedID = 1;
 			break;
@@ -175,9 +177,6 @@ void SceneMain::onKeyDown(float deltaTime, const sf::Keyboard::Key &key) {
 		case sf::Keyboard::LShift:
 			player.vel.y -= vel*deltaTime;
 			break;
-		case sf::Keyboard::E:
-			player.pos = vec3f(0,128,0);
-			break;
 		default:
 			break;
 	}
@@ -187,8 +186,11 @@ void SceneMain::onKeyReleased(float deltaTime, const sf::Keyboard::Key &key) {
 
 }
 
-void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Event& event) {
-	switch(event.mouseButton.button) {
+void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Mouse::Button& Button) {
+}
+
+void SceneMain::onMouseButtonDown(float deltaTime, const sf::Mouse::Button& Button) {
+	switch(Button) {
 		case sf::Mouse::Left: //delete block
 			if(world.playerTargetsBlock) {
 				world.setCubeIDAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z,0);
@@ -204,7 +206,16 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Event& event) {
 	}
 }
 
-void SceneMain::onMouseMoved(float deltaTime, const sf::Event& event) {
+void SceneMain::onMouseButtonReleased(float deltaTime, const sf::Mouse::Button& Button) {
+}
+
+void SceneMain::onMouseMoved(float deltaTime) {
+	vec2i mousePos = mouse.getPosition(parent.getWindow());//vec2i(event.mouseMove.x,event.mouseMove.y);
+	if ((mousePos.x != SCRHEIGHT/2 || mousePos.y != SCRWIDTH/2) && WINDOWFOCUS){
+		player.rotateX(((float)mousePos.y - SCRHEIGHT/2));
+		player.rotateY(((float)mousePos.x - SCRWIDTH/2));
+		mouse.setPosition(vec2i(SCRWIDTH/2, SCRHEIGHT/2),parent.getWindow());
+	}
 }
 
 void SceneMain::onClose() {

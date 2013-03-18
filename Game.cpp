@@ -106,7 +106,10 @@ void Game::update(float deltaTime) {
 				WINDOWFOCUS = false;
 				break;
 			case sf::Event::MouseButtonPressed:
-				onMouseButtonPressed(deltaTime, event);
+				inputManager.pressMouse(event.mouseButton.button);
+				break;
+			case sf::Event::MouseButtonReleased:
+				inputManager.releaseMouse(event.mouseButton.button);
 				break;
 			case sf::Event::KeyPressed:
 				inputManager.pressKey(event.key.code);
@@ -114,27 +117,41 @@ void Game::update(float deltaTime) {
 			case sf::Event::KeyReleased:
 				inputManager.releaseKey(event.key.code);
 				break;
-			case sf::Event::MouseMoved:
-				onMouseMoved(deltaTime,event);
-				break;
 			default:
 				break;
 		}
 	}
-	//pass the input to the scene
-	for(uint i = 0; i < inputManager.pressed.size(); ++i) {
-		if (inputManager.pressed[i]) {
+	onMouseMoved(deltaTime);
+	//pass the key input to the scene
+	for(uint i = 0; i < inputManager.keyPressed.size(); ++i) {
+		if (inputManager.keyPressed[i]) {
 			onKeyPressed(deltaTime,inputManager.keys[i]);
 		}
 	}
-	for(uint i = 0; i < inputManager.down.size(); ++i) {
-		if (inputManager.down[i]) {
+	for(uint i = 0; i < inputManager.keyDown.size(); ++i) {
+		if (inputManager.keyDown[i]) {
 			onKeyDown(deltaTime,inputManager.keys[i]);
 		}
 	}
-	for(uint i = 0; i < inputManager.released.size(); ++i) {
-		if (inputManager.released[i]) {
+	for(uint i = 0; i < inputManager.keyReleased.size(); ++i) {
+		if (inputManager.keyReleased[i]) {
 			onKeyReleased(deltaTime,inputManager.keys[i]);
+		}
+	}
+	//pass the mouse input to the scene
+	for(uint i = 0; i < inputManager.mousePressed.size(); ++i) {
+		if (inputManager.mousePressed[i]) {
+			onMouseButtonPressed(deltaTime,inputManager.mouseButtons[i]);
+		}
+	}
+	for(uint i = 0; i < inputManager.mouseDown.size(); ++i) {
+		if (inputManager.mouseDown[i]) {
+			onMouseButtonDown(deltaTime,inputManager.mouseButtons[i]);
+		}
+	}
+	for(uint i = 0; i < inputManager.mouseReleased.size(); ++i) {
+		if (inputManager.mouseReleased[i]) {
+			onMouseButtonReleased(deltaTime,inputManager.mouseButtons[i]);
 		}
 	}
 }
@@ -147,32 +164,39 @@ void Game::draw() {
 	window.display();
 }
 
-// Pass the time elapsed to scene so it can handle key input
 void Game::onKeyPressed(float deltaTime, const sf::Keyboard::Key &key) {
 	if (currentScene != NULL)
 		currentScene->onKeyPressed(deltaTime, key);
 }
-// Pass the time elapsed to scene so it can handle key input
+
 void Game::onKeyDown(float deltaTime, const sf::Keyboard::Key &key) {
 	if (currentScene != NULL)
 		currentScene->onKeyDown(deltaTime, key);
 }
-// Pass the time elapsed to scene so it can handle key input
+
 void Game::onKeyReleased(float deltaTime, const sf::Keyboard::Key &key) {
 	if (currentScene != NULL)
 		currentScene->onKeyReleased(deltaTime, key);
 }
 
-// Pass the time elapsed and mouse event to scene so it can handle mouse button input
-void Game::onMouseButtonPressed(float deltaTime,const sf::Event& event) {
+void Game::onMouseButtonPressed(float deltaTime, const sf::Mouse::Button &Button) {
 	if (currentScene != NULL)
-		currentScene->onMouseButtonPressed(deltaTime, event);
+		currentScene->onMouseButtonPressed(deltaTime, Button);
 }
 
-// Pass the time elapsed and mouse event to scene so it can handle mouse movement input
-void Game::onMouseMoved(float deltaTime,const sf::Event& event) {
+void Game::onMouseButtonDown(float deltaTime, const sf::Mouse::Button &Button) {
 	if (currentScene != NULL)
-		currentScene->onMouseMoved(deltaTime,event);
+		currentScene->onMouseButtonDown(deltaTime, Button);
+}
+
+void Game::onMouseButtonReleased(float deltaTime, const sf::Mouse::Button &Button) {
+	if (currentScene != NULL)
+		currentScene->onMouseButtonReleased(deltaTime, Button);
+}
+
+void Game::onMouseMoved(float deltaTime) {
+	if (currentScene != NULL)
+		currentScene->onMouseMoved(deltaTime);
 }
 
 // Whenever you wnat to end the game, you must call this function, not the Scene's onClose(); method

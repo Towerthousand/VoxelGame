@@ -3,7 +3,7 @@ CONFIG -= qt
 LIBS += -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lGLU
 INCLUDEPATH += $$PWD/
 QMAKE_CXXFLAGS += -std=c++11
-CXX_FLAGS += -D_GLIBCXX_DEBUG
+CXX_FLAGS += -O3
 SOURCES += \
     $$PWD/main.cpp \
     $$PWD/Game.cpp \

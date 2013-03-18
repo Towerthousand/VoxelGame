@@ -79,7 +79,7 @@ bool World::loadDirbaio(const std::string filePath) {
 void World::regenChunk(int x, int y, int z, int seed) {
     if (chunks[x][y][z] != NULL)
         delete chunks[x][y][z];
-    chunks[x][y][z] = new Chunk(x,y,z,*this);
+	chunks[x][y][z] = new Chunk(x,y,z,*this);
 }
 
 void World::initChunkLight(int x,int y, int z) { //should only be called if upper chunks are loaded. Coords in chunk system.

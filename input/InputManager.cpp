@@ -1,9 +1,12 @@
 #include "InputManager.hpp"
 
 InputManager::InputManager() :
-	pressed(101,false),
-	released(101,false),
-	down(100,false){
+	keyPressed(101,false),
+	keyReleased(101,false),
+	keyDown(100,false),
+	mousePressed(5,false),
+	mouseReleased(5,false),
+	mouseDown(5,false) {
 	keys[0] = sf::Keyboard::A;            ///< The A key
 	keys[1] = sf::Keyboard::B;            ///< The B key
 	keys[2] = sf::Keyboard::C;            ///< The C key
@@ -105,36 +108,65 @@ InputManager::InputManager() :
 	keys[98] = sf::Keyboard::F14;          ///< The F14 key
 	keys[99] = sf::Keyboard::F15;          ///< The F15 key
 	keys[100] = sf::Keyboard::Pause;        ///< The Pause key
+	mouseButtons[0] = sf::Mouse::Left;       ///< The left mouse button
+	mouseButtons[1] = sf::Mouse::Right;      ///< The right mouse button
+	mouseButtons[2] = sf::Mouse::Middle;     ///< The middle (wheel) mouse button
+	mouseButtons[3] = sf::Mouse::XButton1;   ///< The first extra mouse button
+	mouseButtons[4] = sf::Mouse::XButton2;   ///< The second extra mouse button
 }
 
 InputManager::~InputManager() {
 
 }
 
+void InputManager::update() {
+	keyReleased = std::vector<bool>(100,false);
+	keyPressed = std::vector<bool>(100,false);
+	mouseReleased = std::vector<bool>(5,false);
+	mousePressed = std::vector<bool>(5,false);
+}
+
 void InputManager::pressKey(sf::Keyboard::Key key) {
-	pressed[key] = true;
-	down[key] = true;
+	keyPressed[key] = true;
+	keyDown[key] = true;
 }
 
 void InputManager::releaseKey(sf::Keyboard::Key key) {
-	released[key] = true;
-	down[key] = false;
+	keyReleased[key] = true;
+	keyDown[key] = false;
 }
 
-void InputManager::update() {
-	pressed = std::vector<bool>(100,false);
-	released = std::vector<bool>(100,false);
+bool InputManager::isKeyPressed(sf::Keyboard::Key key) {
+	return keyPressed[key];
 }
 
-bool InputManager::keyPressed(sf::Keyboard::Key key) {
-	return pressed[key];
+bool InputManager::isKeyDown(sf::Keyboard::Key key) {
+	return keyDown[key];
 }
 
-bool InputManager::keyDown(sf::Keyboard::Key key) {
-	return down[key];
+bool InputManager::isKeyReleased(sf::Keyboard::Key key) {
+	return keyReleased[key];
 }
 
-bool InputManager::keyReleased(sf::Keyboard::Key key) {
-	return released[key];
+void InputManager::pressMouse(sf::Mouse::Button key) {
+	mousePressed[key] = true;
+	mouseDown[key] = true;
+}
+
+void InputManager::releaseMouse(sf::Mouse::Button key) {
+	mouseReleased[key] = true;
+	mouseDown[key] = false;
+}
+
+bool InputManager::isMousePressed(sf::Mouse::Button key) {
+	return mousePressed[key];
+}
+
+bool InputManager::isMouseDown(sf::Mouse::Button key) {
+	return mouseDown[key];
+}
+
+bool InputManager::isMouseReleased(sf::Mouse::Button key) {
+	return mouseReleased[key];
 }
 
