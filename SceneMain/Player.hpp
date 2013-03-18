@@ -4,14 +4,14 @@
 
 class Player : public Camera {
 	public:
-        enum {
-            TOP = 0,
-            BOTTOM,
-            LEFT,
-            RIGHT,
-            NEAR,
-            FAR
-        };
+		enum {
+			TOP = 0,
+			BOTTOM,
+			LEFT,
+			RIGHT,
+			NEAR,
+			FAR
+		};
 		Player(World &world); //Player is bind to a world on creation, and will use it for collisions.
 		~Player();
 		void update(float deltaTime);

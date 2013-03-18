@@ -17,9 +17,9 @@ class Game {
 									  // move into currentScene on next update()
 									  // so that there is no update() of one
 									  // scene followed by a draw() method
-                                      // of a different scene.
-        void close(); // closes app completely, closing the current scene (if there is)
-                      // first, saves game-wide stuff first.
+									  // of a different scene.
+		void close(); // closes app completely, closing the current scene (if there is)
+					  // first, saves game-wide stuff first.
 
 		sf::RenderWindow &getWindow() { return window; }
 		TextureManager &textures() { return texManager; }
@@ -36,11 +36,11 @@ class Game {
 									  // Game::onMouseButtonPressed(); and
 									  // Game::onKeyPressed();
 									  // calls currentScene.update(deltaTime)
-        void draw(); // calls currentScene.draw()
+		void draw(); // calls currentScene.draw()
 		bool loadResources (); // loads game-wide resources. only called
-									 // by init() once
+							   // by init() once
 		void onKeyPressed(float deltaTime, const sf::Keyboard::Key &key);
-									 	// currentScene.onKeyPressed
+										// currentScene.onKeyPressed
 										// (deltaTime, key)
 		void onKeyDown(float deltaTime, const sf::Keyboard::Key &key);
 										// currentScene.onKeyDown
@@ -48,13 +48,13 @@ class Game {
 		void onKeyReleased(float deltaTime, const sf::Keyboard::Key &key);
 										// currentScene.onKeyReleased
 										// (deltaTime, key)
-        void onMouseButtonPressed(float deltaTime, const sf::Mouse::Button &button);
+		void onMouseButtonPressed(float deltaTime, const sf::Mouse::Button &button);
 										// currentScene.onMouseButtonPressed
 										// (deltaTime, button)
-        void onMouseButtonDown(float deltaTime, const sf::Mouse::Button &button);
+		void onMouseButtonDown(float deltaTime, const sf::Mouse::Button &button);
 										// currentScene.onMouseButtonDown
 										// (deltaTime, button)
-        void onMouseButtonReleased(float deltaTime, const sf::Mouse::Button &button);
+		void onMouseButtonReleased(float deltaTime, const sf::Mouse::Button &button);
 										// currentScene.onMouseButtonReleased
 										// (deltaTime, button)
 		void onMouseMoved(float deltaTime);

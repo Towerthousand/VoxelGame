@@ -13,7 +13,7 @@ bool Texture::load(const std::string &filePath) {
 		outLog("#ERROR " + filePath + " didn't load");
 		return false;
 	}
-    size = vec2i(image.getSize().x,image.getSize().y);
+	size = vec2i(image.getSize().x,image.getSize().y);
 
 	//get handle
 	GLuint tex_handle;
@@ -23,11 +23,11 @@ bool Texture::load(const std::string &filePath) {
 	//bind handle and set to image
 	bind();
 	glTexImage2D(
-		GL_TEXTURE_2D, 0, GL_RGBA,
-		image.getSize().x, image.getSize().y,
-		0,
-		GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr()
-	);
+				GL_TEXTURE_2D, 0, GL_RGBA,
+				image.getSize().x, image.getSize().y,
+				0,
+				GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr()
+				);
 	setFilter(GL_NEAREST);
 	setWrap(GL_REPEAT);
 	return true;

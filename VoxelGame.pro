@@ -20,7 +20,8 @@ SOURCES += \
     $$PWD/audio/Effect.cpp \
     $$PWD/audio/Music.cpp \
     $$PWD/input/InputManager.cpp \
-    SceneMain/Entity.cpp
+    $$PWD/SceneMain/Entity.cpp \
+    $$PWD/SceneMain/GameObject.cpp
 
 HEADERS += \
     $$PWD/Scene.hpp \
@@ -37,6 +38,7 @@ HEADERS += \
     $$PWD/audio/AudioManager.hpp \
     $$PWD/audio/Effect.hpp \
     $$PWD/audio/Music.hpp \
-    $$PWD/Math.h \
+    $$PWD/Math.hpp \
     $$PWD/input/InputManager.hpp \
-    SceneMain/Entity.h
+    $$PWD/SceneMain/GameObject.hpp \
+    $$PWD/SceneMain/Entity.hpp

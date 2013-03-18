@@ -4,12 +4,12 @@
 
 class World;
 class Entity : public Camera {
-    public:
-        Entity();
-        ~Entity();
+	public:
+		Entity(World &world);
+		~Entity();
 
-        virtual draw() = 0;
-        virtual update() = 0;
+		virtual void draw() = 0;
+		virtual void update(float deltaTime) = 0;
 };
 
 #endif // ENTITY_H

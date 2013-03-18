@@ -25,34 +25,34 @@ typedef sf::Vector2<int> vec2i;
 struct Vertex {
 		Vertex(float vx = 0.0, float vy = 0.0, float vz = 0.0,
 			   float nx = 0.0, float ny = 0.0, float nz = 0.0,
-               float tx = 0.0, float ty = 0.0,
-               float cr = 1.0, float cg = 1.0, float cb = 1.0, float ca = 1.0) :
+			   float tx = 0.0, float ty = 0.0,
+			   float cr = 1.0, float cg = 1.0, float cb = 1.0, float ca = 1.0) :
 			vx(vx), vy(vy), vz(vz),
 			nx(nx), ny(ny), nz(nz),
 			tx(tx), ty(ty),
-            cr(cr), cg(cg), cb(cb), ca(ca)
+			cr(cr), cg(cg), cb(cb), ca(ca)
 		{}
 		float vx,vy,vz,
-			  nx,ny,nz,
-			  tx,ty,
-              cr,cg,cb,ca;
+		nx,ny,nz,
+		tx,ty,
+		cr,cg,cb,ca;
 };
 
 struct Cube {
-    Cube (short ID, short light) : ID(ID), light(light) {}
-	short ID;
-    short light;
+		Cube (short ID, short light) : ID(ID), light(light) {}
+		short ID;
+		short light;
 };
 
 struct lightBox {
-	sf::Vector3i source;
-    vec2i radius;
-	bool blockChanged;
+		sf::Vector3i source;
+		vec2i radius;
+		bool blockChanged;
 };
 
 //prototype random functions here (define in tools.cpp). Inlines go here too
 inline void outLog(const std::string& msg) {
-    std::cout << msg << std::endl;
+	std::cout << msg << std::endl;
 }
 std::string toString(float num);
 
@@ -61,7 +61,7 @@ std::string toString(float num);
 #define CHUNKSIZE 16
 #define PLAYER_HEIGHT -1.8
 #define UPDATERADIUS 13.0 //How many potential light blocks does changing a block affect? Not taking into account skylight.
-                          //Usually UPDATERADIUS = MAXLIGHT-MINLIGHT
+						  //Usually UPDATERADIUS = MAXLIGHT-MINLIGHT
 #define MAXLIGHT 15
 #define MINLIGHT 1
 #define DEG_TO_RAD ((2*M_PI)/360.0)

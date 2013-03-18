@@ -11,10 +11,10 @@ Player::~Player() {
 }
 
 void Player::update(float deltaTime) {
-    //move the player's position
-    vel.y -= 15.0f*deltaTime;
-    movePos(vel);
-    makeFrustum();
+	//move the player's position
+	vel.y -= 15.0f*deltaTime;
+	movePos(vel);
+	makeFrustum();
 	vel = vec3f(0.0,0.0,0.0);
 }
 
@@ -43,7 +43,7 @@ void Player::drawFrustum() const {
 	//for debugging purposes. Assign makeFrustrum() to a key
 	//instead of every update and call drawFrustum() every draw
 	//to see the culling from outside.
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	for (int i = 0; i < 6; ++i) {
 		glPushMatrix();
 		glColor4f(0.0,0.0,0.0,1);
@@ -130,17 +130,17 @@ void Player::makeFrustum() {
 
 bool Player::insideFrustum(vec3f center, float radius) const {
 	float distance,D;
-    for(int i=0; i < 6; i++) {
-        //construct the plane with a normal and a point
-        vec3f v = frustumPlanes[i][1]-frustumPlanes[i][0];
-        vec3f u = frustumPlanes[i][2]-frustumPlanes[i][0];
-        vec3f n = cross(v,u); //normal n = (Ax,By,Cz), point [0] = (p1,p2,p3)
-        normalize(n);
-        D = -dot(n,frustumPlanes[i][0]); //A*p1*x + B*p2*y + C*p3*z + D = 0 => D = -dot(n,P)
+	for(int i=0; i < 6; i++) {
+		//construct the plane with a normal and a point
+		vec3f v = frustumPlanes[i][1]-frustumPlanes[i][0];
+		vec3f u = frustumPlanes[i][2]-frustumPlanes[i][0];
+		vec3f n = cross(v,u); //normal n = (Ax,By,Cz), point [0] = (p1,p2,p3)
+		normalize(n);
+		D = -dot(n,frustumPlanes[i][0]); //A*p1*x + B*p2*y + C*p3*z + D = 0 => D = -dot(n,P)
 		distance = dot(n,center) + D;  //Solve the equation using the player's pos instead
-										 //of a point in the plane.
-        if (distance < -radius)
+		//of a point in the plane.
+		if (distance < -radius)
 			return false; //not inside this player's view
-    }
+	}
 	return true;
 }

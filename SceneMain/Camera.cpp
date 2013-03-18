@@ -7,22 +7,20 @@
 //
 
 Camera::Camera(World &world) :
-    pos(vec3f(0,0,0)),
-    rot(vec3f(0,0,0)),
-	parentWorld(world) {
+	GameObject(world) {
 }
 
 Camera::~Camera() {
 }
 
-void Camera::movePos(const vec3f &disp) {
-	if(parentWorld.getCubeAbs(floor(pos.x + disp.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z)).ID == 0)
-		pos.x += disp.x;
-	if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + disp.y + PLAYER_HEIGHT),floor(pos.z)).ID == 0)
-		pos.y += disp.y;
-	if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z + disp.z)).ID == 0)
-		pos.z += disp.z;
-}
+//void Camera::movePos(const vec3f &disp) {
+//	if(parentWorld.getCubeAbs(floor(pos.x + disp.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z)).ID == 0)
+//		pos.x += disp.x;
+//	if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + disp.y + PLAYER_HEIGHT),floor(pos.z)).ID == 0)
+//		pos.y += disp.y;
+//	if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z + disp.z)).ID == 0)
+//		pos.z += disp.z;
+//}
 
 void Camera::rotateX(float deg) {
 	rot.x += deg;

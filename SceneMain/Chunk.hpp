@@ -21,7 +21,7 @@ class Chunk { //16*16*128
 		bool getSkyAccess(int x,int y, int z) const;
 
 		void pushCubeToArray(int x, int y, int z, int cubeID);
-        void makeVbo();
+		void makeVbo();
 
 		int XPOS; //x pos of chunk inside world matrix
 		int YPOS; //y pos of chunk inside world matrix

@@ -181,17 +181,17 @@ void Game::onKeyReleased(float deltaTime, const sf::Keyboard::Key &key) {
 
 void Game::onMouseButtonPressed(float deltaTime, const sf::Mouse::Button &button) {
 	if (currentScene != NULL)
-        currentScene->onMouseButtonPressed(deltaTime, button);
+		currentScene->onMouseButtonPressed(deltaTime, button);
 }
 
 void Game::onMouseButtonDown(float deltaTime, const sf::Mouse::Button &button) {
 	if (currentScene != NULL)
-        currentScene->onMouseButtonDown(deltaTime, button);
+		currentScene->onMouseButtonDown(deltaTime, button);
 }
 
 void Game::onMouseButtonReleased(float deltaTime, const sf::Mouse::Button &button) {
 	if (currentScene != NULL)
-        currentScene->onMouseButtonReleased(deltaTime, button);
+		currentScene->onMouseButtonReleased(deltaTime, button);
 }
 
 void Game::onMouseMoved(float deltaTime) {

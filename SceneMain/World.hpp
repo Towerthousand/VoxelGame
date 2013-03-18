@@ -26,24 +26,24 @@ class World {
 		//Getters and setters
 		bool getOutOfBounds(int x, int y, int z) const;
 		Cube getCubeAbs(int x, int y, int z) const;
-        void setCubeIDAbs(int x, int y, int z, short ID);
-        void setCubeLightAbs(int x, int y, int z, short light);
+		void setCubeIDAbs(int x, int y, int z, short ID);
+		void setCubeLightAbs(int x, int y, int z, short light);
 		int getSkylightLevel(int x, int z) const;
 		bool getSkyAccess(int x, int y, int z) const;
 
 		//main
 		void draw() const;
-        void update(float deltaTime,Player &camera);
+		void update(float deltaTime,Player &camera);
 		void traceView(const Camera& player, float tMax);
 
 		bool playerTargetsBlock;
 		int chunksDrawn;
-        vec3f targetedBlock;
+		vec3f targetedBlock;
 		vec3f last;
 
 	private:
 		void calculateLight(sf::Vector3i source, vec2i radius);
-        void processCubeLighting(const sf::Vector3i& source, const sf::Vector3i& offset, std::vector<sf::Vector3i> &queue);
+		void processCubeLighting(const sf::Vector3i& source, const sf::Vector3i& offset, std::vector<sf::Vector3i> &queue);
 		void updateGrass(float deltaTime);
 		void drawWireCube(const vec3f& pos) const;
 
