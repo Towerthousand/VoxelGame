@@ -15,9 +15,9 @@ class SceneMain : public Scene {
 		void onKeyPressed(float deltaTime, const sf::Keyboard::Key &key);
 		void onKeyDown(float deltaTime, const sf::Keyboard::Key &key);
 		void onKeyReleased(float deltaTime, const sf::Keyboard::Key &key);
-		void onMouseButtonPressed(float deltaTime, const sf::Mouse::Button &Button);
-		void onMouseButtonDown(float deltaTime, const sf::Mouse::Button &Button);
-		void onMouseButtonReleased(float deltaTime, const sf::Mouse::Button &Button);
+        void onMouseButtonPressed(float deltaTime, const sf::Mouse::Button &button);
+        void onMouseButtonDown(float deltaTime, const sf::Mouse::Button &button);
+        void onMouseButtonReleased(float deltaTime, const sf::Mouse::Button &button);
 		void onMouseMoved(float deltaTime);
 		void onClose(); //close scene-wide stuff
 

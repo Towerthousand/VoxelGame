@@ -48,13 +48,13 @@ class Game {
 		void onKeyReleased(float deltaTime, const sf::Keyboard::Key &key);
 										// currentScene.onKeyReleased
 										// (deltaTime, key)
-		void onMouseButtonPressed(float deltaTime, const sf::Mouse::Button &Button);
+        void onMouseButtonPressed(float deltaTime, const sf::Mouse::Button &button);
 										// currentScene.onMouseButtonPressed
 										// (deltaTime, button)
-		void onMouseButtonDown(float deltaTime, const sf::Mouse::Button &Button);
+        void onMouseButtonDown(float deltaTime, const sf::Mouse::Button &button);
 										// currentScene.onMouseButtonDown
 										// (deltaTime, button)
-		void onMouseButtonReleased(float deltaTime, const sf::Mouse::Button &Button);
+        void onMouseButtonReleased(float deltaTime, const sf::Mouse::Button &button);
 										// currentScene.onMouseButtonReleased
 										// (deltaTime, button)
 		void onMouseMoved(float deltaTime);

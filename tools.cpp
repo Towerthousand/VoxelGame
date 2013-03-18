@@ -1,8 +1,8 @@
 #include "Game.hpp"
 
 //extern'd in tools.hpp
-int SCRWIDTH = 1366; //1366
-int SCRHEIGHT = 768; //768
+int SCRWIDTH = sf::VideoMode::getFullscreenModes()[0].width; //1366
+int SCRHEIGHT = sf::VideoMode::getFullscreenModes()[0].height; //768
 bool WINDOWFOCUS = false;
 int DBG_UPDATES = 0;
 int WORLDHEIGHT = 0;

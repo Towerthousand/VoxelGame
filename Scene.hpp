@@ -13,9 +13,9 @@ class Scene {
 		virtual void onKeyPressed(float deltaTime, const sf::Keyboard::Key &key) = 0; //called by parent on parent.update()
 		virtual void onKeyDown(float deltaTime, const sf::Keyboard::Key &key) = 0; //called by parent on parent.update()
 		virtual void onKeyReleased(float deltaTime, const sf::Keyboard::Key &key) = 0; //called by parent on parent.update()
-		virtual void onMouseButtonPressed(float deltaTime, const sf::Mouse::Button &Button) = 0; //called by parent on parent.update()
-		virtual void onMouseButtonDown(float deltaTime, const sf::Mouse::Button &Button) = 0; //called by parent on parent.update()
-		virtual void onMouseButtonReleased(float deltaTime, const sf::Mouse::Button &Button) = 0; //called by parent on parent.update()
+		virtual void onMouseButtonPressed(float deltaTime, const sf::Mouse::Button &button) = 0; //called by parent on parent.update()
+		virtual void onMouseButtonDown(float deltaTime, const sf::Mouse::Button &button) = 0; //called by parent on parent.update()
+		virtual void onMouseButtonReleased(float deltaTime, const sf::Mouse::Button &button) = 0; //called by parent on parent.update()
 		virtual void onMouseMoved(float deltaTime) = 0; //called by parent on parent.update()
 		virtual void onClose() = 0; //close scene-wide stuff
 		

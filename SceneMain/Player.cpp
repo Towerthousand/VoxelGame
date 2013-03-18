@@ -14,7 +14,7 @@ void Player::update(float deltaTime) {
     //move the player's position
     vel.y -= 15.0f*deltaTime;
     movePos(vel);
-	makeFrustum();
+    makeFrustum();
 	vel = vec3f(0.0,0.0,0.0);
 }
 
@@ -43,7 +43,7 @@ void Player::drawFrustum() const {
 	//for debugging purposes. Assign makeFrustrum() to a key
 	//instead of every update and call drawFrustum() every draw
 	//to see the culling from outside.
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 	for (int i = 0; i < 6; ++i) {
 		glPushMatrix();
 		glColor4f(0.0,0.0,0.0,1);
