@@ -3,6 +3,7 @@
 #include "graphics/TextureManager.hpp"
 #include "graphics/FontManager.hpp"
 #include "audio/AudioManager.hpp"
+#include "input/InputManager.hpp"
 #include "SceneMain/SceneMain.hpp"
 
 class Game {
@@ -24,6 +25,7 @@ class Game {
 		TextureManager &textures() { return texManager; }
 		FontManager &font() { return fontManager; }
 		AudioManager &audio() { return audioManager; }
+		InputManager &input() { return inputManager; }
 		
 		bool isRunning;
 	private:
@@ -37,9 +39,15 @@ class Game {
         void draw(); // calls currentScene.draw()
 		bool loadResources (); // loads game-wide resources. only called
 									 // by init() once
-		void onKeyPressed(float deltaTime,const sf::Event& event);
+		void onKeyPressed(float deltaTime, const sf::Keyboard::Key &key);
 									 	// currentScene.onKeyPressed
-										// (deltaTime, event)
+										// (deltaTime, key)
+		void onKeyDown(float deltaTime, const sf::Keyboard::Key &key);
+										// currentScene.onKeyPressed
+										// (deltaTime, key)
+		void onKeyReleased(float deltaTime, const sf::Keyboard::Key &key);
+										// currentScene.onKeyPressed
+										// (deltaTime, key)
 		void onMouseButtonPressed(float deltaTime,const sf::Event& event);
 									 	// currentScene.onMouseButtonPressed
 										// (deltaTime, event)
@@ -54,6 +62,7 @@ class Game {
 		TextureManager texManager;
 		FontManager fontManager;
 		AudioManager audioManager;
+		InputManager inputManager;
 };
 
 #endif //GAME_HPP

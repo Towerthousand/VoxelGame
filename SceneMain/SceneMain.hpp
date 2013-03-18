@@ -12,7 +12,9 @@ class SceneMain : public Scene {
 		bool init();
 		void update(float deltaTime);
 		void draw() const;
-		void onKeyPressed(float deltaTime, const sf::Event& event);
+		void onKeyPressed(float deltaTime, const sf::Keyboard::Key &key);
+		void onKeyDown(float deltaTime, const sf::Keyboard::Key &key);
+		void onKeyReleased(float deltaTime, const sf::Keyboard::Key &key);
 		void onMouseButtonPressed(float deltaTime, const sf::Event& event);
 		void onMouseMoved(float deltaTime, const sf::Event& event);
 		void onClose(); //close scene-wide stuff

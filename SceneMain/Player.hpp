@@ -4,7 +4,6 @@
 
 class Player : public Camera {
 	public:
-
         enum {
             TOP = 0,
             BOTTOM,
@@ -17,12 +16,13 @@ class Player : public Camera {
 		~Player();
 		void update(float deltaTime);
 		void draw() const;
-		void drawFrustum();
+		void drawFrustum() const;
 		void makeFrustum();
-		bool insideFrustum(vec3f center, float radius); //sphere-plane check for frustum culling
+		bool insideFrustum(vec3f center, float radius) const; //sphere-plane check for frustum culling
 
 		vec3f vel;
 		short selectedID; //current blockID, used to place blocks
+	private:
 		std::vector<std::vector<vec3f> > frustumPlanes;
 };
 

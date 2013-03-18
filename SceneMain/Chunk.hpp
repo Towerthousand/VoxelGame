@@ -16,9 +16,9 @@ class Chunk { //16*16*128
 		std::vector<std::vector<std::vector<Cube> > > cubes;
 	private:
 		//Getters & consultors
-		bool getOutOfBounds(int x, int y, int z);
-		Cube getCube(int x, int y, int z);
-		bool getSkyAccess(int x,int y, int z);
+		bool getOutOfBounds(int x, int y, int z) const;
+		Cube getCube(int x, int y, int z) const;
+		bool getSkyAccess(int x,int y, int z) const;
 
 		void pushCubeToArray(int x, int y, int z, int cubeID);
         void makeVbo();

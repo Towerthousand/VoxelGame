@@ -39,7 +39,7 @@ void Player::draw() const {
 	glPopMatrix();
 }
 
-void Player::drawFrustum() {
+void Player::drawFrustum() const {
 	//for debugging purposes. Assign makeFrustrum() to a key
 	//instead of every update and call drawFrustum() every draw
 	//to see the culling from outside.
@@ -128,7 +128,7 @@ void Player::makeFrustum() {
 	frustumPlanes[FAR][3] = fbr;
 }
 
-bool Player::insideFrustum(vec3f center, float radius) {
+bool Player::insideFrustum(vec3f center, float radius) const {
 	float distance,D;
     for(int i=0; i < 6; i++) {
         //construct the plane with a normal and a point

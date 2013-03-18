@@ -9,14 +9,14 @@ class Texture
 		~Texture();
 
 		bool load(const std::string& filePath);
-		void bind();
-		void setFilter(GLenum filter);
-		void setWrap(GLenum wrap);
+		void bind() const;
+		void setFilter(GLenum filter) const;
+		void setWrap(GLenum wrap) const;
 
-		GLuint getHandle();
+		GLuint getHandle() const;
 
-		int getWidth();
-		int getHeight();
+		int getWidth() const;
+		int getHeight() const;
 	private:
 		GLuint handle;
 		vec2i size;

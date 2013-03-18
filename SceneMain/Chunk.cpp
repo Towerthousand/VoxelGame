@@ -14,17 +14,17 @@ Chunk::Chunk(int x, int y, int z, World &world) :
 Chunk::~Chunk() {
 }
 
-bool Chunk::getOutOfBounds(int x, int y, int z) {
+bool Chunk::getOutOfBounds(int x, int y, int z) const {
 	return parentWorld.getOutOfBounds(x+(XPOS*CHUNKSIZE),y+(YPOS*CHUNKSIZE),z+(ZPOS*CHUNKSIZE));
 }
 
-Cube Chunk::getCube(int x, int y, int z) {
+Cube Chunk::getCube(int x, int y, int z) const {
 	if (x >= CHUNKSIZE || y >= CHUNKSIZE || z >= CHUNKSIZE || x < 0 || z < 0 || y < 0) //outside of this chunk
 		return parentWorld.getCubeAbs(x+(XPOS*CHUNKSIZE),y+(YPOS*CHUNKSIZE),z+(ZPOS*CHUNKSIZE));
 	return cubes[x][y][z]; //inside current chunk
 }
 
-bool Chunk::getSkyAccess(int x,int y, int z) {
+bool Chunk::getSkyAccess(int x,int y, int z) const {
 	return parentWorld.getSkyAccess(x,y,z);
 }
 

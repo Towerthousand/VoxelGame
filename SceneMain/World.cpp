@@ -107,20 +107,20 @@ void World::setCubeIDAbs(int x, int y, int z, short ID) { //set the id, calculat
     if (getOutOfBounds(x,y,z))
         return;
     chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE].ID = ID;
-    if (y > skyValues[x][z]) { // calculate "shadow" of the new block
+	if (y > skyValues[x][z]) { // calculate "shadow" of the new block
         int previousSkyValue = skyValues[x][z];
         skyValues[x][z] = getSkylightLevel(x,z);
         calculateLight(sf::Vector3i(x,
-                                    ((y - previousSkyValue	)/2) + previousSkyValue - UPDATERADIUS/2,
+									((y - previousSkyValue)/2) + previousSkyValue - UPDATERADIUS/2,
                                     z),
-                       vec2i(UPDATERADIUS,(y - previousSkyValue)/2 + UPDATERADIUS/2));
+					   vec2i(UPDATERADIUS,std::max(UPDATERADIUS,(y - previousSkyValue)/2 + UPDATERADIUS/2 + 4)));
     }
     else if (y == skyValues[x][z]) { //propagate skylight downwards
         skyValues[x][z] = getSkylightLevel(x,z);
         calculateLight(sf::Vector3i(x,
-                                    ((y - skyValues[x][z])/2) + skyValues[x][z]  - UPDATERADIUS/2,
+									((y - skyValues[x][z])/2) + skyValues[x][z]  - UPDATERADIUS/2,
                                     z),
-                       vec2i(UPDATERADIUS,(y - skyValues[x][z])/2 + UPDATERADIUS/2));
+					   vec2i(UPDATERADIUS,std::max(UPDATERADIUS,(y - skyValues[x][z])/2 + UPDATERADIUS/2 + 4)));
     }
     else { //just calculate the surrounding blocks, since wer'e not changing sky level
         calculateLight(sf::Vector3i(x,y,z),vec2i(UPDATERADIUS,UPDATERADIUS));
@@ -134,7 +134,7 @@ void World::setCubeLightAbs(int x, int y, int z, short light) { //set the light,
     chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->markedForRedraw = true;
 }
 
-int World::getSkylightLevel(int x, int z) { //X and Z in cube coords
+int World::getSkylightLevel(int x, int z) const { //X and Z in cube coords
     for(int y = CHUNKSIZE*WORLDHEIGHT-1; y >= 0; --y) {
         if(getCubeAbs(x,y,z).ID != 0) {
             return y;
@@ -143,7 +143,7 @@ int World::getSkylightLevel(int x, int z) { //X and Z in cube coords
     return -1;
 }
 
-bool World::getSkyAccess(int x, int y, int z) {
+bool World::getSkyAccess(int x, int y, int z) const {
     if (y <= skyValues[x][z])
         return false;
     return true;
@@ -199,8 +199,7 @@ void World::traceView(const Camera& player, float tMax) {
         return;
     }
 
-    vec3f
-            pos(player.pos.x,player.pos.y,player.pos.z),
+	vec3f   pos(player.pos.x,player.pos.y,player.pos.z),
             dir(cos(-player.rot.x*DEG_TO_RAD)*(-sin(-player.rot.y*DEG_TO_RAD)),
                 sin(-player.rot.x*DEG_TO_RAD),
                 -cos(-player.rot.x*DEG_TO_RAD)*cos(-player.rot.y*DEG_TO_RAD)),
@@ -236,16 +235,15 @@ void World::traceView(const Camera& player, float tMax) {
 
     float tCurr = 0;
     while (tCurr < tMax) {
+		last = vox;
         if(tMaxc.x < tMaxc.y) {
             if(tMaxc.x < tMaxc.z) {
-                tCurr = tMaxc.x;
-                last = vox;
-                tMaxc.x= tMaxc.x + tDelta.x;
+				tCurr = tMaxc.x;
+				tMaxc.x = tMaxc.x + tDelta.x;
                 vox.x = vox.x + step.x;
             }
             else {
-                tCurr = tMaxc.z;
-                last = vox;
+				tCurr = tMaxc.z;
                 vox.z = vox.z + step.z;
                 tMaxc.z = tMaxc.z + tDelta.z;
 
@@ -253,14 +251,12 @@ void World::traceView(const Camera& player, float tMax) {
         }
         else {
             if(tMaxc.y < tMaxc.z) {
-                tCurr = tMaxc.y;
-                last = vox;
+				tCurr = tMaxc.y;
                 vox.y = vox.y + step.y;
                 tMaxc.y = tMaxc.y + tDelta.y;
             }
             else {
-                tCurr = tMaxc.z;
-                last = vox;
+				tCurr = tMaxc.z;
                 vox.z = vox.z + step.z;
                 tMaxc.z= tMaxc.z + tDelta.z;
             }
@@ -277,7 +273,7 @@ void World::traceView(const Camera& player, float tMax) {
 
 void World::calculateLight(sf::Vector3i source, vec2i radius) {
 	//int size = radius.x*radius.x*radius.y*8;
-    //std::cout<<"====== UPDATE "<<size << " "<<radius.x<<" "<<radius.y << std::endl;
+	//sstd::cout<<"====== UPDATE "<<size << " "<<radius.x<<" "<<radius.y << std::endl;
     //BFS TO THE MAX
     std::vector<sf::Vector3i> blocksToCheck[MAXLIGHT+1];
     short* ID = 0;

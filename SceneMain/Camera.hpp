@@ -11,8 +11,9 @@ class Camera {
 		void rotateX(float deg);
 		void rotateY(float deg);
 
-        vec3f pos;
+		vec3f pos;
 		vec3f rot;
+	private:
 		World& parentWorld;
 };
 

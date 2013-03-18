@@ -33,29 +33,29 @@ bool Texture::load(const std::string &filePath) {
 	return true;
 }
 
-void Texture::bind() {
+void Texture::bind() const {
 	glBindTexture(GL_TEXTURE_2D, handle);
 }
 
-void Texture::setFilter(GLenum filter) {
+void Texture::setFilter(GLenum filter) const {
 	bind();
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 }
 
-void Texture::setWrap(GLenum wrap) {
+void Texture::setWrap(GLenum wrap) const {
 	bind();
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 }
 
-GLuint Texture::getHandle() {
+GLuint Texture::getHandle() const {
 	return handle;
 }
 
-int Texture::getWidth() {
+int Texture::getWidth() const {
 	return size.x;
 }
-int Texture::getHeight() {
+int Texture::getHeight() const {
 	return size.y;
 }

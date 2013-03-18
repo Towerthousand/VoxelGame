@@ -13,6 +13,7 @@ class FontManager {
 		void deleteText(const std::string& textID);
 
 		sf::Font globalFont;
+	private:
 		std::map<std::string,sf::Text> texts;
 
 };
