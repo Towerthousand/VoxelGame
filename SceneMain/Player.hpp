@@ -1,8 +1,9 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 #include "Camera.hpp"
+#include "Entity.hpp"
 
-class Player : public Camera {
+class Player : public Entity , public Camera {
 	public:
 		enum {
 			TOP = 0,
@@ -16,6 +17,8 @@ class Player : public Camera {
 		~Player();
 		void update(float deltaTime);
 		void draw() const;
+		void movePos(const vec3f &disp);
+
 		void drawFrustum() const;
 		void makeFrustum();
 		bool insideFrustum(vec3f center, float radius) const; //sphere-plane check for frustum culling

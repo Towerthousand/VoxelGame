@@ -1,5 +1,5 @@
-#ifndef MATH_H
-#define MATH_H
+#ifndef MATH_HPP
+#define MATH_HPP
 
 inline float dot(sf::Vector3f a, sf::Vector3f b) {
 	return a.x*b.x + a.y*b.y + a.z*b.z;
@@ -15,4 +15,4 @@ inline void normalize(sf::Vector3f& x) {
 	x = x/float(sqrt(dot(x,x)));
 }
 
-#endif // MATH_H
+#endif // MATH_HPP

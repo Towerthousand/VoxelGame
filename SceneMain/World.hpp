@@ -34,7 +34,7 @@ class World {
 		//main
 		void draw() const;
 		void update(float deltaTime,Player &camera);
-		void traceView(const Camera& player, float tMax);
+		void traceView(const Player &player, float tMax);
 
 		bool playerTargetsBlock;
 		int chunksDrawn;
@@ -42,8 +42,8 @@ class World {
 		vec3f last;
 
 	private:
-		void calculateLight(sf::Vector3i source, vec2i radius);
-		void processCubeLighting(const sf::Vector3i& source, const sf::Vector3i& offset, std::vector<sf::Vector3i> &queue);
+		void calculateLight(vec3i source, vec2i radius);
+		void processCubeLighting(const vec3i& source, const vec3i& offset, std::vector<vec3i> &queue);
 		void updateGrass(float deltaTime);
 		void drawWireCube(const vec3f& pos) const;
 

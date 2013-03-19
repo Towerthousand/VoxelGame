@@ -1,15 +1,19 @@
-#ifndef ENTITY_H
-#define ENTITY_H
-#include "Camera.hpp"
+#ifndef ENTITY_HPP
+#define ENTITY_HPP
+#include "GameObject.hpp"
 
 class World;
-class Entity : public Camera {
+class Entity : public GameObject {
 	public:
 		Entity(World &world);
-		~Entity();
+		virtual ~Entity();
 
-		virtual void draw() = 0;
-		virtual void update(float deltaTime) = 0;
+		virtual void draw();
+		virtual void update(float deltaTime);
+
+		virtual void movePos();
+
+		std::vector<vec3f> hitBox;
 };
 
-#endif // ENTITY_H
+#endif // ENTITY_HPP

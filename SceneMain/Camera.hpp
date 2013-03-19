@@ -1,14 +1,15 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef CAMERA_HPP
+#define CAMERA_HPP
 #include "tools.hpp"
 
-class World;
 class Camera {
 	public:
-		Camera(World& world); //Player is bind to a world on creation, and will use it for collisions.
+		Camera();
 		~Camera();
 		void rotateX(float deg);
 		void rotateY(float deg);
+
+		vec2f camRot;
 };
 
 #endif // CAMERA_HPP

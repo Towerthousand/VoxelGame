@@ -15,7 +15,7 @@
 #include <vector>
 #include <cmath>
 #include <queue>
-#include "Math.h"
+#include "Math.hpp"
 
 typedef sf::Vector3<float> vec3f;
 typedef sf::Vector3<int> vec3i;

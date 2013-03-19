@@ -74,8 +74,8 @@ void SceneMain::draw() const {
 	//Move matrix to position (according to player)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glRotatef(player.rot.x, 1, 0, 0);
-	glRotatef(player.rot.y, 0, 1, 0);
+	glRotatef(player.camRot.x, 1, 0, 0);
+	glRotatef(player.camRot.y, 0, 1, 0);
 	glTranslatef(-player.pos.x, -player.pos.y, -player.pos.z);
 
 	parent.textures().useTexture("lolwtf");
@@ -89,8 +89,8 @@ void SceneMain::draw() const {
 	parent.font().getText("posX").setString("X: " + toString(player.pos.x));
 	parent.font().getText("posY").setString("Y: " + toString(player.pos.y));
 	parent.font().getText("posZ").setString("Z: " + toString(player.pos.z));
-	parent.font().getText("rotY").setString("Rot Y: " + toString(player.rot.y));
-	parent.font().getText("rotX").setString("Rot X: " + toString(player.rot.x));
+	parent.font().getText("rotY").setString("Rot Y: " + toString(player.camRot.y));
+	parent.font().getText("rotX").setString("Rot X: " + toString(player.camRot.x));
 	//SFML draws (until window.popGLStates())
 	glDisable(GL_CULL_FACE);
 	parent.getWindow().pushGLStates();
@@ -153,7 +153,7 @@ void SceneMain::onKeyPressed(float deltaTime, const sf::Keyboard::Key& key) {
 void SceneMain::onKeyDown(float deltaTime, const sf::Keyboard::Key &key) {
 	//Move player
 	const float vel = 5.0f;
-	vec2f dir(sin(player.rot.y*DEG_TO_RAD), -cos(player.rot.y*DEG_TO_RAD));
+	vec2f dir(sin(player.camRot.y*DEG_TO_RAD), -cos(player.camRot.y*DEG_TO_RAD));
 	switch(key) {
 		case sf::Keyboard::W:
 			player.vel.x += dir.x*vel*deltaTime;

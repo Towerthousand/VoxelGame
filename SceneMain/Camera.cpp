@@ -6,38 +6,28 @@
 // and is thougt of as a no-fly, fps kind of view. Tweak it!
 //
 
-Camera::Camera(World &world) :
-	GameObject(world) {
+Camera::Camera() {
 }
 
 Camera::~Camera() {
 }
 
-//void Camera::movePos(const vec3f &disp) {
-//	if(parentWorld.getCubeAbs(floor(pos.x + disp.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z)).ID == 0)
-//		pos.x += disp.x;
-//	if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + disp.y + PLAYER_HEIGHT),floor(pos.z)).ID == 0)
-//		pos.y += disp.y;
-//	if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z + disp.z)).ID == 0)
-//		pos.z += disp.z;
-//}
-
 void Camera::rotateX(float deg) {
-	rot.x += deg;
+	camRot.x += deg;
 
 	//Euler fix
-	if (rot.x > 89.9)
-		rot.x = 89.9;
-	else if (rot.x < -89.9)
-		rot.x = -89.9;
+	if (camRot.x > 89.9)
+		camRot.x = 89.9;
+	else if (camRot.x < -89.9)
+		camRot.x = -89.9;
 }
 
 void Camera::rotateY(float deg) {
-	rot.y += deg;
+	camRot.y += deg;
 
 	//prevent overflow of float rot.y
-	if (rot.y > 360)
-		rot.y = rot.y - 360;
-	else if (rot.y < -360)
-		rot.y = rot.y + 360;
+	if (camRot.y > 360)
+		camRot.y = camRot.y - 360;
+	else if (camRot.y < -360)
+		camRot.y = camRot.y + 360;
 }

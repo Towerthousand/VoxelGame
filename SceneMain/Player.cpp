@@ -2,7 +2,7 @@
 #include "World.hpp"
 
 Player::Player(World &world) :
-	Camera(world), vel(0,0,0), selectedID(1),
+	Entity(world), vel(0,0,0), selectedID(1),
 	frustumPlanes(6,std::vector<vec3f> //6 planes
 				  (4,vec3f(0,0,0)))	{//4 points per plane
 }
@@ -37,6 +37,15 @@ void Player::draw() const {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_TEXTURE_2D);
 	glPopMatrix();
+}
+
+void Player::movePos(const vec3f &disp) {
+	if(parentWorld.getCubeAbs(floor(pos.x + disp.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z)).ID == 0)
+		pos.x += disp.x;
+	if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + disp.y + PLAYER_HEIGHT),floor(pos.z)).ID == 0)
+		pos.y += disp.y;
+	if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z + disp.z)).ID == 0)
+		pos.z += disp.z;
 }
 
 void Player::drawFrustum() const {
