@@ -19,14 +19,17 @@ class Player : public Entity , public Camera {
 		void draw() const;
 		void movePos(const vec3f &disp);
 
+		void drawHitBox();
+
 		void drawFrustum() const;
 		void makeFrustum();
 		bool insideFrustum(vec3f center, float radius) const; //sphere-plane check for frustum culling
 
-		vec3f vel;
 		short selectedID; //current blockID, used to place blocks
 	private:
 		std::vector<std::vector<vec3f> > frustumPlanes;
+		static const vec3f hitBox[8];
+
 };
 
 #endif // PLAYER_HPP

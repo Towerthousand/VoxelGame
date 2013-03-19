@@ -2,7 +2,7 @@
 #define CAMERA_HPP
 #include "tools.hpp"
 
-class Camera {
+class Camera { //Just rotates in a human-like manner. Thought to be used with GameObjects and derived types
 	public:
 		Camera();
 		~Camera();

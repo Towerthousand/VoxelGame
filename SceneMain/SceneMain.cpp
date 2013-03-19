@@ -27,7 +27,6 @@ bool SceneMain::init() {
 	//parent.audio().musicBank["troll"]->getTrack().play();
 	//parent.audio().musicBank["troll"]->getTrack().setLoop(true);
 	//Init debug tags
-	parent.font().makeText("LOL","SDADASDAS",20,vec2f(10,170),sf::Color::White,sf::Text::Bold,false);
 	parent.font().makeText("FPS","",20,vec2f(10,150),sf::Color::White,sf::Text::Bold,false);
 	parent.font().makeText("Updates","",20,vec2f(10,130),sf::Color::White,sf::Text::Bold,false);
 	parent.font().makeText("Chunks","",20,vec2f(10,110),sf::Color::White,sf::Text::Bold,false);
@@ -94,7 +93,6 @@ void SceneMain::draw() const {
 	//SFML draws (until window.popGLStates())
 	glDisable(GL_CULL_FACE);
 	parent.getWindow().pushGLStates();
-	parent.getWindow().draw(parent.font().getText("LOL"));
 	parent.getWindow().draw(parent.font().getText("FPS"));
 	parent.getWindow().draw(parent.font().getText("Updates"));
 	parent.getWindow().draw(parent.font().getText("Chunks"));
@@ -113,8 +111,7 @@ void SceneMain::onKeyPressed(float deltaTime, const sf::Keyboard::Key& key) {
 			vec3f newPos;
 			newPos.x = rand()%(WORLDWIDTH*CHUNKSIZE);
 			newPos.z = rand()%(WORLDWIDTH*CHUNKSIZE);
-			newPos.y = world.getSkylightLevel(newPos.x,newPos.z) + 1 - PLAYER_HEIGHT;
-			parent.font().getText("LOL").setString(toString(world.getSkylightLevel(newPos.x,newPos.z)));
+			newPos.y = world.getSkylightLevel(newPos.x,newPos.z) + 1 + 1.7;
 			player.pos = newPos + vec3f(0.5,0,0.5);
 			break;
 		}
@@ -156,26 +153,24 @@ void SceneMain::onKeyDown(float deltaTime, const sf::Keyboard::Key &key) {
 	vec2f dir(sin(player.camRot.y*DEG_TO_RAD), -cos(player.camRot.y*DEG_TO_RAD));
 	switch(key) {
 		case sf::Keyboard::W:
-			player.vel.x += dir.x*vel*deltaTime;
-			player.vel.z += dir.y*vel*deltaTime;
+			player.vel.x += dir.x*vel;
+			player.vel.z += dir.y*vel;
 			break;
 		case sf::Keyboard::S:
-			player.vel.x += -dir.x*vel*deltaTime;
-			player.vel.z += -dir.y*vel*deltaTime;
+			player.vel.x += -dir.x*vel;
+			player.vel.z += -dir.y*vel;
 			break;
 		case sf::Keyboard::A:
-			player.vel.x += dir.y*vel*deltaTime;
-			player.vel.z += -dir.x*vel*deltaTime;
+			player.vel.x += dir.y*vel;
+			player.vel.z += -dir.x*vel;
 			break;
 		case sf::Keyboard::D:
-			player.vel.x += -dir.y*vel*deltaTime;
-			player.vel.z += dir.x*vel*deltaTime;
+			player.vel.x += -dir.y*vel;
+			player.vel.z += dir.x*vel;
 			break;
 		case sf::Keyboard::Space:
-			player.vel.y += 4*vel*deltaTime;
-			break;
-		case sf::Keyboard::LShift:
-			player.vel.y -= vel*deltaTime;
+			if (player.vel.y == 0)
+				player.vel.y = 10;
 			break;
 		default:
 			break;

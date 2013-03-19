@@ -2,9 +2,10 @@
 #include "World.hpp"
 
 Player::Player(World &world) :
-	Entity(world), vel(0,0,0), selectedID(1),
+	Entity(world), selectedID(1),
 	frustumPlanes(6,std::vector<vec3f> //6 planes
 				  (4,vec3f(0,0,0)))	{//4 points per plane
+	acc.y = -40; //GRAVITY IS WORKIIIIIIING AGAINST MEEE.... OHOH... GRAVITY
 }
 
 Player::~Player() {
@@ -12,10 +13,11 @@ Player::~Player() {
 
 void Player::update(float deltaTime) {
 	//move the player's position
-	vel.y -= 15.0f*deltaTime;
-	movePos(vel);
+	//vel.x += acc.x*deltaTime; Player only accelerates vertically
+	vel.y += acc.y*deltaTime;
+	//vel.z += acc.z*deltaTime; Player only accelerates vertically
+	movePos(vel*deltaTime);
 	makeFrustum();
-	vel = vec3f(0.0,0.0,0.0);
 }
 
 void Player::draw() const {
@@ -40,12 +42,34 @@ void Player::draw() const {
 }
 
 void Player::movePos(const vec3f &disp) {
-	if(parentWorld.getCubeAbs(floor(pos.x + disp.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z)).ID == 0)
+	bool moveX,moveY,moveZ;
+	moveX = moveY = moveZ = true;
+	for(int i = 0; i < 8; ++i) {//8 is the number of points that define the hitbox.
+		if(parentWorld.getCubeAbs(floor(pos.x + disp.x + hitBox[i].x),floor(pos.y + hitBox[i].y),floor(pos.z + hitBox[i].z)).ID != 0) {
+			moveX = false;
+		}
+		if(parentWorld.getCubeAbs(floor(pos.x + hitBox[i].x),floor(pos.y + disp.y + hitBox[i].y),floor(pos.z + hitBox[i].z)).ID != 0) {
+			moveY = false;
+			vel.y = 0; //if touching floor, reset speed.y (only accelerate when in free air)
+		}
+		if(parentWorld.getCubeAbs(floor(pos.x + hitBox[i].x),floor(pos.y + hitBox[i].y),floor(pos.z + disp.z + hitBox[i].z)).ID != 0) {
+			moveZ = false;
+		}
+	}
+	if (moveX)
 		pos.x += disp.x;
-	if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + disp.y + PLAYER_HEIGHT),floor(pos.z)).ID == 0)
+	if (moveY)
 		pos.y += disp.y;
-	if(parentWorld.getCubeAbs(floor(pos.x),floor(pos.y + PLAYER_HEIGHT),floor(pos.z + disp.z)).ID == 0)
+	if (moveZ)
 		pos.z += disp.z;
+	vel.x = 0; // Player only accelerates vertically, so speed.x doesn't carry
+	vel.y = std::fmin(10,vel.y);
+	vel.z = 0; // Player only accelerates vertically
+
+}
+
+void Player::drawHitBox() {
+
 }
 
 void Player::drawFrustum() const {
@@ -146,10 +170,21 @@ bool Player::insideFrustum(vec3f center, float radius) const {
 		vec3f n = cross(v,u); //normal n = (Ax,By,Cz), point [0] = (p1,p2,p3)
 		normalize(n);
 		D = -dot(n,frustumPlanes[i][0]); //A*p1*x + B*p2*y + C*p3*z + D = 0 => D = -dot(n,P)
-		distance = dot(n,center) + D;  //Solve the equation using the player's pos instead
+		distance = dot(n,center) + D;//Solve the equation using the player's pos instead
 		//of a point in the plane.
 		if (distance < -radius)
 			return false; //not inside this player's view
 	}
 	return true;
 }
+
+const vec3f Player::hitBox[8] = {
+	vec3f(-0.25,+0.1,-0.25),
+	vec3f(+0.25,+0.1,-0.25),
+	vec3f(-0.25,-1.7,-0.25),
+	vec3f(+0.25,-1.7,-0.25),
+	vec3f(-0.25,+0.1,+0.25),
+	vec3f(+0.25,+0.1,+0.25),
+	vec3f(-0.25,-1.7,+0.25),
+	vec3f(+0.25,-1.7,+0.25)
+};

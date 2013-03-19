@@ -1,6 +1,7 @@
 #include "Entity.hpp"
 
-Entity::Entity(World& world) : GameObject(world) {
+Entity::Entity(World& world) : GameObject(world),
+	vel(0,0,0), acc(0,0,0){
 }
 
 Entity::~Entity() {

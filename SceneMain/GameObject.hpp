@@ -3,7 +3,7 @@
 #include "tools.hpp"
 
 class World;
-class GameObject {
+class GameObject { //Static objects that have a position and rotation but don't move
 	public:
 		GameObject(World& world);
 		virtual ~GameObject();

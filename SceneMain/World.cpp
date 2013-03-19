@@ -99,7 +99,7 @@ bool World::getOutOfBounds(int x, int y, int z) const{
 
 Cube World::getCubeAbs(int x, int y, int z) const {
 	if (getOutOfBounds(x,y,z))
-		return Cube(0,MINLIGHT);
+		return Cube(0,MAXLIGHT);
 	return chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE];
 }
 
