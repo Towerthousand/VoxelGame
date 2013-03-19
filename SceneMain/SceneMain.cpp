@@ -27,6 +27,8 @@ bool SceneMain::init() {
 	//parent.audio().musicBank["troll"]->getTrack().play();
 	//parent.audio().musicBank["troll"]->getTrack().setLoop(true);
 	//Init debug tags
+	parent.font().makeText("Jumping","",20,vec2f(10,190),sf::Color::White,sf::Text::Bold,false);
+	parent.font().makeText("OnFloor","",20,vec2f(10,170),sf::Color::White,sf::Text::Bold,false);
 	parent.font().makeText("FPS","",20,vec2f(10,150),sf::Color::White,sf::Text::Bold,false);
 	parent.font().makeText("Updates","",20,vec2f(10,130),sf::Color::White,sf::Text::Bold,false);
 	parent.font().makeText("Chunks","",20,vec2f(10,110),sf::Color::White,sf::Text::Bold,false);
@@ -84,6 +86,14 @@ void SceneMain::draw() const {
 	glFlush();
 
 	//Debug tags
+	if (player.isJumping)
+		parent.font().getText("Jumping").setString("Jumping: True");
+	else
+		parent.font().getText("Jumping").setString("Jumping: False");
+	if (player.onFloor)
+		parent.font().getText("OnFloor").setString("OnFloor: True");
+	else
+		parent.font().getText("OnFloor").setString("OnFloor: False");
 	parent.font().getText("Chunks").setString("Chunks drawn: " + toString(world.chunksDrawn));
 	parent.font().getText("posX").setString("X: " + toString(player.pos.x));
 	parent.font().getText("posY").setString("Y: " + toString(player.pos.y));
@@ -93,6 +103,8 @@ void SceneMain::draw() const {
 	//SFML draws (until window.popGLStates())
 	glDisable(GL_CULL_FACE);
 	parent.getWindow().pushGLStates();
+	parent.getWindow().draw(parent.font().getText("Jumping"));
+	parent.getWindow().draw(parent.font().getText("OnFloor"));
 	parent.getWindow().draw(parent.font().getText("FPS"));
 	parent.getWindow().draw(parent.font().getText("Updates"));
 	parent.getWindow().draw(parent.font().getText("Chunks"));
@@ -169,7 +181,7 @@ void SceneMain::onKeyDown(float deltaTime, const sf::Keyboard::Key &key) {
 			player.vel.z += dir.x*vel;
 			break;
 		case sf::Keyboard::Space:
-			if (player.vel.y == 0)
+			if (player.onFloor && !player.isJumping)
 				player.vel.y = 10;
 			break;
 		default:

@@ -26,9 +26,11 @@ class Player : public Entity , public Camera {
 		bool insideFrustum(vec3f center, float radius) const; //sphere-plane check for frustum culling
 
 		short selectedID; //current blockID, used to place blocks
+		bool onFloor;
+		bool isJumping;
 	private:
 		std::vector<std::vector<vec3f> > frustumPlanes;
-		static const vec3f hitBox[8];
+		static const vec3f hitBox[12];
 
 };
 
