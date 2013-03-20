@@ -19,7 +19,7 @@ class Player : public Entity , public Camera {
 		void draw() const;
 		void movePos(const vec3f &disp);
 
-		void drawHitBox();
+		void drawHitBox() const;
 
 		void drawFrustum() const;
 		void makeFrustum();

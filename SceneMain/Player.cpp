@@ -44,7 +44,7 @@ void Player::draw() const {
 void Player::movePos(const vec3f &disp) {
 	bool moveX,moveY,moveZ;
 	moveX = moveY = moveZ = true;
-	for(int i = 0; i < 12; ++i) {//8 is the number of points that define the hitbox.
+	for(int i = 0; i < 12; ++i) {//12 is the number of points that define the hitbox.
 		if(parentWorld.getCubeAbs(floor(pos.x + disp.x + hitBox[i].x),floor(pos.y + hitBox[i].y),floor(pos.z + hitBox[i].z)).ID != 0) {
 			moveX = false;
 		}
@@ -58,7 +58,7 @@ void Player::movePos(const vec3f &disp) {
 	}
 
 	onFloor = false;
-	for(int i = 0; i < 12; ++i) {//8 is the number of points that define the hitbox.
+	for(int i = 0; i < 12; ++i) {//12 is the number of points that define the hitbox.
 		if(parentWorld.getCubeAbs(floor(pos.x + hitBox[i].x),floor(pos.y -0.1 + hitBox[i].y),floor(pos.z + hitBox[i].z)).ID != 0) {
 			onFloor = true;
 		}
@@ -78,8 +78,27 @@ void Player::movePos(const vec3f &disp) {
 
 }
 
-void Player::drawHitBox() {
-
+void Player::drawHitBox() const {
+	//for debugging purposes
+	std::vector<std::vector<bool> > used(12,std::vector<bool>(12,false));
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glPushMatrix();
+	glColor4f(0.0,0.0,0.0,1);
+	glBegin(GL_LINES);
+	for (int i = 0; i < 12; ++i) {//12 is the number of points that define the hitbox.
+		for (int j = 0; j < 12; ++j) {//12 is the number of points that define the hitbox.
+			if(!used[i][j] && i != j && ((hitBox[i].x == hitBox[j].x && hitBox[i].y == hitBox[j].y)
+										 || (hitBox[i].x == hitBox[j].x && hitBox[i].z == hitBox[j].z)
+										 || (hitBox[i].z == hitBox[j].z && hitBox[i].y == hitBox[j].y))) {
+				glVertex3f(pos.x + hitBox[i].x,pos.y + hitBox[i].y,pos.z + hitBox[i].z);
+				glVertex3f(pos.x + hitBox[j].x,pos.y + hitBox[j].y,pos.z + hitBox[j].z);
+				used[i][j] = true;
+			}
+		}
+	}
+	glEnd();
+	glColor4f(1.0,1.0,1.0,1.0);
+	glPopMatrix();
 }
 
 void Player::drawFrustum() const {
