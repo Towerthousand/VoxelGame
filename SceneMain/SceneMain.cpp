@@ -82,7 +82,6 @@ void SceneMain::draw() const {
 	parent.textures().useTexture("lolwtf");
 	world.draw();
 	player.draw();
-	player.drawHitBox();
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glFlush();
 

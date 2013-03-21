@@ -94,10 +94,10 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) { //I DON'T KNOW HOW 
 					 getCube(x+1,y,z+1).light + getCube(x+1,y-1,z+1).light)/4.0;
 			lindD = (getCube(x,y,z+1).light + getCube(x,y+1,z+1).light +
 					 getCube(x+1,y,z+1).light + getCube(x+1,y+1,z+1).light)/4.0;
-			lindA = std::fmax(std::fmax(lindA,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
-			lindB = std::fmax(std::fmax(lindB,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
-			lindC = std::fmax(std::fmax(lindC,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
-			lindD = std::fmax(std::fmax(lindD,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindA = std::fmax(std::fmax(lindA,getCube(x,y,z+1).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindB = std::fmax(std::fmax(lindB,getCube(x,y,z+1).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindC = std::fmax(std::fmax(lindC,getCube(x,y,z+1).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindD = std::fmax(std::fmax(lindD,getCube(x,y,z+1).light/3.0),MINLIGHT)/(MAXLIGHT);
 			lindE = (lindA+lindB+lindC+lindD)/4.0;
 		}
 		//t1
@@ -127,10 +127,10 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) { //I DON'T KNOW HOW 
 					 getCube(x-1,y,z-1).light + getCube(x-1,y-1,z-1).light)/4.0;
 			lindD = (getCube(x,y,z-1).light + getCube(x,y+1,z-1).light +
 					 getCube(x-1,y,z-1).light + getCube(x-1,y+1,z-1).light)/4.0;
-			lindA = std::fmax(std::fmax(lindA,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
-			lindB = std::fmax(std::fmax(lindB,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
-			lindC = std::fmax(std::fmax(lindC,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
-			lindD = std::fmax(std::fmax(lindD,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindA = std::fmax(std::fmax(lindA,getCube(x,y,z-1).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindB = std::fmax(std::fmax(lindB,getCube(x,y,z-1).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindC = std::fmax(std::fmax(lindC,getCube(x,y,z-1).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindD = std::fmax(std::fmax(lindD,getCube(x,y,z-1).light/3.0),MINLIGHT)/(MAXLIGHT);
 			lindE = (lindA+lindB+lindC+lindD)/4.0;
 		}
 		texX = (textureIndexes[cubeID][1] % 32)*16;
@@ -197,10 +197,10 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) { //I DON'T KNOW HOW 
 					 getCube(x-1,y,z+1).light + getCube(x-1,y-1,z+1).light)/4.0;
 			lindD = (getCube(x-1,y,z).light + getCube(x-1,y+1,z).light +
 					 getCube(x-1,y,z+1).light + getCube(x-1,y+1,z+1).light)/4.0;
-			lindA = std::fmax(std::fmax(lindA,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
-			lindB = std::fmax(std::fmax(lindB,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
-			lindC = std::fmax(std::fmax(lindC,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
-			lindD = std::fmax(std::fmax(lindD,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindA = std::fmax(std::fmax(lindA,getCube(x-1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindB = std::fmax(std::fmax(lindB,getCube(x-1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindC = std::fmax(std::fmax(lindC,getCube(x-1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindD = std::fmax(std::fmax(lindD,getCube(x-1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
 			lindE = (lindA+lindB+lindC+lindD)/4.0;
 		}
 		texX = (textureIndexes[cubeID][3] % 32)*16;
@@ -232,10 +232,10 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) { //I DON'T KNOW HOW 
 					 getCube(x,y-1,z-1).light + getCube(x-1,y-1,z-1).light)/4.0;
 			lindD = (getCube(x,y-1,z).light + getCube(x+1,y-1,z).light +
 					 getCube(x,y-1,z-1).light + getCube(x+1,y-1,z-1).light)/4.0;
-			lindA = std::fmax(std::fmax(lindA,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
-			lindB = std::fmax(std::fmax(lindB,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
-			lindC = std::fmax(std::fmax(lindC,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
-			lindD = std::fmax(std::fmax(lindD,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindA = std::fmax(std::fmax(lindA,getCube(x,y-1,z).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindB = std::fmax(std::fmax(lindB,getCube(x,y-1,z).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindC = std::fmax(std::fmax(lindC,getCube(x,y-1,z).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindD = std::fmax(std::fmax(lindD,getCube(x,y-1,z).light/3.0),MINLIGHT)/(MAXLIGHT);
 			lindE = (lindA+lindB+lindC+lindD)/4.0;
 		}
 		texX = (textureIndexes[cubeID][4] % 32)*16;
@@ -267,10 +267,10 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) { //I DON'T KNOW HOW 
 					 getCube(x,y+1,z-1).light + getCube(x+1,y+1,z-1).light)/4.0;
 			lindD = (getCube(x,y+1,z).light + getCube(x-1,y+1,z).light +
 					 getCube(x,y+1,z-1).light + getCube(x-1,y+1,z-1).light)/4.0;
-			lindA = std::fmax(std::fmax(lindA,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
-			lindB = std::fmax(std::fmax(lindB,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
-			lindC = std::fmax(std::fmax(lindC,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
-			lindD = std::fmax(std::fmax(lindD,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindA = std::fmax(std::fmax(lindA,getCube(x,y+1,z).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindB = std::fmax(std::fmax(lindB,getCube(x,y+1,z).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindC = std::fmax(std::fmax(lindC,getCube(x,y+1,z).light/3.0),MINLIGHT)/(MAXLIGHT);
+			lindD = std::fmax(std::fmax(lindD,getCube(x,y+1,z).light/3.0),MINLIGHT)/(MAXLIGHT);
 			lindE = (lindA+lindB+lindC+lindD)/4.0;
 		}
 		texX = (textureIndexes[cubeID][5] % 32)*16;
