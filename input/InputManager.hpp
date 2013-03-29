@@ -1,6 +1,6 @@
 #ifndef INPUTMANAGER_HPP
 #define INPUTMANAGER_HPP
-#include "tools.hpp"
+#include "../tools.hpp"
 
 class InputManager {
 	public:
@@ -10,24 +10,28 @@ class InputManager {
 		void releaseKey(sf::Keyboard::Key key);
 		void pressMouse(sf::Mouse::Button key);
 		void releaseMouse(sf::Mouse::Button key);
+		void moveMouse(int dx, int dy);
+		void setMousePos(int x, int y);
+
+		void gainFocus();
+		void loseFocus();
+
+		void resizeWindow(int newHeight, int newWidth);
+
 		void update();
 
-		bool isKeyPressed(sf::Keyboard::Key key);
-		bool isKeyDown(sf::Keyboard::Key key);
-		bool isKeyReleased(sf::Keyboard::Key key);
-		bool isMousePressed(sf::Mouse::Button key);
-		bool isMouseDown(sf::Mouse::Button key);
-		bool isMouseReleased(sf::Mouse::Button key);
+		std::set<sf::Keyboard::Key> keysPressed;
+		std::set<sf::Keyboard::Key> keysDown;
+		std::set<sf::Keyboard::Key> keysReleased;
 
-		std::vector<bool> keyPressed; //is being pressed
-		std::vector<bool> keyReleased; //is being releassed
-		std::vector<bool> keyDown; //is being held down
-		sf::Keyboard::Key keys[101];
+		std::set<sf::Mouse::Button> mouseButtonsPressed;
+		std::set<sf::Mouse::Button> mouseButtonsDown;
+		std::set<sf::Mouse::Button> mouseButtonsReleased;
 
-		std::vector<bool> mousePressed; //is being pressed
-		std::vector<bool> mouseReleased; //is being releassed
-		std::vector<bool> mouseDown; //is being held down
-		sf::Mouse::Button mouseButtons[5];
+		vec2i lastMousePos;
+		vec2i mouseDisplacement;
+
+		bool focus;
 };
 
 #endif // INPUTMANAGER_HPP

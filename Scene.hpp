@@ -16,7 +16,7 @@ class Scene {
 		virtual void onMouseButtonPressed(float deltaTime, const sf::Mouse::Button &button) = 0; //called by parent on parent.update()
 		virtual void onMouseButtonDown(float deltaTime, const sf::Mouse::Button &button) = 0; //called by parent on parent.update()
 		virtual void onMouseButtonReleased(float deltaTime, const sf::Mouse::Button &button) = 0; //called by parent on parent.update()
-		virtual void onMouseMoved(float deltaTime) = 0; //called by parent on parent.update()
+		virtual void onMouseMoved(float deltaTime, int dx, int dy) = 0; //called by parent on parent.update()
 		virtual void onClose() = 0; //close scene-wide stuff
 		
 	protected:

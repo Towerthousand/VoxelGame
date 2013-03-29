@@ -180,7 +180,6 @@ void World::update(float deltaTime, Player& camera) {
 				}
 				if (chunks[x][y][z]->markedForRedraw == true && updateMax < 30) {
 					updateMax++;
-					DBG_UPDATES++; //I'm a global extern. FIX ME PLS
 					chunks[x][y][z]->update(deltaTime);
 				}
 			}

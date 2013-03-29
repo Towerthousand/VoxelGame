@@ -1,6 +1,30 @@
 
 #ifndef GAME_HPP
 #define GAME_HPP
+
+//	THIS IS THE SFML BINDING OF MY ENGINE. DESIGNED TO WORK ON IT'S OWN CLASS. USAGE:
+//	 - Create a class MyScene that inherits from Scene.hpp
+//	   It has all types of methods for input & game loop: Key & Mouse input,
+//	   Update for logic, Draw for openGL and SFML calls to draw, init, loadResources
+//	   to load stuff (use the managers as to load) and an onClose method. It is pretty
+//	   straightforward.
+//   - Then, on main, just do this:
+//
+//	#include "Game.hpp"
+//  #include "MyScene.hpp"
+//
+//	int main() {
+//		Game myGame;
+//		if(myGame.init()) {
+//			myGame.setScene(new MyScene(myGame));
+//			myGame.run();
+//		}
+//		return 0;
+//	}
+//   - It will run right off the bat. Screen size is set to fullscreen (max resolution
+//     available), but you can tweak that in Game::Game() and tools.cpp
+
+
 #include "graphics/TextureManager.hpp"
 #include "graphics/FontManager.hpp"
 #include "audio/AudioManager.hpp"
@@ -58,7 +82,7 @@ class Game {
 		void onMouseButtonReleased(float deltaTime, const sf::Mouse::Button &button);
 										// currentScene.onMouseButtonReleased
 										// (deltaTime, button)
-		void onMouseMoved(float deltaTime);
+		void onMouseMoved(float deltaTime, int dx, int dy);
 										// currentScene.onMouseMoved
 										// (deltaTime)
 

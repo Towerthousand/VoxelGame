@@ -41,10 +41,6 @@ bool SceneMain::init() {
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
 	glScalef(1.0/512.0f,1.0/512.0f,1); //now textures are in pixel coords (only works for world texture)
-	//Set up GL view
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(FOV, float(SCRWIDTH)/float(SCRHEIGHT), ZNEAR, ZFAR);
 	//Load world from file
 	outLog("* Loading chunks" );
 	if (!world.loadDirbaio("resources/out.bin"))
@@ -61,8 +57,7 @@ void SceneMain::update(float deltaTime) {
 	debugCounter += deltaTime;
 	if (debugCounter > 1) {
 		parent.font().getText("FPS").setString("FPS: " + toString(fpsCount));
-		parent.font().getText("Updates").setString("Updates: " + toString(DBG_UPDATES));
-		DBG_UPDATES = 0;
+		parent.font().getText("Updates").setString("Updates: " + toString(1337));
 		debugCounter -= 1;
 		fpsCount = 0;
 	}
@@ -227,12 +222,12 @@ void SceneMain::onMouseButtonReleased(float deltaTime, const sf::Mouse::Button& 
 	}
 }
 
-void SceneMain::onMouseMoved(float deltaTime) {
-	vec2i mousePos = mouse.getPosition(parent.getWindow());//vec2i(event.mouseMove.x,event.mouseMove.y);
-	if ((mousePos.x != SCRHEIGHT/2 || mousePos.y != SCRWIDTH/2) && WINDOWFOCUS){
-		player.rotateX(((float)mousePos.y - SCRHEIGHT/2)*0.5);
-		player.rotateY(((float)mousePos.x - SCRWIDTH/2)*0.5);
+void SceneMain::onMouseMoved(float deltaTime, int dx, int dy) {
+	if (parent.input().focus){
+		player.rotateX(dy*0.5);
+		player.rotateY(dx*0.5);
 		mouse.setPosition(vec2i(SCRWIDTH/2, SCRHEIGHT/2),parent.getWindow());
+		parent.input().setMousePos(SCRWIDTH/2, SCRHEIGHT/2);
 	}
 }
 

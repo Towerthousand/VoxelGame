@@ -44,12 +44,6 @@ struct Cube {
 		short light;
 };
 
-struct lightBox {
-		sf::Vector3i source;
-		vec2i radius;
-		bool blockChanged;
-};
-
 //prototype random functions here (define in tools.cpp). Inlines go here too
 inline void outLog(const std::string& msg) {
 	std::cout << msg << std::endl;
@@ -68,10 +62,9 @@ std::string toString(float num);
 #define FOV 60.0 //degrees
 #define ZNEAR 0.01f
 #define ZFAR 500.0f
-extern int SCRWIDTH; //1366
-extern int SCRHEIGHT; //768
+extern int SCRWIDTH;
+extern int SCRHEIGHT;
 extern bool WINDOWFOCUS;
-extern int DBG_UPDATES;
 extern int WORLDHEIGHT;
 extern int WORLDWIDTH;
 

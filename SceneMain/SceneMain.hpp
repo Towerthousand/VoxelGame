@@ -18,7 +18,7 @@ class SceneMain : public Scene {
 		void onMouseButtonPressed(float deltaTime, const sf::Mouse::Button &button);
 		void onMouseButtonDown(float deltaTime, const sf::Mouse::Button &button);
 		void onMouseButtonReleased(float deltaTime, const sf::Mouse::Button &button);
-		void onMouseMoved(float deltaTime);
+		void onMouseMoved(float deltaTime, int dx, int dy);
 		void onClose(); //close scene-wide stuff
 
 	private:
