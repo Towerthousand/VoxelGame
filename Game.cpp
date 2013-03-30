@@ -1,7 +1,7 @@
 #include "Game.hpp"
 
 Game::Game() : currentScene(NULL), nextScene(NULL) {
-	window.create(sf::VideoMode(SCRWIDTH,SCRHEIGHT,32), WINDOW_TITLE ,sf::Style::Fullscreen,CONTEXT_SETTINGS_OPENGL);
+	window.create(sf::VideoMode(SCRWIDTH,SCRHEIGHT,32), WINDOW_TITLE ,sf::Style::Default,CONTEXT_SETTINGS_OPENGL);
 	window.setMouseCursorVisible(false);
 	window.setKeyRepeatEnabled(false);
 	window.setVerticalSyncEnabled(false);

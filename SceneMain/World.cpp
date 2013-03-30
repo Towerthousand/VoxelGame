@@ -69,8 +69,8 @@ bool World::loadDirbaio(const std::string filePath) {
 	}
 	outLog(" - Lighting chunks...");
 	calculateLight(vec3i(CHUNKSIZE*WORLDWIDTH/2,
-								CHUNKSIZE*WORLDHEIGHT/2,
-								CHUNKSIZE*WORLDWIDTH/2),
+						 CHUNKSIZE*WORLDHEIGHT/2,
+						 CHUNKSIZE*WORLDWIDTH/2),
 				   vec2i(WORLDWIDTH*CHUNKSIZE/2 + 1,WORLDHEIGHT*CHUNKSIZE/2 + 1));
 	outLog(" - Finished lighting. Time: " + toString((float)clock.restart().asSeconds()) + " seconds");
 	return true;
@@ -100,6 +100,10 @@ bool World::getOutOfBounds(int x, int y, int z) const{
 Cube World::getCubeAbs(int x, int y, int z) const {
 	if (getOutOfBounds(x,y,z))
 		return Cube(0,MAXLIGHT);
+	return getCubeRaw(x,y,z);
+}
+
+Cube World::getCubeRaw(int x, int y, int z) const {
 	return chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE];
 }
 
@@ -111,15 +115,15 @@ void World::setCubeIDAbs(int x, int y, int z, short ID) { //set the id, calculat
 		int previousSkyValue = skyValues[x][z];
 		skyValues[x][z] = getSkylightLevel(x,z);
 		calculateLight(vec3i(x,
-									((y - previousSkyValue)/2) + previousSkyValue - UPDATERADIUS/2,
-									z),
+							 ((y - previousSkyValue)/2) + previousSkyValue - UPDATERADIUS/2,
+							 z),
 					   vec2i(UPDATERADIUS,std::max(UPDATERADIUS,(y - previousSkyValue)/2 + UPDATERADIUS/2 + 4)));
 	}
 	else if (y == skyValues[x][z]) { //propagate skylight downwards
 		skyValues[x][z] = getSkylightLevel(x,z);
 		calculateLight(vec3i(x,
-									((y - skyValues[x][z])/2) + skyValues[x][z]  - UPDATERADIUS/2,
-									z),
+							 ((y - skyValues[x][z])/2) + skyValues[x][z]  - UPDATERADIUS/2,
+							 z),
 					   vec2i(UPDATERADIUS,std::max(UPDATERADIUS,(y - skyValues[x][z])/2 + UPDATERADIUS/2 + 4)));
 	}
 	else { //just calculate the surrounding blocks, since wer'e not changing sky level
@@ -332,22 +336,17 @@ void World::calculateLight(vec3i source, vec2i radius) {
 
 void World::processCubeLighting(const vec3i& source, const vec3i& offset, std::vector<vec3i> &queue) { //BFS node processing
 	vec3i subject = source+offset;
-	if(!getOutOfBounds(subject.x,subject.y,subject.z) &&
-	   chunks[subject.x/CHUNKSIZE][subject.y/CHUNKSIZE][subject.z/CHUNKSIZE]->cubes[subject.x%CHUNKSIZE][subject.y%CHUNKSIZE][subject.z%CHUNKSIZE].ID == 0) {
-		if(chunks[subject.x/CHUNKSIZE][subject.y/CHUNKSIZE][subject.z/CHUNKSIZE]->cubes[subject.x%CHUNKSIZE][subject.y%CHUNKSIZE][subject.z%CHUNKSIZE].light
-		   < chunks[source.x/CHUNKSIZE][source.y/CHUNKSIZE][source.z/CHUNKSIZE]->cubes[source.x%CHUNKSIZE][source.y%CHUNKSIZE][source.z%CHUNKSIZE].light-1) {
-			queue.push_back(subject);
-			setCubeLightAbs(subject.x,subject.y,subject.z,chunks[source.x/CHUNKSIZE][source.y/CHUNKSIZE][source.z/CHUNKSIZE]->cubes[source.x%CHUNKSIZE][source.y%CHUNKSIZE][source.z%CHUNKSIZE].light-1);
+	if(!getOutOfBounds(subject.x,subject.y,subject.z)) {
+		Cube sub = getCubeRaw(subject.x,subject.y,subject.z);
+		if(sub.ID == 0) {
+			Cube src = getCubeRaw(source.x,source.y,source.z);
+			if(sub.light
+			   < src.light-1) {
+				queue.push_back(subject);
+				setCubeLightAbs(subject.x,subject.y,subject.z,src.light-1);
+			}
 		}
 	}
-	//    readable version
-	//    vec3i subject = source+offset;
-	//    if(!getOutOfBounds(subject.x,subject.y,subject.z) && getCubeAbs(subject.x,subject.y,subject.z).ID == 0) {
-	//        if(getCubeAbs(subject.x,subject.y,subject.z).light < getCubeAbs(source.x,source.y,source.z).light-1) {
-	//            queue.push(subject);
-	//            setCubeLightAbs(subject.x,subject.y,subject.z,getCubeAbs(source.x,source.y,source.z).light - 1);
-	//        }
-	//    }
 }
 
 void World::updateGrass(float deltaTime) { //only to be called by world.update()

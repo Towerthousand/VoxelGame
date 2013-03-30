@@ -47,6 +47,20 @@ bool SceneMain::init() {
 		return false;
 	//Center mouse
 	mouse.setPosition(vec2i(SCRWIDTH/2,SCRHEIGHT/2),parent.getWindow());
+	//Enable lights
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
+	glEnable(GL_COLOR_MATERIAL);
+	GLfloat diffuse[] = {0.3, 0.3, 0.3, 1.f};
+	GLfloat ambient[] = {0.2, 0.2, 0.2, 1.f};
+	GLfloat specular[] = {0.1, 0.1, 0.1, 1.f};
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, specular);
+	glLightfv(GL_LIGHT1, GL_AMBIENT, ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
 
 	outLog("* Init was succesful" );
 	return true;
@@ -73,6 +87,12 @@ void SceneMain::draw() const {
 	glRotatef(player.camRot.x, 1, 0, 0);
 	glRotatef(player.camRot.y, 0, 1, 0);
 	glTranslatef(-player.pos.x, -player.pos.y, -player.pos.z);
+
+	//Draw global lights
+	GLfloat lightpos0[] = {-0.5, 0.7 , -0.3, 0.};
+	glLightfv(GL_LIGHT0, GL_POSITION, lightpos0);
+	GLfloat lightpos1[] = {0.4, 0.3 , 0.9, 0.};
+	glLightfv(GL_LIGHT1, GL_POSITION, lightpos1);
 
 	parent.textures().useTexture("lolwtf");
 	world.draw();
@@ -110,6 +130,8 @@ void SceneMain::draw() const {
 	parent.getWindow().draw(parent.font().getText("rotY"));
 	parent.getWindow().popGLStates();
 	glEnable(GL_CULL_FACE);
+
+
 }
 
 void SceneMain::onKeyPressed(float deltaTime, const sf::Keyboard::Key& key) {

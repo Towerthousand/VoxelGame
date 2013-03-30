@@ -26,6 +26,7 @@ class World {
 		//Getters and setters
 		bool getOutOfBounds(int x, int y, int z) const;
 		Cube getCubeAbs(int x, int y, int z) const;
+		Cube getCubeRaw(int x, int y, int z) const;
 		void setCubeIDAbs(int x, int y, int z, short ID);
 		void setCubeLightAbs(int x, int y, int z, short light);
 		int getSkylightLevel(int x, int z) const;
