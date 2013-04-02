@@ -17,7 +17,7 @@ class Player : public Entity , public Camera {
 		~Player();
 		void update(float deltaTime);
 		void draw() const;
-		void movePos(const vec3f &disp);
+		void movePos(float deltaTime);
 
 		void drawHitBox() const;
 
@@ -30,7 +30,6 @@ class Player : public Entity , public Camera {
 		bool isJumping;
 	private:
 		std::vector<std::vector<vec3f> > frustumPlanes;
-		static const vec3f hitBox[12];
 
 };
 

@@ -7,7 +7,7 @@ Chunk::Chunk(int x, int y, int z, World &world) :
 		  (CHUNKSIZE,std::vector<Cube>
 		   (CHUNKSIZE,Cube(0,MINLIGHT)))),
 	XPOS(x), YPOS(y), ZPOS(z),
-	VBOID(XPOS*WORLDWIDTH+ZPOS*WORLDWIDTH+YPOS*WORLDHEIGHT+1),
+	VBOID(1),
 	parentWorld(world) {
 }
 

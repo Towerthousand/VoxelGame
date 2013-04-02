@@ -5,7 +5,10 @@ Player::Player(World &world) :
 	Entity(world), selectedID(1), onFloor(false), isJumping(false),
 	frustumPlanes(6,std::vector<vec3f> //6 planes
 				  (4,vec3f(0,0,0)))	{//4 points per plane
-	acc.y = -40; //GRAVITY IS WORKIIIIIIING AGAINST MEEE.... OHOH... GRAVITY
+	pos = vec3f(256,0,0);
+	hitbox = Hitbox(vec3f(256,0,0), vec3f(0.2,0.9,0.2));
+	camPos = pos + vec3f(0,0.6,0);
+	acc = vec3f(0,-40,0);
 }
 
 Player::~Player() {
@@ -16,7 +19,9 @@ void Player::update(float deltaTime) {
 	//vel.x += acc.x*deltaTime; Player only accelerates vertically
 	vel.y += acc.y*deltaTime;
 	//vel.z += acc.z*deltaTime; Player only accelerates vertically
-	movePos(vel*deltaTime);
+	movePos(deltaTime);
+	hitbox.pos = pos;
+	camPos = pos + vec3f(0,0.6,0);
 	makeFrustum();
 }
 
@@ -41,37 +46,22 @@ void Player::draw() const {
 	glPopMatrix();
 }
 
-void Player::movePos(const vec3f &disp) {
-	bool moveX,moveY,moveZ;
-	moveX = moveY = moveZ = true;
-	for(int i = 0; i < 12; ++i) {//12 is the number of points that define the hitbox.
-		if(parentWorld.getCubeAbs(floor(pos.x + disp.x + hitBox[i].x),floor(pos.y + hitBox[i].y),floor(pos.z + hitBox[i].z)).ID != 0) {
-			moveX = false;
-		}
-		if(parentWorld.getCubeAbs(floor(pos.x + hitBox[i].x),floor(pos.y + disp.y + hitBox[i].y),floor(pos.z + hitBox[i].z)).ID != 0) {
-			moveY = false;
-			vel.y = 0;
-		}
-		if(parentWorld.getCubeAbs(floor(pos.x + hitBox[i].x),floor(pos.y + hitBox[i].y),floor(pos.z + disp.z + hitBox[i].z)).ID != 0) {
-			moveZ = false;
-		}
-	}
+void Player::movePos(float deltaTime) {
 
-	onFloor = false;
-	for(int i = 0; i < 12; ++i) {//12 is the number of points that define the hitbox.
-		if(parentWorld.getCubeAbs(floor(pos.x + hitBox[i].x),floor(pos.y -0.1 + hitBox[i].y),floor(pos.z + hitBox[i].z)).ID != 0) {
-			onFloor = true;
-		}
-	}
+	vec3f disp = vel*deltaTime; //deltax = vt bitch
+
+	if (!hitbox.collidesWithWorld(parentWorld,vec3f(disp.x,0,0)))
+		pos.x += disp.x;
+	if (!hitbox.collidesWithWorld(parentWorld,vec3f(0,disp.y,0)))
+		pos.y += disp.y;
+	if (!hitbox.collidesWithWorld(parentWorld,vec3f(0,0,disp.z)))
+		pos.z += disp.z;
+
+	onFloor = hitbox.collidesWithWorld(parentWorld,vec3f(0,0.1,0));
+	if (onFloor)
+		vel.y = 0;
 
 	isJumping = (vel.y > 0);
-
-	if (moveX)
-		pos.x += disp.x;
-	if (moveY)
-		pos.y += disp.y;
-	if (moveZ)
-		pos.z += disp.z;
 	vel.x = 0; // Player only accelerates vertically, so speed.x doesn't carry
 	vel.y = std::fmin(10,vel.y);
 	vel.z = 0; // Player only accelerates vertically, so speed.z doesn't carry
@@ -80,25 +70,26 @@ void Player::movePos(const vec3f &disp) {
 
 void Player::drawHitBox() const {
 	//for debugging purposes
-	std::vector<std::vector<bool> > used(12,std::vector<bool>(12,false));
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glPushMatrix();
-	glColor4f(0.0,0.0,0.0,1);
-	glBegin(GL_LINES);
-	for (int i = 0; i < 12; ++i) {//12 is the number of points that define the hitbox.
-		for (int j = 0; j < 12; ++j) {//12 is the number of points that define the hitbox.
-			if(!used[i][j] && i != j && ((hitBox[i].x == hitBox[j].x && hitBox[i].y == hitBox[j].y)
-										 || (hitBox[i].x == hitBox[j].x && hitBox[i].z == hitBox[j].z)
-										 || (hitBox[i].z == hitBox[j].z && hitBox[i].y == hitBox[j].y))) {
-				glVertex3f(pos.x + hitBox[i].x,pos.y + hitBox[i].y,pos.z + hitBox[i].z);
-				glVertex3f(pos.x + hitBox[j].x,pos.y + hitBox[j].y,pos.z + hitBox[j].z);
-				used[i][j] = true;
-			}
-		}
-	}
-	glEnd();
-	glColor4f(1.0,1.0,1.0,1.0);
-	glPopMatrix();
+	//	std::vector<std::vector<bool> > used(12,std::vector<bool>(12,false));
+	//	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//	glPushMatrix();
+	//	glColor4f(0.0,0.0,0.0,1);
+	//	glBegin(GL_LINES);
+	//	for (int i = 0; i < 12; ++i) {//12 is the number of points that define the hitbox.
+	//		for (int j = 0; j < 12; ++j) {//12 is the number of points that define the hitbox.
+	//			if(!used[i][j] && i != j && ((hitBox[i].x == hitBox[j].x && hitBox[i].y == hitBox[j].y)
+	//										 || (hitBox[i].x == hitBox[j].x && hitBox[i].z == hitBox[j].z)
+	//										 || (hitBox[i].z == hitBox[j].z && hitBox[i].y == hitBox[j].y))) {
+	//				glVertex3f(pos.x + hitBox[i].x,pos.y + hitBox[i].y,pos.z + hitBox[i].z);
+	//				glVertex3f(pos.x + hitBox[j].x,pos.y + hitBox[j].y,pos.z + hitBox[j].z);
+	//				used[i][j] = true;
+	//			}
+	//		}
+	//	}
+	//	glEnd();
+	//	glColor4f(1.0,1.0,1.0,1.0);
+	//	glPopMatrix();
+	//TODO
 }
 
 void Player::drawFrustum() const {
@@ -206,18 +197,3 @@ bool Player::insideFrustum(vec3f center, float radius) const {
 	}
 	return true;
 }
-
-const vec3f Player::hitBox[12] = {
-	vec3f(-0.25,+0.1,-0.25),
-	vec3f(+0.25,+0.1,-0.25),
-	vec3f(-0.25,-1.7,-0.25),
-	vec3f(+0.25,-1.7,-0.25),
-	vec3f(-0.25,-0.8,-0.25),
-	vec3f(+0.25,-0.8,-0.25),
-	vec3f(-0.25,+0.1,+0.25),
-	vec3f(+0.25,+0.1,+0.25),
-	vec3f(-0.25,-1.7,+0.25),
-	vec3f(+0.25,-1.7,+0.25),
-	vec3f(-0.25,-0.8,+0.25),
-	vec3f(+0.25,-0.8,+0.25)
-};

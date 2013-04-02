@@ -21,7 +21,10 @@ SOURCES += \
     $$PWD/audio/Music.cpp \
     $$PWD/input/InputManager.cpp \
     $$PWD/SceneMain/Entity.cpp \
-    $$PWD/SceneMain/GameObject.cpp
+    $$PWD/SceneMain/GameObject.cpp \
+    SceneMain/Model.cpp \
+    SceneMain/Arrow.cpp \
+    SceneMain/Hitbox.cpp
 
 HEADERS += \
     $$PWD/Scene.hpp \
@@ -41,4 +44,7 @@ HEADERS += \
     $$PWD/Math.hpp \
     $$PWD/input/InputManager.hpp \
     $$PWD/SceneMain/GameObject.hpp \
-    $$PWD/SceneMain/Entity.hpp
+    $$PWD/SceneMain/Entity.hpp \
+    SceneMain/Model.hpp \
+    SceneMain/Arrow.hpp \
+    SceneMain/Hitbox.hpp

@@ -8,11 +8,12 @@ class GameObject { //Static objects that have a position and rotation but don't 
 		GameObject(World& world);
 		virtual ~GameObject();
 
-		virtual void update();
+		virtual void update(float deltaTime);
 		virtual void draw();
 
 		vec3f rot;
 		vec3f pos;
+		vec3f scale;
 		World& parentWorld;
 };
 

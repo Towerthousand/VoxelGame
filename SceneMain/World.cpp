@@ -195,14 +195,14 @@ void World::update(float deltaTime, Player& camera) {
 //By: John Amanatides et al.
 //Implemented by Jordi "BuD" Santiago Provencio
 void World::traceView(const Player& player, float tMax) {
-	if (!getOutOfBounds(floor(player.pos.x),floor(player.pos.y),floor(player.pos.z)) &&
-		getCubeAbs(floor(player.pos.x),floor(player.pos.y),floor(player.pos.z)).ID != 0) {
+	if (!getOutOfBounds(floor(player.camPos.x),floor(player.camPos.y),floor(player.camPos.z)) &&
+		getCubeAbs(floor(player.camPos.x),floor(player.camPos.y),floor(player.camPos.z)).ID != 0) {
 		playerTargetsBlock = true;
-		targetedBlock = vec3f(floor(player.pos.x),floor(player.pos.y),floor(player.pos.z));
+		targetedBlock = vec3f(floor(player.camPos.x),floor(player.camPos.y),floor(player.camPos.z));
 		return;
 	}
 
-	vec3f   pos(player.pos.x,player.pos.y,player.pos.z),
+	vec3f   pos(player.camPos.x,player.camPos.y,player.camPos.z),
 			dir(cos(-player.camRot.x*DEG_TO_RAD)*(-sin(-player.camRot.y*DEG_TO_RAD)),
 				sin(-player.camRot.x*DEG_TO_RAD),
 				-cos(-player.camRot.x*DEG_TO_RAD)*cos(-player.camRot.y*DEG_TO_RAD)),

@@ -86,7 +86,7 @@ void SceneMain::draw() const {
 	glLoadIdentity();
 	glRotatef(player.camRot.x, 1, 0, 0);
 	glRotatef(player.camRot.y, 0, 1, 0);
-	glTranslatef(-player.pos.x, -player.pos.y, -player.pos.z);
+	glTranslatef(-player.camPos.x, -player.camPos.y, -player.camPos.z);
 
 	//Draw global lights
 	GLfloat lightpos0[] = {-0.5, 0.7 , -0.3, 0.};
@@ -199,7 +199,7 @@ void SceneMain::onKeyDown(float deltaTime, const sf::Keyboard::Key &key) {
 			break;
 		case sf::Keyboard::Space:
 			if (player.onFloor && !player.isJumping)
-				player.vel.y = 10;
+			player.vel.y = 10;
 			break;
 		default:
 			break;

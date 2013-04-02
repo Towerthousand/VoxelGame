@@ -10,6 +10,7 @@ class Camera { //Just rotates in a human-like manner. Thought to be used with Ga
 		void rotateY(float deg);
 
 		vec2f camRot;
+		vec3f camPos;
 };
 
 #endif // CAMERA_HPP
