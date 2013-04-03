@@ -8,7 +8,7 @@ Arrow::~Arrow() {
 }
 
 void Arrow::update(float deltaTime) {
-
+	movePos(deltaTime);
 }
 
 void Arrow::draw() {

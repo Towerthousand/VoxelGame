@@ -1,7 +1,6 @@
 #ifndef ENTITY_HPP
 #define ENTITY_HPP
 #include "GameObject.hpp"
-#include "Hitbox.hpp"
 
 class World;
 class Entity : public GameObject { //Stuff that moves (Players, arrows, objects, etc).
@@ -16,7 +15,6 @@ class Entity : public GameObject { //Stuff that moves (Players, arrows, objects,
 
 		vec3f acc; //acceleration
 		vec3f vel; //velocity
-		Hitbox hitbox;
 };
 
 #endif // ENTITY_HPP

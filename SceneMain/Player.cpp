@@ -15,13 +15,16 @@ Player::~Player() {
 }
 
 void Player::update(float deltaTime) {
-	//move the player's position
-	//vel.x += acc.x*deltaTime; Player only accelerates vertically
-	vel.y += acc.y*deltaTime;
-	//vel.z += acc.z*deltaTime; Player only accelerates vertically
-	movePos(deltaTime);
-	hitbox.pos = pos;
+	//move and update camera position
+	movePos(deltaTime); //this handles collisions
 	camPos = pos + vec3f(0,0.6,0);
+
+	onFloor = hitbox.collidesWithWorld(parentWorld,vec3f(0,-0.1,0));
+	isJumping = (vel.y > 0);
+
+	vel.x = 0; // Player only accelerates vertically, so speed.x doesn't carry
+	vel.y = std::fmax(-70,vel.y);
+	vel.z = 0; // Player only accelerates vertically, so speed.z doesn't carry
 	makeFrustum();
 }
 
@@ -44,52 +47,6 @@ void Player::draw() const {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_TEXTURE_2D);
 	glPopMatrix();
-}
-
-void Player::movePos(float deltaTime) {
-
-	vec3f disp = vel*deltaTime; //deltax = vt bitch
-
-	if (!hitbox.collidesWithWorld(parentWorld,vec3f(disp.x,0,0)))
-		pos.x += disp.x;
-	if (!hitbox.collidesWithWorld(parentWorld,vec3f(0,disp.y,0)))
-		pos.y += disp.y;
-	if (!hitbox.collidesWithWorld(parentWorld,vec3f(0,0,disp.z)))
-		pos.z += disp.z;
-
-	onFloor = hitbox.collidesWithWorld(parentWorld,vec3f(0,0.1,0));
-	if (onFloor)
-		vel.y = 0;
-
-	isJumping = (vel.y > 0);
-	vel.x = 0; // Player only accelerates vertically, so speed.x doesn't carry
-	vel.y = std::fmin(10,vel.y);
-	vel.z = 0; // Player only accelerates vertically, so speed.z doesn't carry
-
-}
-
-void Player::drawHitBox() const {
-	//for debugging purposes
-	//	std::vector<std::vector<bool> > used(12,std::vector<bool>(12,false));
-	//	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//	glPushMatrix();
-	//	glColor4f(0.0,0.0,0.0,1);
-	//	glBegin(GL_LINES);
-	//	for (int i = 0; i < 12; ++i) {//12 is the number of points that define the hitbox.
-	//		for (int j = 0; j < 12; ++j) {//12 is the number of points that define the hitbox.
-	//			if(!used[i][j] && i != j && ((hitBox[i].x == hitBox[j].x && hitBox[i].y == hitBox[j].y)
-	//										 || (hitBox[i].x == hitBox[j].x && hitBox[i].z == hitBox[j].z)
-	//										 || (hitBox[i].z == hitBox[j].z && hitBox[i].y == hitBox[j].y))) {
-	//				glVertex3f(pos.x + hitBox[i].x,pos.y + hitBox[i].y,pos.z + hitBox[i].z);
-	//				glVertex3f(pos.x + hitBox[j].x,pos.y + hitBox[j].y,pos.z + hitBox[j].z);
-	//				used[i][j] = true;
-	//			}
-	//		}
-	//	}
-	//	glEnd();
-	//	glColor4f(1.0,1.0,1.0,1.0);
-	//	glPopMatrix();
-	//TODO
 }
 
 void Player::drawFrustum() const {

@@ -17,9 +17,6 @@ class Player : public Entity , public Camera {
 		~Player();
 		void update(float deltaTime);
 		void draw() const;
-		void movePos(float deltaTime);
-
-		void drawHitBox() const;
 
 		void drawFrustum() const;
 		void makeFrustum();

@@ -199,7 +199,7 @@ void SceneMain::onKeyDown(float deltaTime, const sf::Keyboard::Key &key) {
 			break;
 		case sf::Keyboard::Space:
 			if (player.onFloor && !player.isJumping)
-			player.vel.y = 10;
+				player.vel.y = 10;
 			break;
 		default:
 			break;

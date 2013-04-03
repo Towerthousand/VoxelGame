@@ -8,14 +8,6 @@ Hitbox::~Hitbox() {
 }
 
 bool Hitbox::collidesWithWorld(const World &world, vec3f offset) {
-	//	if(radius.x <= 1 && radius.y <= 1 && radius.z <=1) {
-	//		for(int x = -1; x < 2; x += 2)
-	//			for(int y = -1; y < 2; y += 2)
-	//				for(int z = -1; z < 2; z += 2)
-	//					if(pointCollidesWithWorld(world,vec3f(pos.x+radius.x*x,pos.y+radius.y*y,pos.z+radius.z*z)))
-	//						return true;
-	//	}
-	//	else
 	vec3f newPos = pos + offset;
 	for(float x = -radius.x; x <= radius.x+0.5; x += 0.5)
 		for(float y = -radius.y; y <= radius.y+0.5; y += 0.5)
