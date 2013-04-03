@@ -1,6 +1,7 @@
 #include "SceneMain.hpp"
 #include "Game.hpp"
 #include "Chunk.hpp"
+#include "Arrow.hpp"
 
 SceneMain::SceneMain(Game &parent) :
 	Scene(parent), WORLDSEED(std::time(0)%1000), player(world),
@@ -8,6 +9,9 @@ SceneMain::SceneMain(Game &parent) :
 }
 
 SceneMain::~SceneMain() {
+	for(std::vector<Arrow*>::iterator it = objects.begin(); it != objects.end(); ++it) {
+		delete *it;
+	}
 }
 
 bool SceneMain::loadResources() {
@@ -48,6 +52,7 @@ bool SceneMain::init() {
 	//Center mouse
 	mouse.setPosition(vec2i(SCRWIDTH/2,SCRHEIGHT/2),parent.getWindow());
 	//Enable lights
+
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHT1);
@@ -78,6 +83,9 @@ void SceneMain::update(float deltaTime) {
 	world.update(deltaTime,player);
 	world.traceView(player,5);
 	player.update(deltaTime);
+	for(uint i = 0; i < objects.size(); ++i)
+		if(objects[i] != NULL)
+			objects[i]->update(deltaTime);
 }
 
 void SceneMain::draw() const {
@@ -96,6 +104,9 @@ void SceneMain::draw() const {
 
 	parent.textures().useTexture("lolwtf");
 	world.draw();
+	for(uint i = 0; i < objects.size(); ++i)
+		if(objects[i] != NULL)
+			objects[i]->draw();
 	player.draw();
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glFlush();
@@ -140,13 +151,14 @@ void SceneMain::onKeyPressed(float deltaTime, const sf::Keyboard::Key& key) {
 			vec3f newPos;
 			newPos.x = rand()%(WORLDWIDTH*CHUNKSIZE);
 			newPos.z = rand()%(WORLDWIDTH*CHUNKSIZE);
-			newPos.y = world.getSkylightLevel(newPos.x,newPos.z) + 1 + 1.7;
-			player.pos = newPos + vec3f(0.5,0,0.5);
+			newPos.y = world.getSkylightLevel(newPos.x,newPos.z) + player.hitbox.radius.y;
+			player.pos = newPos + vec3f(0.5,1,0.5);
 			break;
 		}
-		case sf::Keyboard::Num1:
+		case sf::Keyboard::Num1: {
 			player.selectedID = 1;
 			break;
+		}
 		case sf::Keyboard::Num2:
 			player.selectedID = 2;
 			break;
@@ -224,6 +236,18 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Mouse::Button& b
 			if(world.playerTargetsBlock) {
 				world.setCubeIDAbs(world.last.x,world.last.y,world.last.z,player.selectedID);
 			}
+			break;
+		case sf::Mouse::Middle: { //Arrow!
+			float m[16];
+			glGetFloatv(GL_MODELVIEW_MATRIX, m);
+			vec3f dir(m[2],m[6],m[10]);//same as the player's pov
+			Arrow * na = new Arrow(world,player.camPos,player.rot, vec3f(0.04,0.04,0.04));
+			na->vel -= vec3f(dir.x*50.0,dir.y*50.0,dir.z*50.0);
+			na->rot.x = 0;
+			na->rot.y = 0;
+			na->rot.z = 0; //DARIO HELP
+			objects.push_back(na);
+		}
 			break;
 		default:
 			break;

@@ -4,6 +4,7 @@
 #include "SceneMain/World.hpp"
 #include "SceneMain/Player.hpp"
 
+class Arrow;
 class SceneMain : public Scene {
 	public:
 		//virtual overrides
@@ -28,6 +29,7 @@ class SceneMain : public Scene {
 		Player player;
 		sf::Mouse mouse;
 		World world;
+		std::vector<Arrow*> objects;
 		float debugCounter;
 		int fpsCount;
 };

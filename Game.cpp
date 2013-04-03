@@ -33,6 +33,7 @@ bool Game::init() {
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_CULL_FACE); //enable backface culling
 	glCullFace(GL_BACK);
+	glEnable(GL_RESCALE_NORMAL);
 
 	//initialise game-wide logic and objects
 	outLog("* INIT GAME SUCCESFUL" );

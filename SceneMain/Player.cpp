@@ -18,6 +18,7 @@ void Player::update(float deltaTime) {
 	//move and update camera position
 	movePos(deltaTime); //this handles collisions
 	camPos = pos + vec3f(0,0.6,0);
+	makeFrustum();
 
 	onFloor = hitbox.collidesWithWorld(parentWorld,vec3f(0,-0.1,0));
 	isJumping = (vel.y > 0);
@@ -25,7 +26,6 @@ void Player::update(float deltaTime) {
 	vel.x = 0; // Player only accelerates vertically, so speed.x doesn't carry
 	vel.y = std::fmax(-70,vel.y);
 	vel.z = 0; // Player only accelerates vertically, so speed.z doesn't carry
-	makeFrustum();
 }
 
 void Player::draw() const {
@@ -58,11 +58,8 @@ void Player::drawFrustum() const {
 		glPushMatrix();
 		glColor4f(0.0,0.0,0.0,1);
 		glBegin(GL_LINE_STRIP);
-		glVertex3f(frustumPlanes[i][0].x,frustumPlanes[i][0].y,frustumPlanes[i][0].z);
-		glVertex3f(frustumPlanes[i][1].x,frustumPlanes[i][1].y,frustumPlanes[i][1].z);
-		glVertex3f(frustumPlanes[i][2].x,frustumPlanes[i][2].y,frustumPlanes[i][2].z);
-		glVertex3f(frustumPlanes[i][3].x,frustumPlanes[i][3].y,frustumPlanes[i][3].z);
-		glVertex3f(frustumPlanes[i][0].x,frustumPlanes[i][0].y,frustumPlanes[i][0].z);
+		for(int j = 0; j < 5; ++j)
+		glVertex3f(frustumPlanes[i][j%4].x,frustumPlanes[i][j%4].y,frustumPlanes[i][j%4].z);
 		glEnd();
 		glColor4f(1.0,1.0,1.0,1.0);
 		glPopMatrix();
@@ -91,8 +88,8 @@ void Player::makeFrustum() {
 	fw = fh * ratio;   //far width
 
 	// compute the centers of the near and far planes
-	nc = pos - dir * ZNEAR;
-	fc = pos - dir * ZFAR;
+	nc = camPos - dir * ZNEAR;
+	fc = camPos - dir * ZFAR;
 
 	// compute the 4 corners of the frustum on the near plane
 	ntl = nc + up * nh - side * nw;

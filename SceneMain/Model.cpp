@@ -4,7 +4,8 @@ ModelCube::ModelCube (bool isAir, vec3f color) : isAir(isAir), color(color) {}
 ModelCube::ModelCube (const ModelCubeFileFormat& c) : isAir(c.isAir) , color(c.r/255.0,c.g/255.0,c.b/255.0){}
 ModelCubeFileFormat::ModelCubeFileFormat(const ModelCube &c): r(c.color.x*255), g(c.color.y*255), b(c.color.z*255), isAir(c.isAir){}
 
-Model::Model() {
+Model::Model(std::string filePath) : modelWidth(0), modelHeight(0), modelDepth(0), VBOID(1) {
+	loadVoxelization(filePath);
 }
 
 Model::~Model() {
@@ -13,21 +14,21 @@ Model::~Model() {
 bool Model::loadVoxelization(std::string filePath) {
 	//Load file as matrix of cubes
 	std::ifstream file;
-	file.open(filePath.c_str());
+	file.open(filePath.c_str(),std::ios::binary|std::ios::in);
 	if(!file) {
 		outLog("#ERROR Could not load voxelization \"" + filePath + "\"");
 		return false;
 	}
 	file.read((char *) &modelWidth, sizeof(int));
 	file.read((char *) &modelHeight, sizeof(int));
-	file.read((char *) &modelWidth, sizeof(int));
+	file.read((char *) &modelDepth, sizeof(int));
 	cubes = std::vector<std::vector<std::vector<ModelCube> > >(modelWidth,std::vector<std::vector<ModelCube> >
 															   (modelHeight,std::vector<ModelCube>
-																(modelWidth,ModelCube(false,vec3f(0,0,0)))));
+																(modelDepth,ModelCube(false,vec3f(0,0,0)))));
 	ModelCubeFileFormat c(ModelCube(false,vec3f(0,0,0)));
 	for(int x = 0; x < modelWidth; ++x) {
 		for(int y = 0; y < modelHeight; ++y) {
-			for(int z = 0; z < modelWidth; ++z) {
+			for(int z = 0; z < modelDepth; ++z) {
 				file.read((char *) &c,sizeof(ModelCubeFileFormat));
 				cubes[x][y][z] = ModelCube(c);
 			}
@@ -37,8 +38,9 @@ bool Model::loadVoxelization(std::string filePath) {
 	//Push back the vertices
 	for(int x = 0; x < modelWidth; ++x) {
 		for(int y = 0; y < modelHeight; ++y) {
-			for(int z = 0; z < modelWidth; ++z) {
-				pushCubeToArray(x,y,z);
+			for(int z = 0; z < modelDepth; ++z) {
+				if (!cubes[x][y][z].isAir) // only draw if it's not air
+					pushCubeToArray(x,y,z);
 			}
 		}
 	}
@@ -47,10 +49,37 @@ bool Model::loadVoxelization(std::string filePath) {
 	return true;
 }
 
+
+void Model::draw(vec3f pos, vec3f rot, vec3f scale) {
+	glBindBuffer(GL_ARRAY_BUFFER, VBOID);
+	glPushMatrix();
+	glTranslatef(pos.x,pos.y,pos.z);
+	glRotatef(rot.x,1,0,0);
+	glRotatef(rot.y,0,1,0);
+	glRotatef(rot.z,0,0,1);
+	glScalef(scale.x,scale.y,scale.z);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+	glDisable(GL_TEXTURE_2D);
+
+	glVertexPointer(3, GL_FLOAT, sizeof(ModelVertex), 0);
+	glNormalPointer(GL_FLOAT, sizeof(ModelVertex),(GLvoid*)(3*sizeof(float)));
+	glColorPointer(4, GL_FLOAT, sizeof(ModelVertex), (GLvoid*)(6*sizeof(float)));
+	glDrawArrays(GL_TRIANGLES, 0, renderData.size());
+
+	glEnable(GL_TEXTURE_2D);
+	glDisableClientState(GL_COLOR_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glPopMatrix();
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 ModelCube Model::getCube(int x, int y, int z) {
 	if (x >= modelWidth || x < 0
 		|| y >= modelHeight || y < 0
-		|| z >= modelWidth || z< 0)
+		|| z >= modelHeight || z< 0)
 		return ModelCube(true,vec3f(0,0,0));
 	return cubes[x][y][z];
 }
