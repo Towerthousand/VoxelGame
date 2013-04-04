@@ -9,7 +9,7 @@ SceneMain::SceneMain(Game &parent) :
 }
 
 SceneMain::~SceneMain() {
-	for(std::vector<Arrow*>::iterator it = objects.begin(); it != objects.end(); ++it) {
+	for(std::vector<GameObject*>::iterator it = objects.begin(); it != objects.end(); ++it) {
 		if(*it != NULL)
 			delete *it;
 	}
@@ -19,6 +19,11 @@ bool SceneMain::loadResources() {
 	if(!parent.textures().loadTexture("lolwtf","resources/lolwtf.png"))
 		return false;
 	if(!parent.audio().loadMusic("troll","resources/troll.ogg"))
+		return false;
+	if(!Arrow::model.loadVoxelization("resources/pene.vox"))
+		return false;
+	outLog("* Loading chunks" );
+	if (!world.loadDirbaio("resources/out.bin"))
 		return false;
 	return true;
 }
@@ -44,10 +49,6 @@ bool SceneMain::init() {
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
 	glScalef(1.0/512.0f,1.0/512.0f,1); //now textures are in pixel coords (only works for world texture)
-	//Load world from file
-	outLog("* Loading chunks" );
-	if (!world.loadDirbaio("resources/out.bin"))
-		return false;
 	//Center mouse
 	mouse.setPosition(vec2i(SCRWIDTH/2,SCRHEIGHT/2),parent.getWindow());
 	//Enable lights
@@ -107,11 +108,11 @@ void SceneMain::draw() const {
 	glLightfv(GL_LIGHT1, GL_POSITION, lightpos1);
 
 	//Draw all the stuff
-	parent.textures().useTexture("lolwtf");
-	world.draw();
 	for(uint i = 0; i < objects.size(); ++i)
 		if(objects[i] != NULL)
 			objects[i]->draw();
+	parent.textures().useTexture("lolwtf");
+	world.draw();
 	player.draw();
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glFlush();
@@ -235,11 +236,8 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Mouse::Button& b
 			float m[16];
 			glGetFloatv(GL_MODELVIEW_MATRIX, m);
 			vec3f dir(m[2],m[6],m[10]);//same as the player's pov
-			Arrow * na = new Arrow(world,player.camPos,player.rot, vec3f(0.04,0.04,0.04));
-			na->vel -= vec3f(dir.x*5.0,dir.y*5.0,dir.z*5.0);
-			na->rot.x = 0;
-			na->rot.y = 0;
-			na->rot.z = 0; //DARIO HELP
+			Arrow * na = new Arrow(world,player.camPos, vec3f(0.04,0.04,0.04));
+			na->vel -= vec3f(dir.x*10.0,dir.y*10.0,dir.z*10.0);
 			objects.push_back(na);
 		}
 			break;

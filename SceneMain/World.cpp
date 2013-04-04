@@ -182,7 +182,7 @@ void World::update(float deltaTime, Player& camera) {
 				else {
 					chunks[x][y][z]->outOfView = true;
 				}
-				if (chunks[x][y][z]->markedForRedraw == true && updateMax < 30) {
+				if (chunks[x][y][z]->markedForRedraw == true && updateMax < 10000) {
 					updateMax++;
 					chunks[x][y][z]->update(deltaTime);
 				}

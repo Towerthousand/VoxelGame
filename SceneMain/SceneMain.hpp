@@ -29,7 +29,7 @@ class SceneMain : public Scene {
 		Player player;
 		sf::Mouse mouse;
 		World world;
-		std::vector<Arrow*> objects;
+		std::vector<GameObject*> objects;
 		float debugCounter;
 		int fpsCount;
 };

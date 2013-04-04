@@ -13,10 +13,10 @@ class GameObject { //Static objects that have a position and rotation but don't 
 		virtual void draw();
 
 		World& parentWorld;
-		vec3f rot;
 		vec3f pos;
 		vec3f scale;
 		Hitbox hitbox;
+		float m[16];
 };
 
 #endif // GAMEOBJECT_HPP

@@ -4,8 +4,7 @@ ModelCube::ModelCube (bool isAir, vec3f color) : isAir(isAir), color(color) {}
 ModelCube::ModelCube (const ModelCubeFileFormat& c) : isAir(c.isAir) , color(c.r/255.0,c.g/255.0,c.b/255.0){}
 ModelCubeFileFormat::ModelCubeFileFormat(const ModelCube &c): r(c.color.x*255), g(c.color.y*255), b(c.color.z*255), isAir(c.isAir){}
 
-Model::Model(std::string filePath) : modelWidth(0), modelHeight(0), modelDepth(0), VBOID(1) {
-	loadVoxelization(filePath);
+Model::Model() : modelWidth(0), modelHeight(0), modelDepth(0), VBOID(1) {
 }
 
 Model::~Model() {
@@ -50,18 +49,20 @@ bool Model::loadVoxelization(std::string filePath) {
 }
 
 
-void Model::draw(vec3f pos, vec3f rot, vec3f scale) {
+void Model::draw(vec3f pos, float m[], vec3f scale) {
 	glBindBuffer(GL_ARRAY_BUFFER, VBOID);
 	glPushMatrix();
+
 	glTranslatef(pos.x,pos.y,pos.z);
-	glRotatef(rot.x,1,0,0);
-	glRotatef(rot.y,0,1,0);
-	glRotatef(rot.z,0,0,1);
 	glScalef(scale.x,scale.y,scale.z);
+	glMultMatrixf(m);
+
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
 	glDisable(GL_TEXTURE_2D);
+
+	glColor3f(0.1,0.1,0.1);
 
 	glVertexPointer(3, GL_FLOAT, sizeof(ModelVertex), 0);
 	glNormalPointer(GL_FLOAT, sizeof(ModelVertex),(GLvoid*)(3*sizeof(float)));

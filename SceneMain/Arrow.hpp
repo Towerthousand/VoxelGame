@@ -5,14 +5,14 @@
 
 class Arrow : public Entity {
 	public:
-		Arrow(World &world, vec3f pos, vec3f rot, vec3f scale);
+		Arrow(World &world, vec3f pos, vec3f scale);
 		~Arrow();
 
 		void update(float deltaTime);
 		void draw();
 		void movePos(float deltaTime);
 
-		Model model;
+		static Model model;
 };
 
 #endif // ARROW_H

@@ -31,11 +31,11 @@ struct ModelVertex {
 
 class Model {
 	public:
-		Model(std::string filePath);
+		Model();
 		~Model();
 
 		bool loadVoxelization(std::string filePath);
-		void draw(vec3f pos, vec3f rot, vec3f scale);
+		void draw(vec3f pos, float m[], vec3f scale);
 
 		int modelWidth; //in model cubes
 		int modelHeight;//in model cubes

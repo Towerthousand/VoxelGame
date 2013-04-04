@@ -24,7 +24,8 @@ SOURCES += \
     $$PWD/SceneMain/GameObject.cpp \
     SceneMain/Model.cpp \
     SceneMain/Arrow.cpp \
-    SceneMain/Hitbox.cpp
+    SceneMain/Hitbox.cpp \
+    Math.cpp
 
 HEADERS += \
     $$PWD/Scene.hpp \
