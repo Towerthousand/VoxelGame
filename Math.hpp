@@ -15,4 +15,8 @@ inline void normalize(sf::Vector3f& x) {
 	x = x/float(sqrt(dot(x,x)));
 }
 
+inline float norm(sf::Vector3f x) {
+	return float(sqrt(dot(x,x)));
+}
+
 #endif // MATH_HPP

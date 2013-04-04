@@ -10,7 +10,6 @@ class Arrow : public Entity {
 
 		void update(float deltaTime);
 		void draw();
-
 		void movePos(float deltaTime);
 
 		Model model;

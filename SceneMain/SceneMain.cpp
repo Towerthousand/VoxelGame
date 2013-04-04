@@ -10,7 +10,8 @@ SceneMain::SceneMain(Game &parent) :
 
 SceneMain::~SceneMain() {
 	for(std::vector<Arrow*>::iterator it = objects.begin(); it != objects.end(); ++it) {
-		delete *it;
+		if(*it != NULL)
+			delete *it;
 	}
 }
 
@@ -31,16 +32,14 @@ bool SceneMain::init() {
 	//parent.audio().musicBank["troll"]->getTrack().play();
 	//parent.audio().musicBank["troll"]->getTrack().setLoop(true);
 	//Init debug tags
-	parent.font().makeText("Jumping","",20,vec2f(10,190),sf::Color::White,sf::Text::Bold,false);
-	parent.font().makeText("OnFloor","",20,vec2f(10,170),sf::Color::White,sf::Text::Bold,false);
-	parent.font().makeText("FPS","",20,vec2f(10,150),sf::Color::White,sf::Text::Bold,false);
-	parent.font().makeText("Updates","",20,vec2f(10,130),sf::Color::White,sf::Text::Bold,false);
-	parent.font().makeText("Chunks","",20,vec2f(10,110),sf::Color::White,sf::Text::Bold,false);
 	parent.font().makeText("posX","",20,vec2f(10,10),sf::Color::White,sf::Text::Bold,false);
 	parent.font().makeText("posY","",20,vec2f(10,30),sf::Color::White,sf::Text::Bold,false);
 	parent.font().makeText("posZ","",20,vec2f(10,50),sf::Color::White,sf::Text::Bold,false);
-	parent.font().makeText("rotX","",20,vec2f(10,90),sf::Color::White,sf::Text::Bold,false);
 	parent.font().makeText("rotY","",20,vec2f(10,70),sf::Color::White,sf::Text::Bold,false);
+	parent.font().makeText("rotX","",20,vec2f(10,90),sf::Color::White,sf::Text::Bold,false);
+	parent.font().makeText("Chunks","",20,vec2f(10,110),sf::Color::White,sf::Text::Bold,false);
+	parent.font().makeText("Updates","",20,vec2f(10,130),sf::Color::White,sf::Text::Bold,false);
+	parent.font().makeText("FPS","",20,vec2f(10,150),sf::Color::White,sf::Text::Bold,false);
 	//Set up textures
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
@@ -52,20 +51,19 @@ bool SceneMain::init() {
 	//Center mouse
 	mouse.setPosition(vec2i(SCRWIDTH/2,SCRHEIGHT/2),parent.getWindow());
 	//Enable lights
-
 	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_LIGHT1);
 	glEnable(GL_COLOR_MATERIAL);
 	GLfloat diffuse[] = {0.3, 0.3, 0.3, 1.f};
 	GLfloat ambient[] = {0.2, 0.2, 0.2, 1.f};
 	GLfloat specular[] = {0.1, 0.1, 0.1, 1.f};
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, specular);
-	glLightfv(GL_LIGHT1, GL_AMBIENT, ambient);
+	glEnable(GL_LIGHT0);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+	glEnable(GL_LIGHT1);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, specular);
+	glLightfv(GL_LIGHT1, GL_AMBIENT, ambient);
 
 	outLog("* Init was succesful" );
 	return true;
@@ -84,8 +82,14 @@ void SceneMain::update(float deltaTime) {
 	world.traceView(player,5);
 	player.update(deltaTime);
 	for(uint i = 0; i < objects.size(); ++i)
-		if(objects[i] != NULL)
-			objects[i]->update(deltaTime);
+		if(objects[i] != NULL) {
+			if (std::fabs(norm(objects[i]->pos-player.pos)) > 200) {
+				delete objects[i];
+				objects[i] = NULL;
+			}
+			else
+				objects[i]->update(deltaTime);
+		}
 }
 
 void SceneMain::draw() const {
@@ -102,6 +106,7 @@ void SceneMain::draw() const {
 	GLfloat lightpos1[] = {0.4, 0.3 , 0.9, 0.};
 	glLightfv(GL_LIGHT1, GL_POSITION, lightpos1);
 
+	//Draw all the stuff
 	parent.textures().useTexture("lolwtf");
 	world.draw();
 	for(uint i = 0; i < objects.size(); ++i)
@@ -112,42 +117,31 @@ void SceneMain::draw() const {
 	glFlush();
 
 	//Debug tags
-	if (player.isJumping)
-		parent.font().getText("Jumping").setString("Jumping: True");
-	else
-		parent.font().getText("Jumping").setString("Jumping: False");
-	if (player.onFloor)
-		parent.font().getText("OnFloor").setString("OnFloor: True");
-	else
-		parent.font().getText("OnFloor").setString("OnFloor: False");
-	parent.font().getText("Chunks").setString("Chunks drawn: " + toString(world.chunksDrawn));
 	parent.font().getText("posX").setString("X: " + toString(player.pos.x));
 	parent.font().getText("posY").setString("Y: " + toString(player.pos.y));
 	parent.font().getText("posZ").setString("Z: " + toString(player.pos.z));
 	parent.font().getText("rotY").setString("Rot Y: " + toString(player.camRot.y));
 	parent.font().getText("rotX").setString("Rot X: " + toString(player.camRot.x));
+	parent.font().getText("Chunks").setString("Chunks drawn: " + toString(world.chunksDrawn));
+
 	//SFML draws (until window.popGLStates())
 	glDisable(GL_CULL_FACE);
 	parent.getWindow().pushGLStates();
-	parent.getWindow().draw(parent.font().getText("Jumping"));
-	parent.getWindow().draw(parent.font().getText("OnFloor"));
-	parent.getWindow().draw(parent.font().getText("FPS"));
-	parent.getWindow().draw(parent.font().getText("Updates"));
-	parent.getWindow().draw(parent.font().getText("Chunks"));
 	parent.getWindow().draw(parent.font().getText("posX"));
 	parent.getWindow().draw(parent.font().getText("posY"));
 	parent.getWindow().draw(parent.font().getText("posZ"));
-	parent.getWindow().draw(parent.font().getText("rotX"));
 	parent.getWindow().draw(parent.font().getText("rotY"));
+	parent.getWindow().draw(parent.font().getText("rotX"));
+	parent.getWindow().draw(parent.font().getText("Chunks"));
+	parent.getWindow().draw(parent.font().getText("Updates"));
+	parent.getWindow().draw(parent.font().getText("FPS"));
 	parent.getWindow().popGLStates();
 	glEnable(GL_CULL_FACE);
-
-
 }
 
 void SceneMain::onKeyPressed(float deltaTime, const sf::Keyboard::Key& key) {
 	switch(key) {
-		case sf::Keyboard::E: {
+		case sf::Keyboard::E: { //new spawnpoint
 			vec3f newPos;
 			newPos.x = rand()%(WORLDWIDTH*CHUNKSIZE);
 			newPos.z = rand()%(WORLDWIDTH*CHUNKSIZE);
@@ -242,7 +236,7 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Mouse::Button& b
 			glGetFloatv(GL_MODELVIEW_MATRIX, m);
 			vec3f dir(m[2],m[6],m[10]);//same as the player's pov
 			Arrow * na = new Arrow(world,player.camPos,player.rot, vec3f(0.04,0.04,0.04));
-			na->vel -= vec3f(dir.x*50.0,dir.y*50.0,dir.z*50.0);
+			na->vel -= vec3f(dir.x*5.0,dir.y*5.0,dir.z*5.0);
 			na->rot.x = 0;
 			na->rot.y = 0;
 			na->rot.z = 0; //DARIO HELP

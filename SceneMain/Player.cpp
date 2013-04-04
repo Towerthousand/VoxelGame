@@ -6,7 +6,7 @@ Player::Player(World &world) :
 	frustumPlanes(6,std::vector<vec3f> //6 planes
 				  (4,vec3f(0,0,0)))	{//4 points per plane
 	pos = vec3f(256,0,0);
-	hitbox = Hitbox(vec3f(256,0,0), vec3f(0.2,0.9,0.2));
+	hitbox.radius = vec3f(0.2,0.9,0.2);
 	camPos = pos + vec3f(0,0.6,0);
 	acc = vec3f(0,-40,0);
 }
@@ -20,7 +20,7 @@ void Player::update(float deltaTime) {
 	camPos = pos + vec3f(0,0.6,0);
 	makeFrustum();
 
-	onFloor = hitbox.collidesWithWorld(parentWorld,vec3f(0,-0.1,0));
+	onFloor = hitbox.collidesWithWorld(vec3f(0,-0.1,0));
 	isJumping = (vel.y > 0);
 
 	vel.x = 0; // Player only accelerates vertically, so speed.x doesn't carry
