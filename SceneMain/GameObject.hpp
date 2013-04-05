@@ -6,7 +6,7 @@
 class World;
 class GameObject { //Static objects that have a position and rotation but don't move
 	public:
-		GameObject(World& world);
+		GameObject(World& world, vec3f pos);
 		virtual ~GameObject();
 
 		virtual void update(float deltaTime);

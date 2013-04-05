@@ -1,37 +1,37 @@
-#include "Arrow.hpp"
+#include "Polla.hpp"
 #include "Player.hpp"
 
-Arrow::Arrow(World &world, vec3f pos) :
-	Entity(world,pos) {
-	this->acc = vec3f(0,-10,0);
+Polla::Polla(World &world, vec3f pos, vec3f scale, Player &player) :
+	Entity(world), followedPlayer(player) {
+	this->acc = vec3f(0,0,0);
 	this->pos = pos;
 	this->scale = scale;
 	this->hitbox.type = Hitbox::POINT;
 }
 
-Arrow::~Arrow() {
+Polla::~Polla() {
 }
 
-void Arrow::update(float deltaTime) {
+void Polla::update(float deltaTime) {
+	vel += vec3f((followedPlayer.pos.x-pos.x+0.6)/100,(followedPlayer.pos.y-pos.y+0.6)/100,(followedPlayer.pos.z-pos.z+0.6)/100);
 	movePos(deltaTime);
 }
 
-void Arrow::draw() {
-	model.draw(pos,m,scale);
+void Polla::draw() {
+	model.draw(pos-hitbox.radius,m,scale);
 }
 
-void Arrow::movePos(float deltaTime) {
+void Polla::movePos(float deltaTime) {
+
 	//Position
 	vel += acc*deltaTime; //a = const, v = at
 	vec3f disp = vel*deltaTime; //deltaX = x0 + vt (intended displacement)
-	acc.y = -10;
 	if (hitbox.collidesWithWorld(vec3f(disp.x,0,0)) ||
 		hitbox.collidesWithWorld(vec3f(0,disp.y,0)) ||
 		hitbox.collidesWithWorld(vec3f(0,0,disp.z))) {
 		vel.x = 0;
 		vel.y = 0;
 		vel.z = 0;
-		acc.y = 0;
 	}
 	disp = vel*deltaTime; //corrected displacement
 	pos += disp;
@@ -42,7 +42,6 @@ void Arrow::movePos(float deltaTime) {
 	if(norm(cross(dummyUp, vel)) != 0) {
 		vec3f back = -vel;
 		normalize(back);
-		vec3f dummyUp(0,1,0);
 		vec3f right = cross(dummyUp,back);
 		normalize(right);
 		vec3f up = cross(back,right);
@@ -54,4 +53,4 @@ void Arrow::movePos(float deltaTime) {
 	}
 }
 
-Model Arrow::model = Model();
+Model Polla::model = Model();

@@ -54,15 +54,13 @@ void Model::draw(vec3f pos, float m[], vec3f scale) {
 	glPushMatrix();
 
 	glTranslatef(pos.x,pos.y,pos.z);
-	glScalef(scale.x,scale.y,scale.z);
 	glMultMatrixf(m);
+	glScalef(scale.x,scale.y,scale.z);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
 	glDisable(GL_TEXTURE_2D);
-
-	glColor3f(0.1,0.1,0.1);
 
 	glVertexPointer(3, GL_FLOAT, sizeof(ModelVertex), 0);
 	glNormalPointer(GL_FLOAT, sizeof(ModelVertex),(GLvoid*)(3*sizeof(float)));
@@ -80,7 +78,7 @@ void Model::draw(vec3f pos, float m[], vec3f scale) {
 ModelCube Model::getCube(int x, int y, int z) {
 	if (x >= modelWidth || x < 0
 		|| y >= modelHeight || y < 0
-		|| z >= modelHeight || z< 0)
+		|| z >= modelDepth || z< 0)
 		return ModelCube(true,vec3f(0,0,0));
 	return cubes[x][y][z];
 }

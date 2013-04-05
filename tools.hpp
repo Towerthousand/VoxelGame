@@ -67,5 +67,6 @@ extern int SCRHEIGHT;
 extern bool WINDOWFOCUS;
 extern int WORLDHEIGHT;
 extern int WORLDWIDTH;
+extern sf::Clock GLOBALCLOCK;
 
 #endif // TOOLS_HPP

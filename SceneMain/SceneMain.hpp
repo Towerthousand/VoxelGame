@@ -4,7 +4,6 @@
 #include "SceneMain/World.hpp"
 #include "SceneMain/Player.hpp"
 
-class Arrow;
 class SceneMain : public Scene {
 	public:
 		//virtual overrides

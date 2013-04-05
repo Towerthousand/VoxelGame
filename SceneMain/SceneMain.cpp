@@ -2,9 +2,11 @@
 #include "Game.hpp"
 #include "Chunk.hpp"
 #include "Arrow.hpp"
+#include "Polla.hpp"
+#include "Skeleton.hpp"
 
 SceneMain::SceneMain(Game &parent) :
-	Scene(parent), WORLDSEED(std::time(0)%1000), player(world),
+	Scene(parent), WORLDSEED(std::time(0)%1000), player(world, vec3f(0,256,0)),
 	debugCounter(0.0), fpsCount(0) {
 }
 
@@ -20,7 +22,11 @@ bool SceneMain::loadResources() {
 		return false;
 	if(!parent.audio().loadMusic("troll","resources/troll.ogg"))
 		return false;
-	if(!Arrow::model.loadVoxelization("resources/pene.vox"))
+	if(!Arrow::model.loadVoxelization("resources/arrow.vox"))
+		return false;
+	if(!Polla::model.loadVoxelization("resources/pene.vox"))
+		return false;
+	if(!Arrow::model.loadVoxelization("resources/mob.vox"))
 		return false;
 	outLog("* Loading chunks" );
 	if (!world.loadDirbaio("resources/out.bin"))
@@ -148,6 +154,12 @@ void SceneMain::onKeyPressed(float deltaTime, const sf::Keyboard::Key& key) {
 			newPos.z = rand()%(WORLDWIDTH*CHUNKSIZE);
 			newPos.y = world.getSkylightLevel(newPos.x,newPos.z) + player.hitbox.radius.y;
 			player.pos = newPos + vec3f(0.5,1,0.5);
+			newPos.x = rand()%(WORLDWIDTH*CHUNKSIZE);
+			newPos.z = rand()%(WORLDWIDTH*CHUNKSIZE);
+			newPos.y = world.getSkylightLevel(newPos.x,newPos.z) + player.hitbox.radius.y;
+			player.pos = newPos + vec3f(0.5,1,0.5);
+			Skeleton * ns = new Skeleton(world,vec3f(0,0,0),player, vec3f(0.04,0.04,0.04));
+			objects.push_back(ns);
 			break;
 		}
 		case sf::Keyboard::Num1: {
@@ -236,9 +248,9 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Mouse::Button& b
 			float m[16];
 			glGetFloatv(GL_MODELVIEW_MATRIX, m);
 			vec3f dir(m[2],m[6],m[10]);//same as the player's pov
-			Arrow * na = new Arrow(world,player.camPos, vec3f(0.04,0.04,0.04));
-			na->vel -= vec3f(dir.x*10.0,dir.y*10.0,dir.z*10.0);
-			objects.push_back(na);
+			Arrow * np = new Arrow(world,player.camPos, vec3f(0.04,0.04,0.04));
+			np->vel -= vec3f(dir.x*30.0,dir.y*30.0,dir.z*30.0);
+			objects.push_back(np);
 		}
 			break;
 		default:

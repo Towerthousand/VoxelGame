@@ -1,11 +1,11 @@
 #include "Player.hpp"
 #include "World.hpp"
 
-Player::Player(World &world) :
-	Entity(world), selectedID(1), onFloor(false), isJumping(false),
+Player::Player(World &world, vec3f pos) :
+	Entity(world,pos), selectedID(1), onFloor(false), isJumping(false),
 	frustumPlanes(6,std::vector<vec3f> //6 planes
 				  (4,vec3f(0,0,0)))	{//4 points per plane
-	pos = vec3f(256,0,0);
+	hitbox.type = Hitbox::BOX;
 	hitbox.radius = vec3f(0.2,0.9,0.2);
 	camPos = pos + vec3f(0,0.6,0);
 	acc = vec3f(0,-40,0);

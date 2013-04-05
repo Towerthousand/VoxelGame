@@ -1,6 +1,6 @@
 #include "Entity.hpp"
 
-Entity::Entity(World& world) : GameObject(world),
+Entity::Entity(World& world, vec3f pos) : GameObject(world,pos),
 	vel(0,0,0), acc(0,0,0){
 }
 
@@ -8,11 +8,11 @@ Entity::~Entity() {
 }
 
 void Entity::draw() {
-
+	GameObject::draw();
 }
 
 void Entity::update(float deltaTime) {
-
+	GameObject::update(deltaTime);
 }
 
 void Entity::movePos(float deltaTime) { //collisons

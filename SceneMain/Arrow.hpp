@@ -3,9 +3,10 @@
 #include "Entity.hpp"
 #include "Model.hpp"
 
+class Player;
 class Arrow : public Entity {
 	public:
-		Arrow(World &world, vec3f pos, vec3f scale);
+		Arrow(World &world, vec3f pos);
 		~Arrow();
 
 		void update(float deltaTime);

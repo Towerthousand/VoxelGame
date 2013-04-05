@@ -22,10 +22,13 @@ SOURCES += \
     $$PWD/input/InputManager.cpp \
     $$PWD/SceneMain/Entity.cpp \
     $$PWD/SceneMain/GameObject.cpp \
-    SceneMain/Model.cpp \
-    SceneMain/Arrow.cpp \
-    SceneMain/Hitbox.cpp \
-    Math.cpp
+	$$PWD/SceneMain/Model.cpp \
+	$$PWD/SceneMain/Arrow.cpp \
+	$$PWD/SceneMain/Polla.cpp \
+	$$PWD/SceneMain/Hitbox.cpp \
+	$$PWD/Math.cpp \
+    SceneMain/Enemy.cpp \
+    SceneMain/Skeleton.cpp
 
 HEADERS += \
     $$PWD/Scene.hpp \
@@ -46,6 +49,9 @@ HEADERS += \
     $$PWD/input/InputManager.hpp \
     $$PWD/SceneMain/GameObject.hpp \
     $$PWD/SceneMain/Entity.hpp \
-    SceneMain/Model.hpp \
-    SceneMain/Arrow.hpp \
-    SceneMain/Hitbox.hpp
+	$$PWD/SceneMain/Model.hpp \
+	$$PWD/SceneMain/Arrow.hpp \
+	$$PWD/SceneMain/Polla.hpp \
+	$$PWD/SceneMain/Hitbox.hpp \
+    SceneMain/Enemy.hpp \
+    SceneMain/Skeleton.hpp

@@ -6,6 +6,7 @@ int SCRHEIGHT = sf::VideoMode::getFullscreenModes()[0].height;
 bool WINDOWFOCUS = false;
 int WORLDHEIGHT = 0;
 int WORLDWIDTH = 0;
+sf::Clock GLOBALCLOCK;
 
 //implement random functions here
 std::string toString(float num) {
