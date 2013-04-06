@@ -1,8 +1,8 @@
 #include "Player.hpp"
 #include "World.hpp"
 
-Player::Player(World &world, vec3f pos) :
-	Entity(world,pos), selectedID(1), onFloor(false), isJumping(false),
+Player::Player(SceneMain* scene, vec3f pos, vec3f scale) :
+	Entity(scene,pos,scale), selectedID(1), onFloor(false), isJumping(false),
 	frustumPlanes(6,std::vector<vec3f> //6 planes
 				  (4,vec3f(0,0,0)))	{//4 points per plane
 	hitbox.type = Hitbox::BOX;
@@ -31,22 +31,6 @@ void Player::update(float deltaTime) {
 void Player::draw() const {
 	//draw crosshair. this shouldn't be here, it is not a "part" of the 3D enviorment. This
 	//should be a sfml draw in SceneMain::draw();
-	glPushMatrix();
-	glLoadIdentity();
-	glDisable(GL_TEXTURE_2D);
-	glDisable(GL_DEPTH_TEST);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glLineWidth(2.0);
-	glBegin(GL_LINES);
-	glColor3f(1,1,1);
-	glVertex3f(-0.0002,      0,-0.01);
-	glVertex3f( 0.0002,      0,-0.01);
-	glVertex3f(      0,-0.0002,-0.01);
-	glVertex3f(      0, 0.0002,-0.01);
-	glEnd();
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_TEXTURE_2D);
-	glPopMatrix();
 }
 
 void Player::drawFrustum() const {

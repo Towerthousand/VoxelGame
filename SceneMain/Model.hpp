@@ -35,7 +35,7 @@ class Model {
 		~Model();
 
 		bool loadVoxelization(std::string filePath);
-		void draw(vec3f pos, float m[], vec3f scale);
+		void draw(vec3f pos, const float m[], vec3f scale) const;
 
 		int modelWidth; //in model cubes
 		int modelHeight;//in model cubes

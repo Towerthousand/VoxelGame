@@ -6,16 +6,16 @@
 class Player;
 class Enemy : public Entity {
 	public:
-		Enemy(World& world, vec3f pos, Player& targetPplayer);
+		Enemy(SceneMain* scene, vec3f pos, vec3f scale, Player* targetPlayer);
 		virtual ~Enemy();
 
 		virtual void update(float deltaTime);
-		virtual void draw();
+		virtual void draw() const;
 		virtual void movePos(float deltaTime);
 
 		virtual void lookAtPlayer();
 
-		Player& targetPlayer;
+		Player* targetPlayer;
 };
 
 #endif // ENEMY_HPP

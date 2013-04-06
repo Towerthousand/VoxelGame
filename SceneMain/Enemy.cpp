@@ -1,7 +1,7 @@
 #include "Enemy.hpp"
 #include "Player.hpp"
 
-Enemy::Enemy(World &world, vec3f pos, Player& targetPplayer) : Entity(world,pos), targetPlayer(targetPplayer){
+Enemy::Enemy(SceneMain* scene, vec3f pos, vec3f scale, Player* targetPlayer) : Entity(scene,pos,scale), targetPlayer(targetPlayer){
 }
 
 Enemy::~Enemy() {
@@ -10,18 +10,19 @@ Enemy::~Enemy() {
 
 void Enemy::update(float deltaTime) {
 	Entity::update(deltaTime);
-	if (norm(targetPlayer.pos-pos) < 50) {
+	if (norm(targetPlayer->pos-pos) < 50) {
 		lookAtPlayer();
 	}
+	movePos(deltaTime);
 }
 
-void Enemy::draw() {
+void Enemy::draw() const {
 	Entity::draw();
 }
 
 void Enemy::lookAtPlayer() {
 	//rotation
-	vec3f front = targetPlayer.pos-pos;
+	vec3f front = targetPlayer->pos-pos;
 	front.y = 0;
 	vec3f dummyUp(0,1,0);
 	if(norm(cross(dummyUp, front)) != 0) {

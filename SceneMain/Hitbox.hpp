@@ -10,21 +10,22 @@ class Hitbox {
 			POINT
 		};
 
-		Hitbox(GameObject& parent, hitboxType type, vec3f radius = vec3f(0,0,0));
+		Hitbox(GameObject* parent, hitboxType type, vec3f radius = vec3f(0,0,0));
 		~Hitbox();
 
-		bool collidesWithWorld(vec3f offset = vec3f(0,0,0));
-		bool collidesWithHitbox(const Hitbox& hitbox, vec3f offset = vec3f(0,0,0));
+		bool collidesWithWorld(vec3f offset = vec3f(0,0,0)) const;
+		bool collidesWithHitbox(const Hitbox& hitbox, vec3f offset = vec3f(0,0,0)) const;
+		void draw() const;
 
 		vec3f radius;
 		hitboxType type;
 
 	private:
-		bool pointCollidesWithWorld(const vec3f& point);
+		bool pointCollidesWithWorld(const vec3f& point) const;
 
-		GameObject& parent;
-
-		//friend class GameObject;
+		GameObject* parent;
+		static const int vertexPoints[8][3];
+		static const int indexes[24];
 };
 
 #endif // HITBOX_HPP

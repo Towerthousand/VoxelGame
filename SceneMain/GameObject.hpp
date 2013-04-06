@@ -3,16 +3,17 @@
 #include "tools.hpp"
 #include "Hitbox.hpp"
 
-class World;
+class SceneMain;
 class GameObject { //Static objects that have a position and rotation but don't move
 	public:
-		GameObject(World& world, vec3f pos);
+		GameObject(SceneMain* scene, vec3f pos, vec3f scale);
 		virtual ~GameObject();
 
 		virtual void update(float deltaTime);
-		virtual void draw();
+		virtual void draw() const;
 
-		World& parentWorld;
+		bool isAlive;
+		SceneMain* parentScene;
 		vec3f pos;
 		vec3f scale;
 		Hitbox hitbox;

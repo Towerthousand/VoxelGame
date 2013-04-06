@@ -4,13 +4,15 @@
 
 class Skeleton : public Enemy {
 	public:
-		Skeleton(World& world, vec3f pos, Player& targetPlayer);
+		Skeleton(SceneMain* world, vec3f pos, vec3f scale, Player* targetPlayer);
 		~Skeleton();
 
 		void update(float deltaTime);
-		void draw();
+		void draw() const;
 
 		static Model model;
+		float cooldown;
+		vec3f shootPosOffset;//where does the arrow exit from (offset from pos)
 };
 
 #endif // SKELETON_HPP

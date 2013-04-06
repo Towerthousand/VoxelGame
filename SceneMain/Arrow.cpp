@@ -1,8 +1,8 @@
 #include "Arrow.hpp"
 #include "Player.hpp"
 
-Arrow::Arrow(World &world, vec3f pos) :
-	Entity(world,pos) {
+Arrow::Arrow(SceneMain* scene, vec3f pos, vec3f scale) :
+	Entity(scene,pos,scale) {
 	this->acc = vec3f(0,-10,0);
 	this->pos = pos;
 	this->scale = scale;
@@ -16,8 +16,8 @@ void Arrow::update(float deltaTime) {
 	movePos(deltaTime);
 }
 
-void Arrow::draw() {
-	model.draw(pos,m,scale);
+void Arrow::draw() const {
+	model.draw(pos-hitbox.radius,m,scale);
 }
 
 void Arrow::movePos(float deltaTime) {

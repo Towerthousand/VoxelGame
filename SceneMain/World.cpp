@@ -1,8 +1,9 @@
 #include "World.hpp"
 #include "Chunk.hpp"
-#include "Player.hpp"
+#include "SceneMain.hpp"
 
-World::World() :
+World::World(SceneMain* parentScene, Player* player) :
+	parentScene(parentScene), player(player),
 	playerTargetsBlock(false), chunksDrawn(0), targetedBlock(0,0,0),
 	last(0,0,0), chunks(0,std::vector<std::vector<Chunk*> >
 						(0,std::vector<Chunk*>
@@ -167,14 +168,15 @@ void World::draw() const {
 		drawWireCube(targetedBlock);
 }
 
-void World::update(float deltaTime, Player& camera) {
+void World::update(float deltaTime) {
 	chunksDrawn = 0;
-	updateGrass(deltaTime);
+	updateStuff(deltaTime);
+	traceView(player,5);
 	int updateMax = 0; //maximum number of chunk redraws
 	for (int x = 0; x < WORLDWIDTH; ++x)  {
 		for (int y = 0; y < WORLDHEIGHT; ++y) {
 			for (int z = 0; z < WORLDWIDTH; ++z) {
-				if (camera.insideFrustum(vec3f(x*CHUNKSIZE+8,y*CHUNKSIZE+8,z*CHUNKSIZE+8)
+				if (player->insideFrustum(vec3f(x*CHUNKSIZE+8,y*CHUNKSIZE+8,z*CHUNKSIZE+8)
 										 ,sqrt(3*(8*8)))) {
 					chunks[x][y][z]->outOfView = false;
 					++chunksDrawn;
@@ -194,18 +196,18 @@ void World::update(float deltaTime, Player& camera) {
 //Based on: Fast Voxel Traversal Algorithm for Ray Tracing
 //By: John Amanatides et al.
 //Implemented by Jordi "BuD" Santiago Provencio
-void World::traceView(const Player& player, float tMax) {
-	if (!getOutOfBounds(floor(player.camPos.x),floor(player.camPos.y),floor(player.camPos.z)) &&
-		getCubeAbs(floor(player.camPos.x),floor(player.camPos.y),floor(player.camPos.z)).ID != 0) {
+void World::traceView(const Player *playerCam, float tMax) {
+	if (!getOutOfBounds(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z)) &&
+		getCubeAbs(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z)).ID != 0) {
 		playerTargetsBlock = true;
-		targetedBlock = vec3f(floor(player.camPos.x),floor(player.camPos.y),floor(player.camPos.z));
+		targetedBlock = vec3f(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z));
 		return;
 	}
 
-	vec3f   pos(player.camPos.x,player.camPos.y,player.camPos.z),
-			dir(cos(-player.camRot.x*DEG_TO_RAD)*(-sin(-player.camRot.y*DEG_TO_RAD)),
-				sin(-player.camRot.x*DEG_TO_RAD),
-				-cos(-player.camRot.x*DEG_TO_RAD)*cos(-player.camRot.y*DEG_TO_RAD)),
+	vec3f   pos(playerCam->camPos.x,playerCam->camPos.y,playerCam->camPos.z),
+			dir(cos(-playerCam->camRot.x*DEG_TO_RAD)*(-sin(-playerCam->camRot.y*DEG_TO_RAD)),
+				sin(-playerCam->camRot.x*DEG_TO_RAD),
+				-cos(-playerCam->camRot.x*DEG_TO_RAD)*cos(-playerCam->camRot.y*DEG_TO_RAD)),
 			vox(floor(pos.x), floor(pos.y), floor(pos.z)),
 			step(0,0,0),
 			next(0,0,0),
@@ -349,8 +351,8 @@ void World::processCubeLighting(const vec3i& source, const vec3i& offset, std::v
 	}
 }
 
-void World::updateGrass(float deltaTime) { //only to be called by world.update()
-	if (updateStuffTimer >= 0.01) {
+void World::updateStuff(float deltaTime) { //only to be called by world.update()
+	if (updateStuffTimer >= 0.01) { //grass thingy
 		updateStuffTimer-= 0.01;
 		for(int i = 0; i < 10; ++i) {
 			int x = rand()%(CHUNKSIZE*WORLDWIDTH);

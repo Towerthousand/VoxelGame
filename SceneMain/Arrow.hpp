@@ -6,11 +6,11 @@
 class Player;
 class Arrow : public Entity {
 	public:
-		Arrow(World &world, vec3f pos);
+		Arrow(SceneMain* scene, vec3f pos, vec3f scale);
 		~Arrow();
 
 		void update(float deltaTime);
-		void draw();
+		void draw() const;
 		void movePos(float deltaTime);
 
 		static Model model;

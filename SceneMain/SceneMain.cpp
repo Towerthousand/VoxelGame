@@ -6,12 +6,13 @@
 #include "Skeleton.hpp"
 
 SceneMain::SceneMain(Game &parent) :
-	Scene(parent), WORLDSEED(std::time(0)%1000), player(world, vec3f(0,256,0)),
+	Scene(parent), WORLDSEED(std::time(0)%1000),
+	player(new Player(this, vec3f(0,256,0), vec3f(1,1,1))), world(this,player),
 	debugCounter(0.0), fpsCount(0) {
 }
 
 SceneMain::~SceneMain() {
-	for(std::vector<GameObject*>::iterator it = objects.begin(); it != objects.end(); ++it) {
+	for(std::list<GameObject*>::iterator it = objects.begin(); it != objects.end(); ++it) {
 		if(*it != NULL)
 			delete *it;
 	}
@@ -26,7 +27,7 @@ bool SceneMain::loadResources() {
 		return false;
 	if(!Polla::model.loadVoxelization("resources/pene.vox"))
 		return false;
-	if(!Arrow::model.loadVoxelization("resources/mob.vox"))
+	if(!Skeleton::model.loadVoxelization("resources/mob.vox"))
 		return false;
 	outLog("* Loading chunks" );
 	if (!world.loadDirbaio("resources/out.bin"))
@@ -56,7 +57,7 @@ bool SceneMain::init() {
 	glLoadIdentity();
 	glScalef(1.0/512.0f,1.0/512.0f,1); //now textures are in pixel coords (only works for world texture)
 	//Center mouse
-	mouse.setPosition(vec2i(SCRWIDTH/2,SCRHEIGHT/2),parent.getWindow());
+	sf::Mouse::setPosition(vec2i(SCRWIDTH/2,SCRHEIGHT/2),parent.getWindow());
 	//Enable lights
 	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
@@ -71,7 +72,8 @@ bool SceneMain::init() {
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse);
 	glLightfv(GL_LIGHT1, GL_SPECULAR, specular);
 	glLightfv(GL_LIGHT1, GL_AMBIENT, ambient);
-
+	// Add player
+	addObject(player);
 	outLog("* Init was succesful" );
 	return true;
 }
@@ -85,27 +87,34 @@ void SceneMain::update(float deltaTime) {
 		debugCounter -= 1;
 		fpsCount = 0;
 	}
-	world.update(deltaTime,player);
-	world.traceView(player,5);
-	player.update(deltaTime);
-	for(uint i = 0; i < objects.size(); ++i)
-		if(objects[i] != NULL) {
-			if (std::fabs(norm(objects[i]->pos-player.pos)) > 200) {
-				delete objects[i];
-				objects[i] = NULL;
-			}
-			else
-				objects[i]->update(deltaTime);
+	world.update(deltaTime);
+	for(std::list<GameObject*>::iterator it = objects.begin();it != objects.end(); ++it) {
+		(*it)->update(deltaTime);
+	}
+	//Kill game objects far away from player
+	for(std::list<GameObject*>::iterator it = objects.begin(); it != objects.end(); ++it)
+		if (std::fabs(norm((*it)->pos-player->pos)) > 200)
+			(*it)->isAlive = false;
+	//Erase dead game objects
+	for(std::list<GameObject*>::iterator it = objects.begin(); it != objects.end();)
+		if (!(*it)->isAlive) {
+			std::list<GameObject*>::iterator it2 = it;
+			++it2;
+			delete *it;
+			objects.erase(it);
+			it = it2;
 		}
+		else
+			++it;
 }
 
 void SceneMain::draw() const {
 	//Move matrix to position (according to player)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glRotatef(player.camRot.x, 1, 0, 0);
-	glRotatef(player.camRot.y, 0, 1, 0);
-	glTranslatef(-player.camPos.x, -player.camPos.y, -player.camPos.z);
+	glRotatef(player->camRot.x, 1, 0, 0);
+	glRotatef(player->camRot.y, 0, 1, 0);
+	glTranslatef(-player->camPos.x, -player->camPos.y, -player->camPos.z);
 
 	//Draw global lights
 	GLfloat lightpos0[] = {-0.5, 0.7 , -0.3, 0.};
@@ -114,21 +123,37 @@ void SceneMain::draw() const {
 	glLightfv(GL_LIGHT1, GL_POSITION, lightpos1);
 
 	//Draw all the stuff
-	for(uint i = 0; i < objects.size(); ++i)
-		if(objects[i] != NULL)
-			objects[i]->draw();
 	parent.textures().useTexture("lolwtf");
 	world.draw();
-	player.draw();
+	for(std::list<GameObject*>::const_iterator it = objects.begin();it != objects.end(); ++it) {
+		(*it)->draw();
+		(*it)->hitbox.draw();
+	}
+
+	glPushMatrix();
+	glLoadIdentity();
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_DEPTH_TEST);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glLineWidth(2.0);
+	glBegin(GL_LINES);
+	glColor3f(1,1,1);
+	glVertex3f(-0.0002,      0,-0.01);
+	glVertex3f( 0.0002,      0,-0.01);
+	glVertex3f(      0,-0.0002,-0.01);
+	glVertex3f(      0, 0.0002,-0.01);
+	glEnd();
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_TEXTURE_2D);
+	glPopMatrix();
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glFlush();
 
 	//Debug tags
-	parent.font().getText("posX").setString("X: " + toString(player.pos.x));
-	parent.font().getText("posY").setString("Y: " + toString(player.pos.y));
-	parent.font().getText("posZ").setString("Z: " + toString(player.pos.z));
-	parent.font().getText("rotY").setString("Rot Y: " + toString(player.camRot.y));
-	parent.font().getText("rotX").setString("Rot X: " + toString(player.camRot.x));
+	parent.font().getText("posX").setString("X: " + toString(player->pos.x));
+	parent.font().getText("posY").setString("Y: " + toString(player->pos.y));
+	parent.font().getText("posZ").setString("Z: " + toString(player->pos.z));
+	parent.font().getText("rotY").setString("Rot Y: " + toString(player->camRot.y));
+	parent.font().getText("rotX").setString("Rot X: " + toString(player->camRot.x));
 	parent.font().getText("Chunks").setString("Chunks drawn: " + toString(world.chunksDrawn));
 
 	//SFML draws (until window.popGLStates())
@@ -152,40 +177,34 @@ void SceneMain::onKeyPressed(float deltaTime, const sf::Keyboard::Key& key) {
 			vec3f newPos;
 			newPos.x = rand()%(WORLDWIDTH*CHUNKSIZE);
 			newPos.z = rand()%(WORLDWIDTH*CHUNKSIZE);
-			newPos.y = world.getSkylightLevel(newPos.x,newPos.z) + player.hitbox.radius.y;
-			player.pos = newPos + vec3f(0.5,1,0.5);
-			newPos.x = rand()%(WORLDWIDTH*CHUNKSIZE);
-			newPos.z = rand()%(WORLDWIDTH*CHUNKSIZE);
-			newPos.y = world.getSkylightLevel(newPos.x,newPos.z) + player.hitbox.radius.y;
-			player.pos = newPos + vec3f(0.5,1,0.5);
-			Skeleton * ns = new Skeleton(world,vec3f(0,0,0),player, vec3f(0.04,0.04,0.04));
-			objects.push_back(ns);
-			break;
+			newPos.y = world.getSkylightLevel(newPos.x,newPos.z) + player->hitbox.radius.y;
+			player->pos = newPos + vec3f(0.5,1,0.5);
 		}
+			break;
 		case sf::Keyboard::Num1: {
-			player.selectedID = 1;
-			break;
+			player->selectedID = 1;
 		}
+			break;
 		case sf::Keyboard::Num2:
-			player.selectedID = 2;
+			player->selectedID = 2;
 			break;
 		case sf::Keyboard::Num3:
-			player.selectedID = 3;
+			player->selectedID = 3;
 			break;
 		case sf::Keyboard::Num4:
-			player.selectedID = 4;
+			player->selectedID = 4;
 			break;
 		case sf::Keyboard::Num5:
-			player.selectedID = 5;
+			player->selectedID = 5;
 			break;
 		case sf::Keyboard::Num6:
-			player.selectedID = 6;
+			player->selectedID = 6;
 			break;
 		case sf::Keyboard::Num7:
-			player.selectedID = 7;
+			player->selectedID = 7;
 			break;
 		case sf::Keyboard::Num8:
-			player.selectedID = 8;
+			player->selectedID = 8;
 			break;
 		case sf::Keyboard::Escape:
 			parent.close();
@@ -198,27 +217,27 @@ void SceneMain::onKeyPressed(float deltaTime, const sf::Keyboard::Key& key) {
 void SceneMain::onKeyDown(float deltaTime, const sf::Keyboard::Key &key) {
 	//Move player
 	const float vel = 5.0f;
-	vec2f dir(sin(player.camRot.y*DEG_TO_RAD), -cos(player.camRot.y*DEG_TO_RAD));
+	vec2f dir(sin(player->camRot.y*DEG_TO_RAD), -cos(player->camRot.y*DEG_TO_RAD));
 	switch(key) {
 		case sf::Keyboard::W:
-			player.vel.x += dir.x*vel;
-			player.vel.z += dir.y*vel;
+			player->vel.x += dir.x*vel;
+			player->vel.z += dir.y*vel;
 			break;
 		case sf::Keyboard::S:
-			player.vel.x += -dir.x*vel;
-			player.vel.z += -dir.y*vel;
+			player->vel.x += -dir.x*vel;
+			player->vel.z += -dir.y*vel;
 			break;
 		case sf::Keyboard::A:
-			player.vel.x += dir.y*vel;
-			player.vel.z += -dir.x*vel;
+			player->vel.x += dir.y*vel;
+			player->vel.z += -dir.x*vel;
 			break;
 		case sf::Keyboard::D:
-			player.vel.x += -dir.y*vel;
-			player.vel.z += dir.x*vel;
+			player->vel.x += -dir.y*vel;
+			player->vel.z += dir.x*vel;
 			break;
 		case sf::Keyboard::Space:
-			if (player.onFloor && !player.isJumping)
-				player.vel.y = 10;
+			if (player->onFloor && !player->isJumping)
+				player->vel.y = 10;
 			break;
 		default:
 			break;
@@ -241,18 +260,13 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Mouse::Button& b
 			break;
 		case sf::Mouse::Right: //place block
 			if(world.playerTargetsBlock) {
-				world.setCubeIDAbs(world.last.x,world.last.y,world.last.z,player.selectedID);
+				world.setCubeIDAbs(world.last.x,world.last.y,world.last.z,player->selectedID);
 			}
 			break;
 		case sf::Mouse::Middle: { //Arrow!
-			float m[16];
-			glGetFloatv(GL_MODELVIEW_MATRIX, m);
-			vec3f dir(m[2],m[6],m[10]);//same as the player's pov
-			Arrow * np = new Arrow(world,player.camPos, vec3f(0.04,0.04,0.04));
-			np->vel -= vec3f(dir.x*30.0,dir.y*30.0,dir.z*30.0);
-			objects.push_back(np);
-		}
+			addObject(new Skeleton(this,player->pos, vec3f(0.1,0.1,0.1),player));
 			break;
+		}
 		default:
 			break;
 	}
@@ -274,9 +288,9 @@ void SceneMain::onMouseButtonReleased(float deltaTime, const sf::Mouse::Button& 
 
 void SceneMain::onMouseMoved(float deltaTime, int dx, int dy) {
 	if (parent.input().focus){
-		player.rotateX(dy*0.5);
-		player.rotateY(dx*0.5);
-		mouse.setPosition(vec2i(SCRWIDTH/2, SCRHEIGHT/2),parent.getWindow());
+		player->rotateX(dy*0.5);
+		player->rotateY(dx*0.5);
+		sf::Mouse::setPosition(vec2i(SCRWIDTH/2, SCRHEIGHT/2),parent.getWindow());
 		parent.input().setMousePos(SCRWIDTH/2, SCRHEIGHT/2);
 	}
 }
@@ -286,4 +300,12 @@ void SceneMain::onClose() {
 
 	parent.textures().deleteTexture("lolwtf");
 	parent.audio().deleteMusic("troll");
+}
+
+void SceneMain::addObject(GameObject* object) {
+	objects.push_back(object);
+}
+
+World& SceneMain::getWorld() {
+	return world;
 }

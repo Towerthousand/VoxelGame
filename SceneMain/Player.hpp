@@ -13,7 +13,7 @@ class Player : public Entity , public Camera {
 			NEAR,
 			FAR
 		};
-		Player(World &world,vec3f pos); //Player is bind to a world on creation, and will use it for collisions.
+		Player(SceneMain* scene,vec3f pos, vec3f scale); //Player is bind to a world on creation, and will use it for collisions.
 		~Player();
 		void update(float deltaTime);
 		void draw() const;

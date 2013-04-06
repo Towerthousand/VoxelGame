@@ -56,9 +56,9 @@ void Chunk::draw() const {
 	glEnableClientState(GL_COLOR_ARRAY);
 
 	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), 0);
-	glNormalPointer(GL_FLOAT, sizeof(Vertex),(GLvoid*)(3*sizeof(float)));
-	glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (GLvoid*)(6*sizeof(float)));
-	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (GLvoid*)(8*sizeof(float)));
+	glNormalPointer(GL_FLOAT, sizeof(Vertex),(GLvoid*)(4*sizeof(float)));
+	glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (GLvoid*)(8*sizeof(float)));
+	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (GLvoid*)(12*sizeof(float)));
 
 	glDrawArrays(GL_TRIANGLES, 0, renderData.size());
 

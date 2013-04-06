@@ -6,14 +6,14 @@
 class Player;
 class Polla : public Entity {
 	public:
-		Polla(World &world, vec3f pos, vec3f scale, Player& player);
+		Polla(SceneMain* scene, vec3f pos, vec3f scale, Player* player);
 		~Polla();
 
 		void update(float deltaTime);
-		void draw();
+		void draw() const;
 		void movePos(float deltaTime);
 
-		Player& followedPlayer;
+		Player* followedPlayer;
 		static Model model;
 };
 

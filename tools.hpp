@@ -16,6 +16,7 @@
 #include <cmath>
 #include <queue>
 #include "Math.hpp"
+#include <list>
 
 typedef sf::Vector3<float> vec3f;
 typedef sf::Vector3<int> vec3i;
@@ -27,14 +28,15 @@ struct Vertex {
 			   float nx = 0.0, float ny = 0.0, float nz = 0.0,
 			   float tx = 0.0, float ty = 0.0,
 			   float cr = 1.0, float cg = 1.0, float cb = 1.0, float ca = 1.0) :
-			vx(vx), vy(vy), vz(vz),
-			nx(nx), ny(ny), nz(nz),
-			tx(tx), ty(ty),
+			vx(vx), vy(vy), vz(vz), vw(0),
+			nx(nx), ny(ny), nz(nz), nw(0),
+			tx(tx), ty(ty), tu(0) , tv(0),
 			cr(cr), cg(cg), cb(cb), ca(ca)
 		{}
-		float vx,vy,vz,
-		nx,ny,nz,
-		tx,ty,
+		float
+		vx,vy,vz, vw,
+		nx,ny,nz, nw,
+		tx,ty,tu, tv,
 		cr,cg,cb,ca;
 };
 

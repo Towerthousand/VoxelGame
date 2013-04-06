@@ -1,9 +1,10 @@
 #ifndef SCENEMAIN_HPP
 #define SCENEMAIN_HPP
-#include "Scene.hpp"
-#include "SceneMain/World.hpp"
-#include "SceneMain/Player.hpp"
+#include "../Scene.hpp"
+#include "World.hpp"
+#include "Player.hpp"
 
+class Skeleton;
 class SceneMain : public Scene {
 	public:
 		//virtual overrides
@@ -21,14 +22,16 @@ class SceneMain : public Scene {
 		void onMouseMoved(float deltaTime, int dx, int dy);
 		void onClose(); //close scene-wide stuff
 
+		void addObject(GameObject* object);
+		World& getWorld();
+		int WORLDSEED;
+		Player* player; //for easy access, so that you don't have to search the object vector each time
+
 	private:
 		bool loadResources();
 
-		int WORLDSEED;
-		Player player;
-		sf::Mouse mouse;
 		World world;
-		std::vector<GameObject*> objects;
+		std::list<GameObject*> objects;
 		float debugCounter;
 		int fpsCount;
 };

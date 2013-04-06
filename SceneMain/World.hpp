@@ -12,11 +12,11 @@
 //0 <= y < WORLDHEIGHT*CHUNKSIZE
 
 class Chunk;
+class SceneMain;
 class Player;
-class Camera;
 class World {
 	public:
-		World();
+		World(SceneMain* parentScene, Player* player);
 		~World();
 		//generators
 		bool loadDirbaio(const std::string filePath);
@@ -34,8 +34,8 @@ class World {
 
 		//main
 		void draw() const;
-		void update(float deltaTime,Player &camera);
-		void traceView(const Player &player, float tMax);
+		void update(float deltaTime);
+		void traceView(const Player *playerCam, float tMax);
 
 		bool playerTargetsBlock;
 		int chunksDrawn;
@@ -45,9 +45,11 @@ class World {
 	private:
 		void calculateLight(vec3i source, vec2i radius);
 		void processCubeLighting(const vec3i& source, const vec3i& offset, std::vector<vec3i> &queue);
-		void updateGrass(float deltaTime);
+		void updateStuff(float deltaTime);
 		void drawWireCube(const vec3f& pos) const;
 
+		SceneMain* parentScene;
+		Player* player;
 		std::vector<std::vector<std::vector<Chunk*> > > chunks;
 		std::vector<std::vector<int> > skyValues;
 		float updateStuffTimer;

@@ -1,17 +1,17 @@
 #include "Hitbox.hpp"
-#include "World.hpp"
+#include "SceneMain.hpp"
 #include "GameObject.hpp"
 
-Hitbox::Hitbox(GameObject& parent, hitboxType type, vec3f radius) : radius(radius), type(type), parent(parent) {
+Hitbox::Hitbox(GameObject* parent, hitboxType type, vec3f radius) : radius(radius), type(type), parent(parent) {
 }
 
 Hitbox::~Hitbox() {
 }
 
-bool Hitbox::collidesWithWorld(vec3f offset) {
+bool Hitbox::collidesWithWorld(vec3f offset) const {
 	switch (type) {
 		case (BOX): {
-			vec3f newPos = parent.pos + offset;
+			vec3f newPos = parent->pos + offset;
 			for(float x = -radius.x; x <= radius.x+0.5; x += 0.5)
 				for(float y = -radius.y; y <= radius.y+0.5; y += 0.5)
 					for(float z = -radius.z; z <= radius.z+0.5; z += 0.5) {
@@ -22,7 +22,7 @@ bool Hitbox::collidesWithWorld(vec3f offset) {
 			break;
 		}
 		case (POINT):
-			return pointCollidesWithWorld(parent.pos+offset);
+			return pointCollidesWithWorld(parent->pos+offset);
 			break;
 		default:
 			break;
@@ -30,12 +30,53 @@ bool Hitbox::collidesWithWorld(vec3f offset) {
 	return false;
 }
 
-bool Hitbox::collidesWithHitbox(const Hitbox &hitbox, vec3f offset) {
+bool Hitbox::collidesWithHitbox(const Hitbox &hitbox, vec3f offset) const {
 	return false; //TODO
 }
 
-bool Hitbox::pointCollidesWithWorld(const vec3f& point) {
-	if(parent.parentWorld.getCubeAbs(floor(point.x),floor(point.y),floor(point.z)).ID != 0)
+bool Hitbox::pointCollidesWithWorld(const vec3f& point) const {
+	if(parent->parentScene->getWorld().getCubeAbs(floor(point.x),floor(point.y),floor(point.z)).ID != 0)
 		return true;
 	return false;
 }
+
+void Hitbox::draw() const {
+	vec3f drawPos = parent->pos-radius;
+	glPushMatrix();
+	glLineWidth(1.5);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glColor4f(0.0,0.0,0.0,0.5);
+	glTranslatef(drawPos.x,drawPos.y,drawPos.z);
+	glScalef(radius.x*2,radius.y*2,radius.z*2);
+	glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
+	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glColor4f(1.0,1.0,1.0,1.0);
+	glPopMatrix();
+}
+
+const int Hitbox::vertexPoints[8][3] = {
+	{0,0,1},
+	{1,0,1},
+	{1,1,1},
+	{0,1,1},
+	{0,0,0},
+	{1,0,0},
+	{1,1,0},
+	{0,1,0}
+};
+
+const int Hitbox::indexes[24] = {
+	0,1,
+	1,2,
+	2,3,
+	3,0,
+	4,5,
+	5,6,
+	6,7,
+	7,4,
+	0,4,
+	1,5,
+	2,6,
+	3,7,
+};

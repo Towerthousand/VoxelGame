@@ -1,11 +1,8 @@
 #include "Polla.hpp"
 #include "Player.hpp"
 
-Polla::Polla(World &world, vec3f pos, vec3f scale, Player &player) :
-	Entity(world), followedPlayer(player) {
-	this->acc = vec3f(0,0,0);
-	this->pos = pos;
-	this->scale = scale;
+Polla::Polla(SceneMain* scene, vec3f pos, vec3f scale, Player *player) :
+	Entity(scene,pos,scale), followedPlayer(player) {
 	this->hitbox.type = Hitbox::POINT;
 }
 
@@ -13,18 +10,17 @@ Polla::~Polla() {
 }
 
 void Polla::update(float deltaTime) {
-	vel += vec3f((followedPlayer.pos.x-pos.x+0.6)/100,(followedPlayer.pos.y-pos.y+0.6)/100,(followedPlayer.pos.z-pos.z+0.6)/100);
+	vel += vec3f((followedPlayer->pos.x-pos.x+0.6)/100,(followedPlayer->pos.y-pos.y+0.6)/100,(followedPlayer->pos.z-pos.z+0.6)/100);
 	movePos(deltaTime);
 }
 
-void Polla::draw() {
+void Polla::draw() const{
 	model.draw(pos-hitbox.radius,m,scale);
 }
 
 void Polla::movePos(float deltaTime) {
 
 	//Position
-	vel += acc*deltaTime; //a = const, v = at
 	vec3f disp = vel*deltaTime; //deltaX = x0 + vt (intended displacement)
 	if (hitbox.collidesWithWorld(vec3f(disp.x,0,0)) ||
 		hitbox.collidesWithWorld(vec3f(0,disp.y,0)) ||
@@ -34,8 +30,8 @@ void Polla::movePos(float deltaTime) {
 		vel.z = 0;
 	}
 	disp = vel*deltaTime; //corrected displacement
+	disp.y += std::sin(GLOBALCLOCK.getElapsedTime().asSeconds()*10)/50;
 	pos += disp;
-	vel.y = std::fmax(-70,vel.y);
 
 	//rotation
 	vec3f dummyUp(0,1,0);
