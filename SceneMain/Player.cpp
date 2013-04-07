@@ -6,8 +6,8 @@ Player::Player(SceneMain* scene, vec3f pos, vec3f scale) :
 	frustumPlanes(6,std::vector<vec3f> //6 planes
 				  (4,vec3f(0,0,0)))	{//4 points per plane
 	hitbox.type = Hitbox::BOX;
-	hitbox.radius = vec3f(0.2,0.9,0.2);
-	camPos = pos + vec3f(0,0.6,0);
+	hitbox.radius = vec3f(0.8,1.9,0.8);
+	camPos = pos + vec3f(0,1.5,0);
 	acc = vec3f(0,-40,0);
 }
 
@@ -17,7 +17,7 @@ Player::~Player() {
 void Player::update(float deltaTime) {
 	//move and update camera position
 	movePos(deltaTime); //this handles collisions
-	camPos = pos + vec3f(0,0.6,0);
+	camPos = pos + vec3f(0,1.5,0);
 	makeFrustum();
 
 	onFloor = hitbox.collidesWithWorld(vec3f(0,-0.1,0));

@@ -24,6 +24,7 @@ World::~World() {
 
 
 bool World::loadDirbaio(const std::string filePath) {
+
 	sf::Clock clock;
 	clock.restart();
 	std::ifstream file(filePath.c_str());
@@ -75,6 +76,89 @@ bool World::loadDirbaio(const std::string filePath) {
 				   vec2i(WORLDWIDTH*CHUNKSIZE/2 + 1,WORLDHEIGHT*CHUNKSIZE/2 + 1));
 	outLog(" - Finished lighting. Time: " + toString((float)clock.restart().asSeconds()) + " seconds");
 	return true;
+	//this commented version expands the map so that every block is made of 4 blocks.
+//	sf::Clock clock;
+//	clock.restart();
+//	std::ifstream file(filePath.c_str());
+//	if(!file) {
+//		outLog("#ERROR Could not load dirbaio \"" + filePath + "\"");
+//		return false;
+//	}
+//	int sizeX = int(file.get()) << 24 | int(file.get()) << 16 | int(file.get()) << 8 | int(file.get());
+//	int sizeY = int(file.get()) << 24 | int(file.get()) << 16 | int(file.get()) << 8 | int(file.get());
+//	int sizeZ = int(file.get()) << 24 | int(file.get()) << 16 | int(file.get()) << 8 | int(file.get());
+//	sizeX *= 2;
+//	sizeY *= 2;
+//	sizeZ *= 2;
+//	WORLDWIDTH = sizeX/CHUNKSIZE;
+//	WORLDHEIGHT = sizeY/CHUNKSIZE;
+//	chunks.resize(WORLDWIDTH);
+//	for(int i = 0; i < WORLDWIDTH; ++i)
+//		chunks[i].resize(WORLDHEIGHT);
+//	for(int i = 0; i < WORLDWIDTH; ++i)
+//		for(int j = 0; j < WORLDHEIGHT; ++j)
+//			chunks[i][j].resize(WORLDWIDTH);
+
+//	outLog(" - Creating chunks...");
+//	for (int x = 0; x < WORLDWIDTH; ++x)
+//		for (int y = 0; y < WORLDHEIGHT; ++y)
+//			for (int z = 0; z < WORLDWIDTH; ++z)
+//				regenChunk(x,y,z,0);
+//	outLog(" - Loading chunk data...");
+//	Cube c(0,0);
+//	for(int y = 0; y < sizeY/2; ++y)
+//		for(int x = 0; x < sizeX/2; ++x)
+//			for(int z = 0; z < sizeZ/2; ++z) {
+//				c = Cube(file.get(),0);
+//				int nX = x*2;
+//				int nY = y*2;
+//				int nZ = z*2;
+//				chunks[nX    /CHUNKSIZE][nY    /CHUNKSIZE][nZ    /CHUNKSIZE]->cubes[nX    %CHUNKSIZE][nY    %CHUNKSIZE][nZ    %CHUNKSIZE] = c;
+//				chunks[nX    /CHUNKSIZE][nY    /CHUNKSIZE][(nZ+1)/CHUNKSIZE]->cubes[nX    %CHUNKSIZE][nY    %CHUNKSIZE][(nZ+1)%CHUNKSIZE] = c;
+//				chunks[nX    /CHUNKSIZE][(nY+1)/CHUNKSIZE][nZ    /CHUNKSIZE]->cubes[nX    %CHUNKSIZE][(nY+1)%CHUNKSIZE][nZ    %CHUNKSIZE] = c;
+//				chunks[nX    /CHUNKSIZE][(nY+1)/CHUNKSIZE][(nZ+1)/CHUNKSIZE]->cubes[nX    %CHUNKSIZE][(nY+1)%CHUNKSIZE][(nZ+1)%CHUNKSIZE] = c;
+//				chunks[(nX+1)/CHUNKSIZE][nY    /CHUNKSIZE][nZ    /CHUNKSIZE]->cubes[(nX+1)%CHUNKSIZE][nY    %CHUNKSIZE][nZ    %CHUNKSIZE] = c;
+//				chunks[(nX+1)/CHUNKSIZE][nY    /CHUNKSIZE][(nZ+1)/CHUNKSIZE]->cubes[(nX+1)%CHUNKSIZE][nY    %CHUNKSIZE][(nZ+1)%CHUNKSIZE] = c;
+//				chunks[(nX+1)/CHUNKSIZE][(nY+1)/CHUNKSIZE][nZ    /CHUNKSIZE]->cubes[(nX+1)%CHUNKSIZE][(nY+1)%CHUNKSIZE][nZ    %CHUNKSIZE] = c;
+//				chunks[(nX+1)/CHUNKSIZE][(nY+1)/CHUNKSIZE][(nZ+1)/CHUNKSIZE]->cubes[(nX+1)%CHUNKSIZE][(nY+1)%CHUNKSIZE][(nZ+1)%CHUNKSIZE] = c;
+//			}
+//	file.close();
+//	outLog(" - Fixing grass...");
+//	for(int y = 0; y < sizeY; ++y)
+//		for(int x = 0; x < sizeX; ++x)
+//			for(int z = 0; z < sizeZ; ++z)
+//				if(getCubeRaw(x,y,z).ID == 3)
+//					if (getCubeAbs(x,y+1,z).ID != 0)
+//						chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE] = Cube(1,0);
+
+//	WORLDWIDTH /=2;
+//	WORLDHEIGHT /=2;
+//	for(int x = WORLDWIDTH; x < 2*WORLDWIDTH-1; ++x)
+//		for(int y = WORLDWIDTH; y < 2*WORLDHEIGHT-1; ++y)
+//			for(int z = WORLDWIDTH; z < 2*WORLDWIDTH-1; ++z)
+//				delete chunks[x][y][z];
+//	chunks.resize(WORLDWIDTH);
+//	for(int i = 0; i < WORLDWIDTH; ++i)
+//		chunks[i].resize(WORLDHEIGHT);
+//	for(int i = 0; i < WORLDWIDTH; ++i)
+//		for(int j = 0; j < WORLDHEIGHT; ++j)
+//			chunks[i][j].resize(WORLDWIDTH);
+
+//	outLog(" - Calculating sky levels...");
+//	skyValues = std::vector<std::vector<int> >(CHUNKSIZE*WORLDWIDTH,
+//											   std::vector<int>(CHUNKSIZE*WORLDWIDTH,-1));
+//	for(int x = 0; x < CHUNKSIZE*WORLDWIDTH; ++x) {
+//		for(int z = 0; z < CHUNKSIZE*WORLDWIDTH; ++z) {
+//			skyValues[x][z] = getSkylightLevel(x,z);
+//		}
+//	}
+//	outLog(" - Lighting chunks...");
+//	calculateLight(vec3i(CHUNKSIZE*WORLDWIDTH/2,
+//						 CHUNKSIZE*WORLDHEIGHT/2,
+//						 CHUNKSIZE*WORLDWIDTH/2),
+//				   vec2i(WORLDWIDTH*CHUNKSIZE/2 + 1,WORLDHEIGHT*CHUNKSIZE/2 + 1));
+//	outLog(" - Finished lighting. Time: " + toString((float)clock.restart().asSeconds()) + " seconds");
+//	return true;
 }
 
 void World::regenChunk(int x, int y, int z, int seed) {
@@ -171,13 +255,13 @@ void World::draw() const {
 void World::update(float deltaTime) {
 	chunksDrawn = 0;
 	updateStuff(deltaTime);
-	traceView(player,5);
+	traceView(player,10);
 	int updateMax = 0; //maximum number of chunk redraws
-	for (int x = 0; x < WORLDWIDTH; ++x)  {
-		for (int y = 0; y < WORLDHEIGHT; ++y) {
+	for (int x = 0; x < WORLDWIDTH; ++x)
+		for (int y = 0; y < WORLDHEIGHT; ++y)
 			for (int z = 0; z < WORLDWIDTH; ++z) {
 				if (player->insideFrustum(vec3f(x*CHUNKSIZE+8,y*CHUNKSIZE+8,z*CHUNKSIZE+8)
-										 ,sqrt(3*(8*8)))) {
+										  ,sqrt(3*(8*8)))) {
 					chunks[x][y][z]->outOfView = false;
 					++chunksDrawn;
 				}
@@ -189,8 +273,6 @@ void World::update(float deltaTime) {
 					chunks[x][y][z]->update(deltaTime);
 				}
 			}
-		}
-	}
 }
 
 //Based on: Fast Voxel Traversal Algorithm for Ray Tracing
@@ -277,8 +359,6 @@ void World::traceView(const Player *playerCam, float tMax) {
 
 
 void World::calculateLight(vec3i source, vec2i radius) {
-	//int size = radius.x*radius.x*radius.y*8;
-	//sstd::cout<<"====== UPDATE "<<size << " "<<radius.x<<" "<<radius.y << std::endl;
 	//BFS TO THE MAX
 	std::vector<vec3i> blocksToCheck[MAXLIGHT+1];
 	short* ID = 0;

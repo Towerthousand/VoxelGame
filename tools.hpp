@@ -60,10 +60,11 @@ std::string toString(float num);
 						  //Usually UPDATERADIUS = MAXLIGHT-MINLIGHT
 #define MAXLIGHT 15
 #define MINLIGHT 2
-#define DEG_TO_RAD ((2*M_PI)/360.0)
-#define FOV 60.0 //degrees
+#define DEG_TO_RAD ((2*M_PI)/360.0f)
+#define FOV 60.0f //degrees
 #define ZNEAR 0.01f
 #define ZFAR 500.0f
+#define TEXSIZE 8
 extern int SCRWIDTH;
 extern int SCRHEIGHT;
 extern bool WINDOWFOCUS;

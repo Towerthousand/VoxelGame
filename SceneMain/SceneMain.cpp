@@ -19,7 +19,7 @@ SceneMain::~SceneMain() {
 }
 
 bool SceneMain::loadResources() {
-	if(!parent.textures().loadTexture("lolwtf","resources/lolwtf.png"))
+	if(!parent.textures().loadTexture("lolwtf","resources/blocks" + toString(TEXSIZE) +".png"))
 		return false;
 	if(!parent.audio().loadMusic("troll","resources/troll.ogg"))
 		return false;
@@ -174,16 +174,17 @@ void SceneMain::draw() const {
 void SceneMain::onKeyPressed(float deltaTime, const sf::Keyboard::Key& key) {
 	switch(key) {
 		case sf::Keyboard::E: { //new spawnpoint
-			vec3f newPos;
-			newPos.x = rand()%(WORLDWIDTH*CHUNKSIZE);
-			newPos.z = rand()%(WORLDWIDTH*CHUNKSIZE);
-			newPos.y = world.getSkylightLevel(newPos.x,newPos.z) + player->hitbox.radius.y;
+			vec3f newPos(0,0,0);
+			while(newPos.y < 250) {
+				newPos.x = rand()%(WORLDWIDTH*CHUNKSIZE);
+				newPos.z = rand()%(WORLDWIDTH*CHUNKSIZE);
+				newPos.y = world.getSkylightLevel(newPos.x,newPos.z) + player->hitbox.radius.y;
+			}
 			player->pos = newPos + vec3f(0.5,1,0.5);
 		}
 			break;
-		case sf::Keyboard::Num1: {
+		case sf::Keyboard::Num1:
 			player->selectedID = 1;
-		}
 			break;
 		case sf::Keyboard::Num2:
 			player->selectedID = 2;
@@ -216,7 +217,7 @@ void SceneMain::onKeyPressed(float deltaTime, const sf::Keyboard::Key& key) {
 
 void SceneMain::onKeyDown(float deltaTime, const sf::Keyboard::Key &key) {
 	//Move player
-	const float vel = 5.0f;
+	const float vel = 10.0f;
 	vec2f dir(sin(player->camRot.y*DEG_TO_RAD), -cos(player->camRot.y*DEG_TO_RAD));
 	switch(key) {
 		case sf::Keyboard::W:
@@ -237,7 +238,7 @@ void SceneMain::onKeyDown(float deltaTime, const sf::Keyboard::Key &key) {
 			break;
 		case sf::Keyboard::Space:
 			if (player->onFloor && !player->isJumping)
-				player->vel.y = 10;
+				player->vel.y = 15;
 			break;
 		default:
 			break;
@@ -264,7 +265,7 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Mouse::Button& b
 			}
 			break;
 		case sf::Mouse::Middle: { //Arrow!
-			addObject(new Skeleton(this,player->pos, vec3f(0.1,0.1,0.1),player));
+			addObject(new Skeleton(this,player->pos, vec3f(0.2,0.2,0.2),player));
 			break;
 		}
 		default:

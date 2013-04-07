@@ -81,8 +81,6 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) { //I DON'T KNOW HOW 
 	//						Tx,Ty,
 	//						Cr,Cg,Cb,Ca
 	if(getCube(x,y,z+1).ID == 0) { // front face
-		texX = (textureIndexes[cubeID][0] % 32)*16; // 32 = number of textures/row, 16 = width
-		texY = (textureIndexes[cubeID][0] / 32)*16; // 32 = number of textures/row, 16 = height
 		if (cubeID != 4) {
 			//if it's not a light (light should be fully lit) calculate the average of the adjacent
 			//air blocks and assign max(max(average,adjacentBlock.light/2),MINLIGHT)
@@ -100,22 +98,24 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) { //I DON'T KNOW HOW 
 			lindD = std::fmax(std::fmax(lindD,getCube(x,y,z+1).light/3.0),MINLIGHT)/(MAXLIGHT);
 			lindE = (lindA+lindB+lindC+lindD)/4.0;
 		}
+		texX = (textureIndexes[cubeID][0] % (512/TEXSIZE))*TEXSIZE; // TEXSIZE/2 = number of textures/row
+		texY = (textureIndexes[cubeID][0] / (512/TEXSIZE))*TEXSIZE; // TEXSIZE/2 = number of textures/row
 		//t1
-		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ+1.0, 0,0,-1, texX     ,texY     , lindD,lindD,lindD,1.0));
-		renderData.push_back(Vertex(absX    , absY+1.0, absZ+1.0, 0,0,-1, texX+16.0,texY     , lindA,lindA,lindA,1.0));
-		renderData.push_back(Vertex(absX+0.5, absY+0.5, absZ+1.0, 0,0,-1, texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ+1.0, 0,0,-1, texX          ,texY          , lindD,lindD,lindD,1.0));
+		renderData.push_back(Vertex(absX    , absY+1.0, absZ+1.0, 0,0,-1, texX+TEXSIZE  ,texY          , lindA,lindA,lindA,1.0));
+		renderData.push_back(Vertex(absX+0.5, absY+0.5, absZ+1.0, 0,0,-1, texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 		//t2
-		renderData.push_back(Vertex(absX+1.0, absY    , absZ+1.0, 0,0,-1, texX	   ,texY+16.0, lindC,lindC,lindC,1.0));
-		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ+1.0, 0,0,-1, texX     ,texY     , lindD,lindD,lindD,1.0));
-		renderData.push_back(Vertex(absX+0.5, absY+0.5, absZ+1.0, 0,0,-1, texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY    , absZ+1.0, 0,0,-1, texX	        ,texY+TEXSIZE  , lindC,lindC,lindC,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ+1.0, 0,0,-1, texX          ,texY          , lindD,lindD,lindD,1.0));
+		renderData.push_back(Vertex(absX+0.5, absY+0.5, absZ+1.0, 0,0,-1, texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 		//t3
-		renderData.push_back(Vertex(absX    , absY    , absZ+1.0, 0,0,-1, texX+16.0,texY+16.0, lindB,lindB,lindB,1.0));
-		renderData.push_back(Vertex(absX+1.0, absY    , absZ+1.0, 0,0,-1, texX	   ,texY+16.0, lindC,lindC,lindC,1.0));
-		renderData.push_back(Vertex(absX+0.5, absY+0.5, absZ+1.0, 0,0,-1, texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX    , absY    , absZ+1.0, 0,0,-1, texX+TEXSIZE  ,texY+TEXSIZE  , lindB,lindB,lindB,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY    , absZ+1.0, 0,0,-1, texX	        ,texY+TEXSIZE  , lindC,lindC,lindC,1.0));
+		renderData.push_back(Vertex(absX+0.5, absY+0.5, absZ+1.0, 0,0,-1, texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 		//t4
-		renderData.push_back(Vertex(absX    , absY+1.0, absZ+1.0, 0,0,-1, texX+16.0,texY     , lindA,lindA,lindA,1.0));
-		renderData.push_back(Vertex(absX    , absY    , absZ+1.0, 0,0,-1, texX+16.0,texY+16.0, lindB,lindB,lindB,1.0));
-		renderData.push_back(Vertex(absX+0.5, absY+0.5, absZ+1.0, 0,0,-1, texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX    , absY+1.0, absZ+1.0, 0,0,-1, texX+TEXSIZE  ,texY          , lindA,lindA,lindA,1.0));
+		renderData.push_back(Vertex(absX    , absY    , absZ+1.0, 0,0,-1, texX+TEXSIZE  ,texY+TEXSIZE  , lindB,lindB,lindB,1.0));
+		renderData.push_back(Vertex(absX+0.5, absY+0.5, absZ+1.0, 0,0,-1, texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 	}
 	if(getCube(x,y,z-1).ID == 0) { // back face
 		if (cubeID != 4) {
@@ -133,24 +133,24 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) { //I DON'T KNOW HOW 
 			lindD = std::fmax(std::fmax(lindD,getCube(x,y,z-1).light/3.0),MINLIGHT)/(MAXLIGHT);
 			lindE = (lindA+lindB+lindC+lindD)/4.0;
 		}
-		texX = (textureIndexes[cubeID][1] % 32)*16;
-		texY = (textureIndexes[cubeID][1] / 32)*16;
+		texX = (textureIndexes[cubeID][1] % (512/TEXSIZE))*TEXSIZE;
+		texY = (textureIndexes[cubeID][1] / (512/TEXSIZE))*TEXSIZE;
 		//t1
-		renderData.push_back(Vertex(absX    , absY+1.0, absZ    , 0,0,-1, texX+16.0,texY     , lindD,lindD,lindD,1.0));
-		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ    , 0,0,-1, texX     ,texY     , lindA,lindA,lindA,1.0));
-		renderData.push_back(Vertex(absX+0.5, absY+0.5, absZ    , 0,0,-1, texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX    , absY+1.0, absZ    , 0,0,-1, texX+TEXSIZE  ,texY          , lindD,lindD,lindD,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ    , 0,0,-1, texX          ,texY          , lindA,lindA,lindA,1.0));
+		renderData.push_back(Vertex(absX+0.5, absY+0.5, absZ    , 0,0,-1, texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 		//t2
-		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ    , 0,0,-1, texX     ,texY     , lindA,lindA,lindA,1.0));
-		renderData.push_back(Vertex(absX+1.0, absY    , absZ    , 0,0,-1, texX	   ,texY+16.0, lindB,lindB,lindB,1.0));
-		renderData.push_back(Vertex(absX+0.5, absY+0.5, absZ    , 0,0,-1, texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ    , 0,0,-1, texX          ,texY          , lindA,lindA,lindA,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY    , absZ    , 0,0,-1, texX	        ,texY+TEXSIZE  , lindB,lindB,lindB,1.0));
+		renderData.push_back(Vertex(absX+0.5, absY+0.5, absZ    , 0,0,-1, texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 		//t3
-		renderData.push_back(Vertex(absX+1.0, absY    , absZ    , 0,0,-1, texX	   ,texY+16.0, lindB,lindB,lindB,1.0));
-		renderData.push_back(Vertex(absX    , absY    , absZ    , 0,0,-1, texX+16.0,texY+16.0, lindC,lindC,lindC,1.0));
-		renderData.push_back(Vertex(absX+0.5, absY+0.5, absZ    , 0,0,-1, texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY    , absZ    , 0,0,-1, texX	        ,texY+TEXSIZE  , lindB,lindB,lindB,1.0));
+		renderData.push_back(Vertex(absX    , absY    , absZ    , 0,0,-1, texX+TEXSIZE  ,texY+TEXSIZE  , lindC,lindC,lindC,1.0));
+		renderData.push_back(Vertex(absX+0.5, absY+0.5, absZ    , 0,0,-1, texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 		//t4
-		renderData.push_back(Vertex(absX    , absY    , absZ    , 0,0,-1, texX+16.0,texY+16.0, lindC,lindC,lindC,1.0));
-		renderData.push_back(Vertex(absX    , absY+1.0, absZ    , 0,0,-1, texX+16.0,texY     , lindD,lindD,lindD,1.0));
-		renderData.push_back(Vertex(absX+0.5, absY+0.5, absZ    , 0,0,-1, texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX    , absY    , absZ    , 0,0,-1, texX+TEXSIZE  ,texY+TEXSIZE  , lindC,lindC,lindC,1.0));
+		renderData.push_back(Vertex(absX    , absY+1.0, absZ    , 0,0,-1, texX+TEXSIZE  ,texY          , lindD,lindD,lindD,1.0));
+		renderData.push_back(Vertex(absX+0.5, absY+0.5, absZ    , 0,0,-1, texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 	}
 	if(getCube(x+1,y,z).ID == 0) { // left face
 		if (cubeID != 4) {
@@ -168,24 +168,24 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) { //I DON'T KNOW HOW 
 			lindD = std::fmax(std::fmax(lindD,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
 			lindE = (lindA+lindB+lindC+lindD)/4.0;
 		}
-		texX = (textureIndexes[cubeID][2] % 32)*16;
-		texY = (textureIndexes[cubeID][2] / 32)*16;
+		texX = (textureIndexes[cubeID][2] % (512/TEXSIZE))*TEXSIZE;
+		texY = (textureIndexes[cubeID][2] / (512/TEXSIZE))*TEXSIZE;
 		//t1
-		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ    , -1,0,0, texX     ,texY     , lindD,lindD,lindD,1.0));
-		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ+1.0, -1,0,0, texX+16.0,texY     , lindA,lindA,lindA,1.0));
-		renderData.push_back(Vertex(absX+1.0, absY+0.5, absZ+0.5, -1,0,0, texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ    , -1,0,0, texX          ,texY          , lindD,lindD,lindD,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ+1.0, -1,0,0, texX+TEXSIZE  ,texY          , lindA,lindA,lindA,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY+0.5, absZ+0.5, -1,0,0, texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 		//t2
-		renderData.push_back(Vertex(absX+1.0, absY    , absZ    , -1,0,0, texX	   ,texY+16.0, lindC,lindC,lindC,1.0));
-		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ    , -1,0,0, texX     ,texY     , lindD,lindD,lindD,1.0));
-		renderData.push_back(Vertex(absX+1.0, absY+0.5, absZ+0.5, -1,0,0, texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY    , absZ    , -1,0,0, texX	        ,texY+TEXSIZE  , lindC,lindC,lindC,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ    , -1,0,0, texX          ,texY          , lindD,lindD,lindD,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY+0.5, absZ+0.5, -1,0,0, texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 		//t3
-		renderData.push_back(Vertex(absX+1.0, absY    , absZ+1.0, -1,0,0, texX+16.0,texY+16.0, lindB,lindB,lindB,1.0));
-		renderData.push_back(Vertex(absX+1.0, absY    , absZ    , -1,0,0, texX	   ,texY+16.0, lindC,lindC,lindC,1.0));
-		renderData.push_back(Vertex(absX+1.0, absY+0.5, absZ+0.5, -1,0,0, texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY    , absZ+1.0, -1,0,0, texX+TEXSIZE  ,texY+TEXSIZE  , lindB,lindB,lindB,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY    , absZ    , -1,0,0, texX	        ,texY+TEXSIZE  , lindC,lindC,lindC,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY+0.5, absZ+0.5, -1,0,0, texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 		//t4
-		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ+1.0, -1,0,0, texX+16.0,texY     , lindA,lindA,lindA,1.0));
-		renderData.push_back(Vertex(absX+1.0, absY    , absZ+1.0, -1,0,0, texX+16.0,texY+16.0, lindB,lindB,lindB,1.0));
-		renderData.push_back(Vertex(absX+1.0, absY+0.5, absZ+0.5, -1,0,0, texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ+1.0, -1,0,0, texX+TEXSIZE  ,texY          , lindA,lindA,lindA,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY    , absZ+1.0, -1,0,0, texX+TEXSIZE  ,texY+TEXSIZE  , lindB,lindB,lindB,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY+0.5, absZ+0.5, -1,0,0, texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 	}
 	if(getCube(x-1,y,z).ID == 0) { // right face
 		if (cubeID != 4) {
@@ -203,24 +203,24 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) { //I DON'T KNOW HOW 
 			lindD = std::fmax(std::fmax(lindD,getCube(x-1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT);
 			lindE = (lindA+lindB+lindC+lindD)/4.0;
 		}
-		texX = (textureIndexes[cubeID][3] % 32)*16;
-		texY = (textureIndexes[cubeID][3] / 32)*16;
+		texX = (textureIndexes[cubeID][3] % (512/TEXSIZE))*TEXSIZE;
+		texY = (textureIndexes[cubeID][3] / (512/TEXSIZE))*TEXSIZE;
 		//t1
-		renderData.push_back(Vertex(absX    , absY+1.0, absZ+1.0, -1,0,0, texX+16.0,texY     , lindD,lindD,lindD,1.0));
-		renderData.push_back(Vertex(absX    , absY+1.0, absZ    , -1,0,0, texX     ,texY     , lindA,lindA,lindA,1.0));
-		renderData.push_back(Vertex(absX    , absY+0.5, absZ+0.5, -1,0,0, texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX    , absY+1.0, absZ+1.0, -1,0,0, texX+TEXSIZE  ,texY          , lindD,lindD,lindD,1.0));
+		renderData.push_back(Vertex(absX    , absY+1.0, absZ    , -1,0,0, texX          ,texY          , lindA,lindA,lindA,1.0));
+		renderData.push_back(Vertex(absX    , absY+0.5, absZ+0.5, -1,0,0, texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 		//t2
-		renderData.push_back(Vertex(absX    , absY+1.0, absZ    , -1,0,0, texX     ,texY     , lindA,lindA,lindA,1.0));
-		renderData.push_back(Vertex(absX    , absY    , absZ    , -1,0,0, texX	   ,texY+16.0, lindB,lindB,lindB,1.0));
-		renderData.push_back(Vertex(absX    , absY+0.5, absZ+0.5, -1,0,0, texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX    , absY+1.0, absZ    , -1,0,0, texX          ,texY          , lindA,lindA,lindA,1.0));
+		renderData.push_back(Vertex(absX    , absY    , absZ    , -1,0,0, texX	        ,texY+TEXSIZE  , lindB,lindB,lindB,1.0));
+		renderData.push_back(Vertex(absX    , absY+0.5, absZ+0.5, -1,0,0, texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 		//t3
-		renderData.push_back(Vertex(absX    , absY    , absZ    , -1,0,0, texX	   ,texY+16.0, lindB,lindB,lindB,1.0));
-		renderData.push_back(Vertex(absX    , absY    , absZ+1.0, -1,0,0, texX+16.0,texY+16.0, lindC,lindC,lindC,1.0));
-		renderData.push_back(Vertex(absX    , absY+0.5, absZ+0.5, -1,0,0, texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX    , absY    , absZ    , -1,0,0, texX	        ,texY+TEXSIZE  , lindB,lindB,lindB,1.0));
+		renderData.push_back(Vertex(absX    , absY    , absZ+1.0, -1,0,0, texX+TEXSIZE  ,texY+TEXSIZE  , lindC,lindC,lindC,1.0));
+		renderData.push_back(Vertex(absX    , absY+0.5, absZ+0.5, -1,0,0, texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 		//t4
-		renderData.push_back(Vertex(absX    , absY    , absZ+1.0, -1,0,0, texX+16.0,texY+16.0, lindC,lindC,lindC,1.0));
-		renderData.push_back(Vertex(absX    , absY+1.0, absZ+1.0, -1,0,0, texX+16.0,texY     , lindD,lindD,lindD,1.0));
-		renderData.push_back(Vertex(absX    , absY+0.5, absZ+0.5, -1,0,0, texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX    , absY    , absZ+1.0, -1,0,0, texX+TEXSIZE  ,texY+TEXSIZE  , lindC,lindC,lindC,1.0));
+		renderData.push_back(Vertex(absX    , absY+1.0, absZ+1.0, -1,0,0, texX+TEXSIZE  ,texY          , lindD,lindD,lindD,1.0));
+		renderData.push_back(Vertex(absX    , absY+0.5, absZ+0.5, -1,0,0, texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 	}
 	if(getCube(x,y-1,z).ID == 0) { // bottom face
 		if (cubeID != 4) {
@@ -238,24 +238,24 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) { //I DON'T KNOW HOW 
 			lindD = std::fmax(std::fmax(lindD,getCube(x,y-1,z).light/3.0),MINLIGHT)/(MAXLIGHT);
 			lindE = (lindA+lindB+lindC+lindD)/4.0;
 		}
-		texX = (textureIndexes[cubeID][4] % 32)*16;
-		texY = (textureIndexes[cubeID][4] / 32)*16;
+		texX = (textureIndexes[cubeID][4] % (512/TEXSIZE))*TEXSIZE;
+		texY = (textureIndexes[cubeID][4] / (512/TEXSIZE))*TEXSIZE;
 		//t1
-		renderData.push_back(Vertex(absX    , absY    , absZ    , 0,-1,0, texX+16.0,texY+16.0, lindC,lindC,lindC,1.0));
-		renderData.push_back(Vertex(absX+1.0, absY    , absZ    , 0,-1,0, texX+16.0,texY     , lindD,lindD,lindD,1.0));
-		renderData.push_back(Vertex(absX+0.5, absY    , absZ+0.5, 0,-1,0 ,texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX    , absY    , absZ    , 0,-1,0, texX+TEXSIZE  ,texY+TEXSIZE  , lindC,lindC,lindC,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY    , absZ    , 0,-1,0, texX+TEXSIZE  ,texY          , lindD,lindD,lindD,1.0));
+		renderData.push_back(Vertex(absX+0.5, absY    , absZ+0.5, 0,-1,0 ,texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 		//t2
-		renderData.push_back(Vertex(absX+1.0, absY    , absZ    , 0,-1,0, texX+16.0,texY     , lindD,lindD,lindD,1.0));
-		renderData.push_back(Vertex(absX+1.0, absY    , absZ+1.0, 0,-1,0, texX     ,texY     , lindA,lindA,lindA,1.0));
-		renderData.push_back(Vertex(absX+0.5, absY    , absZ+0.5, 0,-1,0 ,texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY    , absZ    , 0,-1,0, texX+TEXSIZE  ,texY          , lindD,lindD,lindD,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY    , absZ+1.0, 0,-1,0, texX          ,texY          , lindA,lindA,lindA,1.0));
+		renderData.push_back(Vertex(absX+0.5, absY    , absZ+0.5, 0,-1,0 ,texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 		//t3
-		renderData.push_back(Vertex(absX+1.0, absY    , absZ+1.0, 0,-1,0, texX     ,texY     , lindA,lindA,lindA,1.0));
-		renderData.push_back(Vertex(absX    , absY    , absZ+1.0, 0,-1,0, texX     ,texY+16.0, lindB,lindB,lindB,1.0));
-		renderData.push_back(Vertex(absX+0.5, absY    , absZ+0.5, 0,-1,0 ,texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY    , absZ+1.0, 0,-1,0, texX          ,texY          , lindA,lindA,lindA,1.0));
+		renderData.push_back(Vertex(absX    , absY    , absZ+1.0, 0,-1,0, texX	        ,texY+TEXSIZE  , lindB,lindB,lindB,1.0));
+		renderData.push_back(Vertex(absX+0.5, absY    , absZ+0.5, 0,-1,0 ,texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 		//t4
-		renderData.push_back(Vertex(absX    , absY    , absZ+1.0, 0,-1,0, texX     ,texY+16.0, lindB,lindB,lindB,1.0));
-		renderData.push_back(Vertex(absX    , absY    , absZ    , 0,-1,0, texX+16.0,texY+16.0, lindC,lindC,lindC,1.0));
-		renderData.push_back(Vertex(absX+0.5, absY    , absZ+0.5, 0,-1,0 ,texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX    , absY    , absZ+1.0, 0,-1,0, texX	        ,texY+TEXSIZE  , lindB,lindB,lindB,1.0));
+		renderData.push_back(Vertex(absX    , absY    , absZ    , 0,-1,0, texX+TEXSIZE  ,texY+TEXSIZE  , lindC,lindC,lindC,1.0));
+		renderData.push_back(Vertex(absX+0.5, absY    , absZ+0.5, 0,-1,0 ,texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 	}
 	if(getCube(x,y+1,z).ID == 0) { // top face
 		if (cubeID != 4) {
@@ -273,24 +273,24 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) { //I DON'T KNOW HOW 
 			lindD = std::fmax(std::fmax(lindD,getCube(x,y+1,z).light/3.0),MINLIGHT)/(MAXLIGHT);
 			lindE = (lindA+lindB+lindC+lindD)/4.0;
 		}
-		texX = (textureIndexes[cubeID][5] % 32)*16;
-		texY = (textureIndexes[cubeID][5] / 32)*16;
+		texX = (textureIndexes[cubeID][5] % (512/TEXSIZE))*TEXSIZE;
+		texY = (textureIndexes[cubeID][5] / (512/TEXSIZE))*TEXSIZE;
 		//t1
-		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ    , 0,1,0 , texX+16.0,texY+16.0, lindC,lindC,lindC,1.0));
-		renderData.push_back(Vertex(absX    , absY+1.0, absZ    , 0,1,0 , texX+16.0,texY     , lindD,lindD,lindD,1.0));
-		renderData.push_back(Vertex(absX+0.5, absY+1.0, absZ+0.5, 0,1,0 , texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ    , 0,1,0 , texX+TEXSIZE  ,texY+TEXSIZE  , lindC,lindC,lindC,1.0));
+		renderData.push_back(Vertex(absX    , absY+1.0, absZ    , 0,1,0 , texX+TEXSIZE  ,texY          , lindD,lindD,lindD,1.0));
+		renderData.push_back(Vertex(absX+0.5, absY+1.0, absZ+0.5, 0,1,0 , texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 		//t2
-		renderData.push_back(Vertex(absX    , absY+1.0, absZ    , 0,1,0 , texX+16.0,texY     , lindD,lindD,lindD,1.0));
-		renderData.push_back(Vertex(absX    , absY+1.0, absZ+1.0, 0,1,0 , texX     ,texY     , lindA,lindA,lindA,1.0));
-		renderData.push_back(Vertex(absX+0.5, absY+1.0, absZ+0.5, 0,1,0 , texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX    , absY+1.0, absZ    , 0,1,0 , texX+TEXSIZE  ,texY          , lindD,lindD,lindD,1.0));
+		renderData.push_back(Vertex(absX    , absY+1.0, absZ+1.0, 0,1,0 , texX          ,texY          , lindA,lindA,lindA,1.0));
+		renderData.push_back(Vertex(absX+0.5, absY+1.0, absZ+0.5, 0,1,0 , texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 		//t3
-		renderData.push_back(Vertex(absX    , absY+1.0, absZ+1.0, 0,1,0 , texX     ,texY     , lindA,lindA,lindA,1.0));
-		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ+1.0, 0,1,0 , texX     ,texY+16.0, lindB,lindB,lindB,1.0));
-		renderData.push_back(Vertex(absX+0.5, absY+1.0, absZ+0.5, 0,1,0 , texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX    , absY+1.0, absZ+1.0, 0,1,0 , texX          ,texY          , lindA,lindA,lindA,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ+1.0, 0,1,0 , texX	        ,texY+TEXSIZE  , lindB,lindB,lindB,1.0));
+		renderData.push_back(Vertex(absX+0.5, absY+1.0, absZ+0.5, 0,1,0 , texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 		//t4
-		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ+1.0, 0,1,0 , texX     ,texY+16.0, lindB,lindB,lindB,1.0));
-		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ    , 0,1,0 , texX+16.0,texY+16.0, lindC,lindC,lindC,1.0));
-		renderData.push_back(Vertex(absX+0.5, absY+1.0, absZ+0.5, 0,1,0 , texX+8.0 ,texY+8.0 , lindE,lindE,lindE,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ+1.0, 0,1,0 , texX	        ,texY+TEXSIZE  , lindB,lindB,lindB,1.0));
+		renderData.push_back(Vertex(absX+1.0, absY+1.0, absZ    , 0,1,0 , texX+TEXSIZE  ,texY+TEXSIZE  , lindC,lindC,lindC,1.0));
+		renderData.push_back(Vertex(absX+0.5, absY+1.0, absZ+0.5, 0,1,0 , texX+TEXSIZE/2,texY+TEXSIZE/2, lindE,lindE,lindE,1.0));
 	}
 }
 
