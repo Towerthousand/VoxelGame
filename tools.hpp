@@ -54,7 +54,7 @@ std::string toString(float num);
 
 #define WINDOW_TITLE "VoxelGame"
 #define CONTEXT_SETTINGS_OPENGL sf::ContextSettings(32,32,0,3,0)
-#define CHUNKSIZE 16
+#define CHUNKSIZE 8
 #define PLAYER_HEIGHT -1.8
 #define UPDATERADIUS 13.0 //How many potential light blocks does changing a block affect? Not taking into account skylight.
 						  //Usually UPDATERADIUS = MAXLIGHT-MINLIGHT

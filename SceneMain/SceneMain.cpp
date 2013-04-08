@@ -265,7 +265,13 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Mouse::Button& b
 			}
 			break;
 		case sf::Mouse::Middle: { //Arrow!
-			addObject(new Skeleton(this,player->pos,player));
+			float m[16];
+			glGetFloatv(GL_MODELVIEW_MATRIX, m);
+			vec3f dir(m[2],m[6],m[10]);//same as the player's pov
+			Arrow * np = new Arrow(this,player->camPos);
+			np->vel -= vec3f(dir.x*30.0,dir.y*30.0,dir.z*30.0);
+			addObject(np);
+
 			break;
 		}
 		default:

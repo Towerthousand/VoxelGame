@@ -260,7 +260,7 @@ void World::update(float deltaTime) {
 	for (int x = 0; x < WORLDWIDTH; ++x)
 		for (int y = 0; y < WORLDHEIGHT; ++y)
 			for (int z = 0; z < WORLDWIDTH; ++z) {
-				if (player->insideFrustum(vec3f(x*CHUNKSIZE+8,y*CHUNKSIZE+8,z*CHUNKSIZE+8)
+				if (player->insideFrustum(vec3f(x*CHUNKSIZE+CHUNKSIZE/2,y*CHUNKSIZE+CHUNKSIZE/2,z*CHUNKSIZE+CHUNKSIZE/2)
 										  ,sqrt(3*(8*8)))) {
 					chunks[x][y][z]->outOfView = false;
 					++chunksDrawn;

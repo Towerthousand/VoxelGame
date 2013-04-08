@@ -3,7 +3,7 @@
 #include "tools.hpp"
 
 class World;
-class Chunk { //16*16*128
+class Chunk { //16*16*16
 	public:
 		Chunk(int x, int y, int z, World &world);
 		~Chunk();

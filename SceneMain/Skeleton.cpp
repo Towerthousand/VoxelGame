@@ -15,6 +15,8 @@ Skeleton::~Skeleton() {
 }
 
 void Skeleton::update(float deltaTime) {
+	movePos(deltaTime);
+
 	cooldown -= deltaTime;
 	if (norm(targetPlayer->pos-pos) < 20 ) {
 		lookAtPlayer();
@@ -27,11 +29,10 @@ void Skeleton::update(float deltaTime) {
 			parentScene->addObject(na);
 		}
 	}
-	movePos(deltaTime);
 
-	vel.x = 0; // Player only accelerates vertically, so speed.x doesn't carry
+	vel.x = 0; // Mobs only accelerate vertically, so speed.x doesn't carry
 	vel.y = std::fmax(-70,vel.y);
-	vel.z = 0; // Player only accelerates vertically, so speed.z doesn't carry
+	vel.z = 0; // Mobs only accelerate vertically, so speed.z doesn't carry
 }
 
 void Skeleton::draw() const {

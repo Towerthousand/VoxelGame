@@ -21,36 +21,44 @@ void Arrow::draw() const {
 }
 
 void Arrow::movePos(float deltaTime) {
-	//Position
-	vel += acc*deltaTime; //a = const, v = at
-	vec3f disp = vel*deltaTime; //deltaX = x0 + vt (intended displacement)
-	acc.y = -10;
-	if (hitbox.collidesWithWorld(vec3f(disp.x,0,0)) ||
-		hitbox.collidesWithWorld(vec3f(0,disp.y,0)) ||
-		hitbox.collidesWithWorld(vec3f(0,0,disp.z))) {
-		vel.x = 0;
-		vel.y = 0;
-		vel.z = 0;
-		acc.y = 0;
-	}
-	disp = vel*deltaTime; //corrected displacement
-	pos += disp;
-	vel.y = std::fmax(-70,vel.y);
+	vec3f offset(-m[8]*0.6,-m[9]*0.6,-m[10]*0.6);//offset determines arrow's point position
+	if(!hitbox.collidesWithWorld(offset)) {
+		//Position
+		vel += acc*deltaTime; //a = const, v = at
+		vec3f disp = vel*deltaTime;
+		pos += disp; //before checking for collisions, so that if it collides it gets stuck.
+		if (hitbox.collidesWithWorld(disp+offset)) {
+			vel.x = 0;
+			vel.y = 0;
+			vel.z = 0;
+			acc.y = 0;
+			pos += disp; //get a bit more stuck
+		}
+		else
+			acc.y = -10;
+		vel.y = std::fmax(-70,vel.y);
 
-	//rotation
-	vec3f dummyUp(0,1,0);
-	if(norm(cross(dummyUp, vel)) != 0) {
-		vec3f back = -vel;
-		normalize(back);
+		//rotation
 		vec3f dummyUp(0,1,0);
-		vec3f right = cross(dummyUp,back);
-		normalize(right);
-		vec3f up = cross(back,right);
-		normalize(up);
-		m[0 ] = right.x; m[4 ] = up.x; m[8 ] = back.x; m[12] = 0;
-		m[1 ] = right.y; m[5 ] = up.y; m[9 ] = back.y; m[13] = 0;
-		m[2 ] = right.z; m[6 ] = up.z; m[10] = back.z; m[14] = 0;
-		m[3 ] = 0;       m[7 ] = 0;    m[11] = 0;      m[15] = 1;
+		if(norm(cross(dummyUp, vel)) != 0) {
+			vec3f back = -vel;
+			normalize(back);
+			vec3f dummyUp(0,1,0);
+			vec3f right = cross(dummyUp,back);
+			normalize(right);
+			vec3f up = cross(back,right);
+			normalize(up);
+			m[0 ] = right.x; m[4 ] = up.x; m[8 ] = back.x; m[12] = 0;
+			m[1 ] = right.y; m[5 ] = up.y; m[9 ] = back.y; m[13] = 0;
+			m[2 ] = right.z; m[6 ] = up.z; m[10] = back.z; m[14] = 0;
+			m[3 ] = 0;       m[7 ] = 0;    m[11] = 0;      m[15] = 1;
+		}
+		else if(!hitbox.collidesWithWorld(offset)){ //no x or z velocity, fall straight down
+			m[0 ] = 1; m[4 ] = 0; m[8 ] = 0; m[12] = 0;
+			m[1 ] = 0; m[5 ] = 0; m[9 ] = 1; m[13] = 0;
+			m[2 ] = 0; m[6 ] =-1; m[10] = 0; m[14] = 0;
+			m[3 ] = 0; m[7 ] = 0; m[11] = 0; m[15] = 1;
+		}
 	}
 }
 

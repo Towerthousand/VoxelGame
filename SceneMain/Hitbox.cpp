@@ -41,18 +41,18 @@ bool Hitbox::pointCollidesWithWorld(const vec3f& point) const {
 }
 
 void Hitbox::draw() const {
-	vec3f drawPos = parent->pos-radius;
-	glPushMatrix();
-	glLineWidth(1.5);
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glColor4f(0.0,0.0,0.0,0.5);
-	glTranslatef(drawPos.x,drawPos.y,drawPos.z);
-	glScalef(radius.x*2,radius.y*2,radius.z*2);
-	glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
-	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glColor4f(1.0,1.0,1.0,1.0);
-	glPopMatrix();
+//	vec3f drawPos = parent->pos-radius;
+//	glPushMatrix();
+//	glLineWidth(1.5);
+//	glEnableClientState(GL_VERTEX_ARRAY);
+//	glColor4f(0.0,0.0,0.0,0.5);
+//	glTranslatef(drawPos.x,drawPos.y,drawPos.z);
+//	glScalef(radius.x*2,radius.y*2,radius.z*2);
+//	glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
+//	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
+//	glDisableClientState(GL_VERTEX_ARRAY);
+//	glColor4f(1.0,1.0,1.0,1.0);
+//	glPopMatrix();
 }
 
 const int Hitbox::vertexPoints[8][3] = {
