@@ -59,7 +59,7 @@ std::string toString(float num);
 #define UPDATERADIUS 13.0 //How many potential light blocks does changing a block affect? Not taking into account skylight.
 						  //Usually UPDATERADIUS = MAXLIGHT-MINLIGHT
 #define MAXLIGHT 15
-#define MINLIGHT 2
+#define MINLIGHT 1
 #define DEG_TO_RAD ((2*M_PI)/360.0f)
 #define FOV 60.0f //degrees
 #define ZNEAR 0.01f

@@ -3,9 +3,9 @@
 #include "SceneMain.hpp"
 #include "Arrow.hpp"
 
-Skeleton::Skeleton(SceneMain* world, vec3f pos, vec3f scale, Player* targetPlayer)
+Skeleton::Skeleton(SceneMain* world, vec3f pos, Player* targetPlayer, vec3f scale)
 	: Enemy(world, pos, scale, targetPlayer), cooldown(0),
-	  shootPosOffset(0,(model.modelHeight*scale.y)/4,0) {
+	  shootPosOffset(0,(model.modelHeight*scale.y)/3,0) {
 	hitbox.type = Hitbox::BOX;
 	hitbox.radius = vec3f(model.modelWidth*scale.x,model.modelHeight*scale.y,model.modelDepth*scale.z)*0.5f;
 	acc.y = -40;
@@ -20,7 +20,7 @@ void Skeleton::update(float deltaTime) {
 		lookAtPlayer();
 		if (cooldown <= 0) {
 			cooldown = 1;
-			Arrow* na = new Arrow(parentScene,(pos+shootPosOffset),vec3f(0.04,0.04,0.04));
+			Arrow* na = new Arrow(parentScene,(pos+shootPosOffset));
 			na->vel = targetPlayer->camPos-(pos+shootPosOffset);
 			normalize(na->vel);
 			na->vel *= 30.0f;

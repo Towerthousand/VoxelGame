@@ -7,7 +7,7 @@
 
 SceneMain::SceneMain(Game &parent) :
 	Scene(parent), WORLDSEED(std::time(0)%1000),
-	player(new Player(this, vec3f(0,256,0), vec3f(1,1,1))), world(this,player),
+	player(new Player(this, vec3f(0,256,0))), world(this,player),
 	debugCounter(0.0), fpsCount(0) {
 }
 
@@ -178,7 +178,7 @@ void SceneMain::onKeyPressed(float deltaTime, const sf::Keyboard::Key& key) {
 			while(newPos.y < 250) {
 				newPos.x = rand()%(WORLDWIDTH*CHUNKSIZE);
 				newPos.z = rand()%(WORLDWIDTH*CHUNKSIZE);
-				newPos.y = world.getSkylightLevel(newPos.x,newPos.z) + player->hitbox.radius.y;
+				newPos.y = world.getSkylightLevel(newPos.x,newPos.z) + player->hitbox.radius.y + 0.5; //0.5 extra
 			}
 			player->pos = newPos + vec3f(0.5,1,0.5);
 		}
@@ -265,7 +265,7 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Mouse::Button& b
 			}
 			break;
 		case sf::Mouse::Middle: { //Arrow!
-			addObject(new Skeleton(this,player->pos, vec3f(0.2,0.2,0.2),player));
+			addObject(new Skeleton(this,player->pos,player));
 			break;
 		}
 		default:

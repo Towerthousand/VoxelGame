@@ -4,7 +4,7 @@
 
 class Skeleton : public Enemy {
 	public:
-		Skeleton(SceneMain* world, vec3f pos, vec3f scale, Player* targetPlayer);
+		Skeleton(SceneMain* world, vec3f pos, Player* targetPlayer, vec3f scale = vec3f(0.2,0.2,0.2));
 		~Skeleton();
 
 		void update(float deltaTime);

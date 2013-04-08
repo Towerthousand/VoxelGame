@@ -5,7 +5,7 @@
 
 class Player : public Entity , public Camera {
 	public:
-		enum {
+		enum { //frustrum planes
 			TOP = 0,
 			BOTTOM,
 			LEFT,
@@ -13,7 +13,7 @@ class Player : public Entity , public Camera {
 			NEAR,
 			FAR
 		};
-		Player(SceneMain* scene,vec3f pos, vec3f scale); //Player is bind to a world on creation, and will use it for collisions.
+		Player(SceneMain* scene,vec3f pos, vec3f scale = vec3f(1,1,1)); //Player is bind to a world on creation, and will use it for collisions.
 		~Player();
 		void update(float deltaTime);
 		void draw() const;

@@ -1,7 +1,7 @@
 #include "Polla.hpp"
 #include "Player.hpp"
 
-Polla::Polla(SceneMain* scene, vec3f pos, vec3f scale, Player *player) :
+Polla::Polla(SceneMain* scene, vec3f pos, Player *player, vec3f scale) :
 	Entity(scene,pos,scale), followedPlayer(player) {
 	this->hitbox.type = Hitbox::POINT;
 }

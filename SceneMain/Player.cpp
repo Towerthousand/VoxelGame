@@ -6,7 +6,7 @@ Player::Player(SceneMain* scene, vec3f pos, vec3f scale) :
 	frustumPlanes(6,std::vector<vec3f> //6 planes
 				  (4,vec3f(0,0,0)))	{//4 points per plane
 	hitbox.type = Hitbox::BOX;
-	hitbox.radius = vec3f(0.8,1.9,0.8);
+	hitbox.radius = vec3f(0.8*scale.x,1.9*scale.y,0.8*scale.z);
 	camPos = pos + vec3f(0,1.5,0);
 	acc = vec3f(0,-40,0);
 }
