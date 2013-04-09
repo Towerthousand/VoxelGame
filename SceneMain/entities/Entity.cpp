@@ -16,14 +16,17 @@ void Entity::update(float deltaTime) {
 }
 
 void Entity::movePos(float deltaTime) { //collisons
-	vel.y = std::fmax(-70,vel.y);
+	//vel.y = std::fmax(-70,vel.y);
 	vel += acc*deltaTime; //a = const, v = at
 	vec3f disp = vel*deltaTime; //deltaX = x0 +
 	if(hitbox.collidesWithWorld(vec3f(disp.x,0,0))) {
+		if (!hitbox.collidesWithWorld(vec3f(disp.x,1.01,0)) || !hitbox.collidesWithWorld(vec3f(disp.x,0.5,0)) ) {
+			pos.y += 15*deltaTime;
+			vel.y += 2*deltaTime;
+		}
 		float min = 0;
 		float max = 1;
-		while(max-min > 0.001)
-		{
+		while(max-min > 0.001) {
 			float m = (max+min)/2;
 			if(hitbox.collidesWithWorld(vec3f(disp.x*m,0,0)))
 				max = m;
@@ -34,26 +37,14 @@ void Entity::movePos(float deltaTime) { //collisons
 		disp.x *= min;
 	}
 
-	if(hitbox.collidesWithWorld(vec3f(0,disp.y,0))) {
-		float min = 0;
-		float max = 1;
-		while(max-min > 0.001)
-		{
-			float m = (max+min)/2;
-			if(hitbox.collidesWithWorld(vec3f(0,disp.y*m,0)))
-				max = m;
-			else
-				min = m;
-		}
-		vel.y = 0;
-		disp.y *= min;
-	}
-
 	if(hitbox.collidesWithWorld(vec3f(0,0,disp.z))) {
+		if (!hitbox.collidesWithWorld(vec3f(0,1.01,disp.z)) || !hitbox.collidesWithWorld(vec3f(0,0.5,disp.z))) {
+			pos.y += 15*deltaTime;;
+			vel.y += 2*deltaTime;;
+		}
 		float min = 0;
 		float max = 1;
-		while(max-min > 0.001)
-		{
+		while(max-min > 0.001) {
 			float m = (max+min)/2;
 			if(hitbox.collidesWithWorld(vec3f(0,0,disp.z*m)))
 				max = m;
@@ -62,6 +53,22 @@ void Entity::movePos(float deltaTime) { //collisons
 		}
 		vel.z = 0;
 		disp.z *= min;
+	}
+
+	disp.y = vel.y * deltaTime;
+
+	if(hitbox.collidesWithWorld(vec3f(0,disp.y,0))) {
+		float min = 0;
+		float max = 1;
+		while(max-min > 0.001) {
+			float m = (max+min)/2;
+			if(hitbox.collidesWithWorld(vec3f(0,disp.y*m,0)))
+				max = m;
+			else
+				min = m;
+		}
+		vel.y = 0;
+		disp.y *= min;
 	}
 
 	pos += disp;

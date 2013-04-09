@@ -8,7 +8,9 @@ Chunk::Chunk(int x, int y, int z, World &world) :
 		   (CHUNKSIZE,Cube(0,MINLIGHT)))),
 	XPOS(x), YPOS(y), ZPOS(z),
 	VBOID(1),
-	parentWorld(world) {
+	parentWorld(world),
+	vertexCount(0) {
+	glGenBuffers(1, (GLuint*) &VBOID);
 }
 
 Chunk::~Chunk() {
@@ -31,46 +33,49 @@ bool Chunk::getSkyAccess(int x,int y, int z) const {
 void Chunk::update(float deltaTime) {
 	//empty arrays and re-do them
 	markedForRedraw = false;
-	renderData.resize(0);
+	std::vector<Vertex> renderData;
 	int cubeID;
 	for(int z = 0; z < CHUNKSIZE; ++z) {
 		for(int y = 0; y < CHUNKSIZE; ++y) {
 			for(int x = 0; x < CHUNKSIZE; ++x) {
 				cubeID = getCube(x,y,z).ID;
 				if (cubeID != 0) { // only draw if it's not air
-					pushCubeToArray(x,y,z,cubeID);
+					pushCubeToArray(x,y,z,cubeID,renderData);
 				}
 			}
 		}
 	}
-	makeVbo();
+	makeVbo(renderData);
+	vertexCount = renderData.size();
 }
 
 
 void Chunk::draw() const {
-	glBindBuffer(GL_ARRAY_BUFFER, VBOID);
-	glPushMatrix();
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
+	if(vertexCount != 0) {
+		glBindBuffer(GL_ARRAY_BUFFER, VBOID);
+		glPushMatrix();
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_NORMAL_ARRAY);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glEnableClientState(GL_COLOR_ARRAY);
 
-	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), 0);
-	glNormalPointer(GL_FLOAT, sizeof(Vertex),(GLvoid*)(4*sizeof(float)));
-	glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (GLvoid*)(8*sizeof(float)));
-	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (GLvoid*)(12*sizeof(float)));
+		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), 0);
+		glNormalPointer(GL_FLOAT, sizeof(Vertex),(GLvoid*)(3*sizeof(float)));
+		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (GLvoid*)(6*sizeof(float)));
+		glColorPointer(4, GL_FLOAT, sizeof(Vertex), (GLvoid*)(8*sizeof(float)));
 
-	glDrawArrays(GL_TRIANGLES, 0, renderData.size());
+		glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 
-	glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glPopMatrix();
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glDisableClientState(GL_COLOR_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glDisableClientState(GL_NORMAL_ARRAY);
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glPopMatrix();
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
 }
 
-void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) { //I DON'T KNOW HOW TO MAKE THIS COMPACT
+void Chunk::pushCubeToArray(int x,int y, int z,int cubeID, std::vector<Vertex> &renderData) { //I DON'T KNOW HOW TO MAKE THIS COMPACT
 	int absX = x+CHUNKSIZE*XPOS;
 	int absY = y+CHUNKSIZE*YPOS;
 	int absZ = z+CHUNKSIZE*ZPOS;
@@ -294,8 +299,7 @@ void Chunk::pushCubeToArray(int x,int y, int z,int cubeID) { //I DON'T KNOW HOW 
 	}
 }
 
-void Chunk::makeVbo() {
-	glGenBuffers(1, (GLuint*) &VBOID);
+void Chunk::makeVbo(std::vector<Vertex> &renderData) {
 	glBindBuffer(GL_ARRAY_BUFFER, VBOID);
 	glBufferData(GL_ARRAY_BUFFER, renderData.size()*sizeof(Vertex), &renderData[0], GL_STATIC_DRAW);
 }

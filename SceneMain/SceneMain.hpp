@@ -12,7 +12,7 @@ class SceneMain : public Scene {
 		~SceneMain();
 		bool init();
 		void update(float deltaTime);
-		void draw() const;
+		void draw();
 		void onKeyPressed(float deltaTime, sf::Keyboard::Key key);
 		void onKeyDown(float deltaTime, sf::Keyboard::Key key);
 		void onKeyReleased(float deltaTime, sf::Keyboard::Key key);
@@ -34,6 +34,7 @@ class SceneMain : public Scene {
 		std::list<GameObject*> objects;
 		float debugCounter;
 		int fpsCount;
+		sf::Clock clock;
 };
 
 #endif // SCENEMAIN_HPP

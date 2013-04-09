@@ -12,6 +12,7 @@ Model::~Model() {
 
 bool Model::loadVoxelization(std::string filePath) {
 	//Load file as matrix of cubes
+	glGenBuffers(1, (GLuint*) &VBOID);
 	std::ifstream file;
 	file.open(filePath.c_str(),std::ios::binary|std::ios::in);
 	if(!file) {
@@ -257,7 +258,6 @@ void Model::pushCubeToArray(int x,int y, int z) { //I DON'T KNOW HOW TO MAKE THI
 
 
 void Model::makeVbo() {
-	glGenBuffers(1, (GLuint*) &VBOID);
 	glBindBuffer(GL_ARRAY_BUFFER, VBOID);
 	glBufferData(GL_ARRAY_BUFFER, renderData.size()*sizeof(ModelVertex), &renderData[0], GL_STATIC_DRAW);
 }

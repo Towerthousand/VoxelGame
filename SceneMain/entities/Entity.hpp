@@ -13,8 +13,8 @@ class Entity : public GameObject { //Stuff that moves (Players, arrows, objects,
 		virtual void update(float deltaTime);
 		virtual void movePos(float deltaTime);
 
-		vec3f acc; //acceleration
 		vec3f vel; //velocity
+		vec3f acc; //acceleration
 };
 
 #endif // ENTITY_HPP

@@ -7,7 +7,7 @@
 
 SceneMain::SceneMain(Game &parent) :
 	Scene(parent), WORLDSEED(std::time(0)%1000),
-	player(new Player(this, vec3f(0,256,0))), world(this,player),
+	player(new Player(this, vec3f(0,1,0))), world(this,player),
 	debugCounter(0.0), fpsCount(0) {
 }
 
@@ -108,7 +108,7 @@ void SceneMain::update(float deltaTime) {
 			++it;
 }
 
-void SceneMain::draw() const {
+void SceneMain::draw() {
 	//Move matrix to position (according to player)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -266,7 +266,7 @@ void SceneMain::onMouseButtonPressed(float deltaTime, sf::Mouse::Button button) 
 			float m[16];
 			glGetFloatv(GL_MODELVIEW_MATRIX, m);
 			vec3f dir(m[2],m[6],m[10]);//same as the player's pov
-			Polla * np = new Polla(this,player->camPos,player);
+			Skeleton * np = new Skeleton(this,player->camPos,player);
 			np->vel -= vec3f(dir.x*30.0,dir.y*30.0,dir.z*30.0);
 			addObject(np);
 

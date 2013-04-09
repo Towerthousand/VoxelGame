@@ -15,6 +15,8 @@ Skeleton::~Skeleton() {
 }
 
 void Skeleton::update(float deltaTime) {
+	//brain.think();
+
 	movePos(deltaTime);
 
 	cooldown -= deltaTime;

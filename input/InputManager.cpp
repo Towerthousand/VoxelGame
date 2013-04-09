@@ -1,7 +1,7 @@
 #include "InputManager.hpp"
 
 InputManager::InputManager() :
-	focus(true), lastMousePos(0,0), mouseDisplacement(0,0) {
+	lastMousePos(0,0), mouseDisplacement(0,0), focus(true) {
 }
 
 InputManager::~InputManager() {

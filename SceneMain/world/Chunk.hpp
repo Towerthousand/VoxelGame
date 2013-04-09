@@ -20,16 +20,16 @@ class Chunk { //16*16*16
 		Cube getCube(int x, int y, int z) const;
 		bool getSkyAccess(int x,int y, int z) const;
 
-		void pushCubeToArray(int x, int y, int z, int cubeID);
-		void makeVbo();
+		void pushCubeToArray(int x, int y, int z, int cubeID, std::vector<Vertex> &renderData);
+		void makeVbo(std::vector<Vertex> &renderData);
 
 		int XPOS; //x pos of chunk inside world matrix
 		int YPOS; //y pos of chunk inside world matrix
 		int ZPOS; //z pos of chunk inside world matrix
 		int VBOID;
 		World& parentWorld;
+		int vertexCount;
 		static const int textureIndexes[9][6];
-		std::vector<Vertex> renderData;
 };
 
 #endif // CHUNK_HPP

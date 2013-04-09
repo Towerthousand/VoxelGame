@@ -12,9 +12,9 @@ bool Hitbox::collidesWithWorld(const vec3f &offset) const {
 	switch (type) {
 		case (BOX): {
 			vec3f newPos = parent->pos + offset;
-			for(float x = -radius.x; x <= radius.x+0.5; x += 0.5)
-				for(float y = -radius.y; y <= radius.y+0.5; y += 0.5)
-					for(float z = -radius.z; z <= radius.z+0.5; z += 0.5) {
+			for(float x = -radius.x; x <= radius.x+0.3; x += 0.3)
+				for(float y = -radius.y; y <= radius.y+0.3; y += 0.3)
+					for(float z = -radius.z; z <= radius.z+0.3; z += 0.3) {
 						vec3f point(std::fmin(x, radius.x),std::fmin(y, radius.y),std::fmin(z, radius.z));
 						if(pointCollidesWithWorld(point+newPos))
 							return true;
@@ -41,18 +41,18 @@ bool Hitbox::pointCollidesWithWorld(const vec3f& point) const {
 }
 
 void Hitbox::draw() const {
-//	vec3f drawPos = parent->pos-radius;
-//	glPushMatrix();
-//	glLineWidth(1.5);
-//	glEnableClientState(GL_VERTEX_ARRAY);
-//	glColor4f(0.0,0.0,0.0,0.5);
-//	glTranslatef(drawPos.x,drawPos.y,drawPos.z);
-//	glScalef(radius.x*2,radius.y*2,radius.z*2);
-//	glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
-//	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
-//	glDisableClientState(GL_VERTEX_ARRAY);
-//	glColor4f(1.0,1.0,1.0,1.0);
-//	glPopMatrix();
+	vec3f drawPos = parent->pos-radius;
+	glPushMatrix();
+	glLineWidth(1.5);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glColor4f(0.0,0.0,0.0,0.5);
+	glTranslatef(drawPos.x,drawPos.y,drawPos.z);
+	glScalef(radius.x*2,radius.y*2,radius.z*2);
+	glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
+	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glColor4f(1.0,1.0,1.0,1.0);
+	glPopMatrix();
 }
 
 const int Hitbox::vertexPoints[8][3] = {
