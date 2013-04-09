@@ -10,11 +10,11 @@ class Hitbox {
 			POINT
 		};
 
-		Hitbox(GameObject* parent, hitboxType type, vec3f radius = vec3f(0,0,0));
+		Hitbox(GameObject* parent, hitboxType type, const vec3f &radius = vec3f(0,0,0));
 		~Hitbox();
 
-		bool collidesWithWorld(vec3f offset = vec3f(0,0,0)) const;
-		bool collidesWithHitbox(const Hitbox& hitbox, vec3f offset = vec3f(0,0,0)) const;
+		bool collidesWithWorld( const vec3f &offset = vec3f(0,0,0)) const;
+		bool collidesWithHitbox(const Hitbox& hitbox, const vec3f &offset = vec3f(0,0,0)) const;
 		void draw() const;
 
 		vec3f radius;

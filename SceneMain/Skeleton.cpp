@@ -3,7 +3,7 @@
 #include "SceneMain.hpp"
 #include "Arrow.hpp"
 
-Skeleton::Skeleton(SceneMain* world, vec3f pos, Player* targetPlayer, vec3f scale)
+Skeleton::Skeleton(SceneMain* world, const vec3f &pos, Player* targetPlayer, const vec3f &scale)
 	: Enemy(world, pos, scale, targetPlayer), cooldown(0),
 	  shootPosOffset(0,(model.modelHeight*scale.y)/3,0) {
 	hitbox.type = Hitbox::BOX;

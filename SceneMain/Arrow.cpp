@@ -1,9 +1,9 @@
 #include "Arrow.hpp"
 #include "Player.hpp"
 
-Arrow::Arrow(SceneMain* scene, vec3f pos, vec3f scale) :
+Arrow::Arrow(SceneMain* scene, const vec3f &pos, const vec3f &scale) :
 	Entity(scene,pos,scale) {
-	this->acc = vec3f(0,-10,0);
+	this->acc = vec3f(0,GRAVITY,0);
 	this->pos = pos;
 	this->scale = scale;
 	this->hitbox.type = Hitbox::POINT;
@@ -21,7 +21,7 @@ void Arrow::draw() const {
 }
 
 void Arrow::movePos(float deltaTime) {
-	vec3f offset(-m[8]*0.6,-m[9]*0.6,-m[10]*0.6);//offset determines arrow's point position
+	vec3f offset(-m[8]*0.6,-m[9]*0.6,-m[10]*0.6);//offset determines arrow's not position
 	if(!hitbox.collidesWithWorld(offset)) {
 		//Position
 		vel += acc*deltaTime; //a = const, v = at
@@ -35,7 +35,7 @@ void Arrow::movePos(float deltaTime) {
 			pos += disp; //get a bit more stuck
 		}
 		else
-			acc.y = -10;
+			acc.y = -40;
 		vel.y = std::fmax(-70,vel.y);
 
 		//rotation

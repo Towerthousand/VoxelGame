@@ -171,15 +171,13 @@ void SceneMain::draw() const {
 	glEnable(GL_CULL_FACE);
 }
 
-void SceneMain::onKeyPressed(float deltaTime, const sf::Keyboard::Key& key) {
+void SceneMain::onKeyPressed(float deltaTime, sf::Keyboard::Key key) {
 	switch(key) {
 		case sf::Keyboard::E: { //new spawnpoint
 			vec3f newPos(0,0,0);
-			while(newPos.y < 250) {
-				newPos.x = rand()%(WORLDWIDTH*CHUNKSIZE);
-				newPos.z = rand()%(WORLDWIDTH*CHUNKSIZE);
-				newPos.y = world.getSkylightLevel(newPos.x,newPos.z) + player->hitbox.radius.y + 0.5; //0.5 extra
-			}
+			newPos.x = rand()%(WORLDWIDTH*CHUNKSIZE);
+			newPos.z = rand()%(WORLDWIDTH*CHUNKSIZE);
+			newPos.y = world.getSkylightLevel(newPos.x,newPos.z) + player->hitbox.radius.y + 0.5; //0.5 extra
 			player->pos = newPos + vec3f(0.5,1,0.5);
 		}
 			break;
@@ -215,7 +213,7 @@ void SceneMain::onKeyPressed(float deltaTime, const sf::Keyboard::Key& key) {
 	}
 }
 
-void SceneMain::onKeyDown(float deltaTime, const sf::Keyboard::Key &key) {
+void SceneMain::onKeyDown(float deltaTime, sf::Keyboard::Key key) {
 	//Move player
 	const float vel = 10.0f;
 	vec2f dir(sin(player->camRot.y*DEG_TO_RAD), -cos(player->camRot.y*DEG_TO_RAD));
@@ -245,14 +243,14 @@ void SceneMain::onKeyDown(float deltaTime, const sf::Keyboard::Key &key) {
 	}
 }
 
-void SceneMain::onKeyReleased(float deltaTime, const sf::Keyboard::Key &key) {
+void SceneMain::onKeyReleased(float deltaTime, sf::Keyboard::Key key) {
 	switch(key) {
 		default:
 			break;
 	}
 }
 
-void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Mouse::Button& button) {
+void SceneMain::onMouseButtonPressed(float deltaTime, sf::Mouse::Button button) {
 	switch(button) {
 		case sf::Mouse::Left: //delete block
 			if(world.playerTargetsBlock) {
@@ -268,7 +266,7 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Mouse::Button& b
 			float m[16];
 			glGetFloatv(GL_MODELVIEW_MATRIX, m);
 			vec3f dir(m[2],m[6],m[10]);//same as the player's pov
-			Arrow * np = new Arrow(this,player->camPos);
+			Polla * np = new Polla(this,player->camPos,player);
 			np->vel -= vec3f(dir.x*30.0,dir.y*30.0,dir.z*30.0);
 			addObject(np);
 
@@ -279,14 +277,14 @@ void SceneMain::onMouseButtonPressed(float deltaTime, const sf::Mouse::Button& b
 	}
 }
 
-void SceneMain::onMouseButtonDown(float deltaTime, const sf::Mouse::Button& button) {
+void SceneMain::onMouseButtonDown(float deltaTime, sf::Mouse::Button button) {
 	switch(button) {
 		default:
 			break;
 	}
 }
 
-void SceneMain::onMouseButtonReleased(float deltaTime, const sf::Mouse::Button& button) {
+void SceneMain::onMouseButtonReleased(float deltaTime, sf::Mouse::Button button) {
 	switch(button) {
 		default:
 			break;

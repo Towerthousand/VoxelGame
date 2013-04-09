@@ -6,7 +6,7 @@
 class Player;
 class Enemy : public Entity {
 	public:
-		Enemy(SceneMain* scene, vec3f pos, vec3f scale, Player* targetPlayer);
+		Enemy(SceneMain* scene, const vec3f &pos, const vec3f &scale, Player* targetPlayer);
 		virtual ~Enemy();
 
 		virtual void update(float deltaTime);

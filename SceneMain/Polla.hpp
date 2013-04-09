@@ -6,7 +6,7 @@
 class Player;
 class Polla : public Entity {
 	public:
-		Polla(SceneMain* scene, vec3f pos, Player* player, vec3f scale = vec3f(0.1,0.1,0.1));
+		Polla(SceneMain* scene, const vec3f &pos, Player* player, const vec3f &scale = vec3f(0.1,0.1,0.1));
 		~Polla();
 
 		void update(float deltaTime);

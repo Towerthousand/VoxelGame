@@ -23,7 +23,7 @@ World::~World() {
 }
 
 
-bool World::loadDirbaio(const std::string filePath) {
+bool World::loadDirbaio(const std::string &filePath) {
 
 	sf::Clock clock;
 	clock.restart();

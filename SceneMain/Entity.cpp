@@ -1,6 +1,6 @@
 #include "Entity.hpp"
 
-Entity::Entity(SceneMain* scene, vec3f pos, vec3f scale) : GameObject(scene,pos,scale),
+Entity::Entity(SceneMain* scene, const vec3f &pos, const vec3f &scale) : GameObject(scene,pos,scale),
 	vel(0,0,0), acc(0,0,0){
 }
 
@@ -16,8 +16,9 @@ void Entity::update(float deltaTime) {
 }
 
 void Entity::movePos(float deltaTime) { //collisons
+	vel.y = std::fmax(-70,vel.y);
 	vel += acc*deltaTime; //a = const, v = at
-	vec3f disp = vel*deltaTime; //deltaX = x0 + vt (intended displacement)
+	vec3f disp = vel*deltaTime; //deltaX = x0 +
 	if(hitbox.collidesWithWorld(vec3f(disp.x,0,0))) {
 		float min = 0;
 		float max = 1;

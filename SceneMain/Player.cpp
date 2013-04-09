@@ -1,7 +1,7 @@
 #include "Player.hpp"
 #include "World.hpp"
 
-Player::Player(SceneMain* scene, vec3f pos, vec3f scale) :
+Player::Player(SceneMain* scene, const vec3f& pos, const vec3f &scale) :
 	Entity(scene,pos,scale), selectedID(1), onFloor(false), isJumping(false),
 	frustumPlanes(6,std::vector<vec3f> //6 planes
 				  (4,vec3f(0,0,0)))	{//4 points per plane
@@ -119,7 +119,7 @@ void Player::makeFrustum() {
 	frustumPlanes[FAR][3] = fbr;
 }
 
-bool Player::insideFrustum(vec3f center, float radius) const {
+bool Player::insideFrustum( const vec3f &center, float radius) const {
 	float distance,D;
 	for(int i=0; i < 6; i++) {
 		//construct the plane with a normal and a point

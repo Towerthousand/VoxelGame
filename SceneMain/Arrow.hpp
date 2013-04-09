@@ -6,7 +6,7 @@
 class Player;
 class Arrow : public Entity {
 	public:
-		Arrow(SceneMain* scene, vec3f pos, vec3f scale = vec3f(0.08,0.08,0.08));
+		Arrow(SceneMain* scene, const vec3f &pos, const vec3f &scale = vec3f(0.08,0.08,0.08));
 		~Arrow();
 
 		void update(float deltaTime);

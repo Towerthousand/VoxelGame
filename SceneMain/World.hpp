@@ -19,7 +19,7 @@ class World {
 		World(SceneMain* parentScene, Player* player);
 		~World();
 		//generators
-		bool loadDirbaio(const std::string filePath);
+		bool loadDirbaio(const std::string &filePath);
 		void regenChunk(int x, int y, int z, int seed);
 		void initChunkLight(int x,int y, int z);
 

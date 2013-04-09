@@ -6,7 +6,7 @@
 class SceneMain;
 class GameObject { //Static objects that have a position and rotation but don't move
 	public:
-		GameObject(SceneMain* scene, vec3f pos, vec3f scale);
+		GameObject(SceneMain* scene, const vec3f &pos, const vec3f &scale);
 		virtual ~GameObject();
 
 		virtual void update(float deltaTime);

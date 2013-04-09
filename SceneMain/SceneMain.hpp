@@ -13,12 +13,12 @@ class SceneMain : public Scene {
 		bool init();
 		void update(float deltaTime);
 		void draw() const;
-		void onKeyPressed(float deltaTime, const sf::Keyboard::Key &key);
-		void onKeyDown(float deltaTime, const sf::Keyboard::Key &key);
-		void onKeyReleased(float deltaTime, const sf::Keyboard::Key &key);
-		void onMouseButtonPressed(float deltaTime, const sf::Mouse::Button &button);
-		void onMouseButtonDown(float deltaTime, const sf::Mouse::Button &button);
-		void onMouseButtonReleased(float deltaTime, const sf::Mouse::Button &button);
+		void onKeyPressed(float deltaTime, sf::Keyboard::Key key);
+		void onKeyDown(float deltaTime, sf::Keyboard::Key key);
+		void onKeyReleased(float deltaTime, sf::Keyboard::Key key);
+		void onMouseButtonPressed(float deltaTime, sf::Mouse::Button button);
+		void onMouseButtonDown(float deltaTime, sf::Mouse::Button button);
+		void onMouseButtonReleased(float deltaTime, sf::Mouse::Button button);
 		void onMouseMoved(float deltaTime, int dx, int dy);
 		void onClose(); //close scene-wide stuff
 

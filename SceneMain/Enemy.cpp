@@ -1,7 +1,7 @@
 #include "Enemy.hpp"
 #include "Player.hpp"
 
-Enemy::Enemy(SceneMain* scene, vec3f pos, vec3f scale, Player* targetPlayer) : Entity(scene,pos,scale), targetPlayer(targetPlayer){
+Enemy::Enemy(SceneMain* scene, const vec3f &pos, const vec3f &scale, Player* targetPlayer) : Entity(scene,pos,scale), targetPlayer(targetPlayer){
 }
 
 Enemy::~Enemy() {

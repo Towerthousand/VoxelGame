@@ -1,7 +1,7 @@
 #include "GameObject.hpp"
 #include "SceneMain.hpp"
 
-GameObject::GameObject(SceneMain* scene, vec3f pos, vec3f scale) :
+GameObject::GameObject(SceneMain* scene, const vec3f &pos, const vec3f &scale) :
 	isAlive(true), parentScene(scene),
 	pos(pos), scale(scale), hitbox(this, Hitbox::POINT, vec3f(0,0,0)) {
 	m[0 ] = 1; m[4 ] = 0; m[8 ] = 0; m[12] = 0;

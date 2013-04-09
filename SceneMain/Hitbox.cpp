@@ -2,13 +2,13 @@
 #include "SceneMain.hpp"
 #include "GameObject.hpp"
 
-Hitbox::Hitbox(GameObject* parent, hitboxType type, vec3f radius) : radius(radius), type(type), parent(parent) {
+Hitbox::Hitbox(GameObject* parent, hitboxType type, const vec3f &radius) : radius(radius), type(type), parent(parent) {
 }
 
 Hitbox::~Hitbox() {
 }
 
-bool Hitbox::collidesWithWorld(vec3f offset) const {
+bool Hitbox::collidesWithWorld(const vec3f &offset) const {
 	switch (type) {
 		case (BOX): {
 			vec3f newPos = parent->pos + offset;
@@ -30,7 +30,7 @@ bool Hitbox::collidesWithWorld(vec3f offset) const {
 	return false;
 }
 
-bool Hitbox::collidesWithHitbox(const Hitbox &hitbox, vec3f offset) const {
+bool Hitbox::collidesWithHitbox(const Hitbox &hitbox, const vec3f &offset) const {
 	return false; //TODO
 }
 

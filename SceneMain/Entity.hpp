@@ -6,7 +6,7 @@ class World;
 class Entity : public GameObject { //Stuff that moves (Players, arrows, objects, etc).
 								   //Classes that inherit Entity will usally have a hitBox
 	public:
-		Entity(SceneMain* scene, vec3f pos, vec3f scale);
+		Entity(SceneMain* scene, const vec3f &pos, const vec3f &scale);
 		virtual ~Entity();
 
 		virtual void draw() const;
