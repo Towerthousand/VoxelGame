@@ -1,6 +1,6 @@
 #ifndef ENTITY_HPP
 #define ENTITY_HPP
-#include "GameObject.hpp"
+#include "../GameObject.hpp"
 
 class World;
 class Entity : public GameObject { //Stuff that moves (Players, arrows, objects, etc).

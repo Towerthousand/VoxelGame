@@ -15,6 +15,7 @@
 #include <vector>
 #include <cmath>
 #include <queue>
+#include <utility>
 #include "Math.hpp"
 #include <list>
 
@@ -25,17 +26,14 @@ typedef sf::Vector2<int> vec2i;
 
 struct Vertex {
 		Vertex(float vx = 0.0, float vy = 0.0, float vz = 0.0,
-			   float nx = 0.0, float ny = 0.0, float nz = 0.0,
 			   float tx = 0.0, float ty = 0.0,
 			   float cr = 1.0, float cg = 1.0, float cb = 1.0, float ca = 1.0) :
 			vx(vx), vy(vy), vz(vz),
-			nx(nx), ny(ny), nz(nz),
 			tx(tx), ty(ty),
 			cr(cr), cg(cg), cb(cb), ca(ca)
 		{}
-		float
+		char
 		vx,vy,vz,
-		nx,ny,nz,
 		tx,ty,
 		cr,cg,cb,ca;
 };

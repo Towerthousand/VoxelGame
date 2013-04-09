@@ -6,10 +6,10 @@ Chunk::Chunk(int x, int y, int z, World &world) :
 	cubes(CHUNKSIZE,std::vector<std::vector<Cube> >
 		  (CHUNKSIZE,std::vector<Cube>
 		   (CHUNKSIZE,Cube(0,MINLIGHT)))),
+	vertexCount(0),
 	XPOS(x), YPOS(y), ZPOS(z),
 	VBOID(1),
-	parentWorld(world),
-	vertexCount(0) {
+	parentWorld(world) {
 	glGenBuffers(1, (GLuint*) &VBOID);
 }
 
@@ -73,6 +73,46 @@ void Chunk::draw() const {
 		glPopMatrix();
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
+}
+
+void Chunk::drawBoundingBox() const {
+	glPushMatrix();
+	glTranslatef(XPOS*CHUNKSIZE,YPOS*CHUNKSIZE,ZPOS*CHUNKSIZE);
+	glScalef(CHUNKSIZE,CHUNKSIZE,CHUNKSIZE);
+	glColor4f(1,0,0,1);
+	glBegin(GL_QUADS);
+	glVertex3f(1, 0, 0);
+	glVertex3f(1, 0, 1);
+	glVertex3f(0, 0, 1);
+	glVertex3f(0, 0, 0);
+
+	glVertex3f(0, 1, 0);
+	glVertex3f(0, 1, 1);
+	glVertex3f(1, 1, 1);
+	glVertex3f(1, 1, 0);
+
+	glVertex3f(0, 0, 1);
+	glVertex3f(0, 1, 1);
+	glVertex3f(0, 1, 0);
+	glVertex3f(0, 0, 0);
+
+	glVertex3f(1, 0, 0);
+	glVertex3f(1, 1, 0);
+	glVertex3f(1, 1, 1);
+	glVertex3f(1, 0, 1);
+
+	glVertex3f(0, 1, 0);
+	glVertex3f(1, 1, 0);
+	glVertex3f(1, 0, 0);
+	glVertex3f(0, 0, 0);
+
+	glVertex3f(0, 0, 1);
+	glVertex3f(1, 0, 1);
+	glVertex3f(1, 1, 1);
+	glVertex3f(0, 1, 1);
+	glEnd();
+
+	glPopMatrix();
 }
 
 void Chunk::pushCubeToArray(int x,int y, int z,int cubeID, std::vector<Vertex> &renderData) { //I DON'T KNOW HOW TO MAKE THIS COMPACT

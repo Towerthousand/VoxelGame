@@ -1,9 +1,9 @@
 #include "World.hpp"
 #include "Chunk.hpp"
-#include "SceneMain.hpp"
+#include "../SceneMain.hpp"
 
 World::World(SceneMain* parentScene, Player* player) :
-	playerTargetsBlock(false), chunksDrawn(0), targetedBlock(0,0,0),
+	playerTargetsBlock(false), targetedBlock(0,0,0),
 	last(0,0,0), parentScene(parentScene), player(player),
 	chunks(0,std::vector<std::vector<Chunk*> >
 		   (0,std::vector<Chunk*>
@@ -191,6 +191,21 @@ Cube World::getCubeRaw(int x, int y, int z) const {
 	return chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE];
 }
 
+int World::getSkylightLevel(int x, int z) const { //X and Z in cube coords
+	for(int y = CHUNKSIZE*WORLDHEIGHT-1; y >= 0; --y) {
+		if(getCubeAbs(x,y,z).ID != 0) {
+			return y;
+		}
+	}
+	return -1;
+}
+
+bool World::getSkyAccess(int x, int y, int z) const {
+	if (y <= skyValues[x][z])
+		return false;
+	return true;
+}
+
 void World::setCubeIDAbs(int x, int y, int z, short ID) { //set the id, calculate light (taking into account sky level)
 	if (getOutOfBounds(x,y,z))
 		return;
@@ -222,28 +237,83 @@ void World::setCubeLightAbs(int x, int y, int z, short light) { //set the light,
 	chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->markedForRedraw = true;
 }
 
-int World::getSkylightLevel(int x, int z) const { //X and Z in cube coords
-	for(int y = CHUNKSIZE*WORLDHEIGHT-1; y >= 0; --y) {
-		if(getCubeAbs(x,y,z).ID != 0) {
-			return y;
-		}
-	}
-	return -1;
-}
-
-bool World::getSkyAccess(int x, int y, int z) const {
-	if (y <= skyValues[x][z])
-		return false;
-	return true;
-}
-
 void World::draw() const {
-	for (int x = 0; x < WORLDWIDTH; ++x)  {
-		for (int y = 0; y < WORLDHEIGHT; ++y) {
+	parentScene->chunksDrawn = 0;
+	//empty culing
+	for (int x = 0; x < WORLDWIDTH; ++x)
+		for (int y = 0; y < WORLDHEIGHT; ++y)
 			for (int z = 0; z < WORLDWIDTH; ++z) {
+				if (chunks[x][y][z]->vertexCount == 0)
+					chunks[x][y][z]->outOfView = true;
+				else
+					chunks[x][y][z]->outOfView = !player->insideFrustum(vec3f(x*CHUNKSIZE+CHUNKSIZE/2,
+																			 y*CHUNKSIZE+CHUNKSIZE/2,
+																			 z*CHUNKSIZE+CHUNKSIZE/2)
+																		,sqrt(3*(8*8)));
+			}
+
+
+	//do occlusion culling here!
+	std::priority_queue<std::pair<float,Chunk*> > queryList; //chunks to be queried, ordered by distance
+
+	//sort by distance
+	float dist = 0;
+	for(int x = 0; x < WORLDWIDTH; ++x)
+		for(int y = 0; y < WORLDHEIGHT; ++y)
+			for(int z = 0; z < WORLDWIDTH; ++z)
 				if(!chunks[x][y][z]->outOfView) {
-					chunks[x][y][z]->draw();
+					dist = norm(vec3f(x*CHUNKSIZE,y*CHUNKSIZE,z*CHUNKSIZE) + vec3f(CHUNKSIZE/2,CHUNKSIZE/2,CHUNKSIZE/2) - parentScene->player->pos);
+					queryList.push(std::pair<float,Chunk*>(-dist,chunks[x][y][z]));
 				}
+
+	int layers = 10;
+	int chunksPerLayer = queryList.size()/layers + int(queryList.size()%layers > 0); //chunks per pass
+	std::vector<GLuint> queries(chunksPerLayer,0);
+
+	//first layer is always drawn
+	for(int i = 0; i < chunksPerLayer && queryList.size() > 0; i++) {
+		std::pair<float,Chunk*> c = queryList.top();
+		queryList.pop();
+		c.second->draw();
+		++parentScene->chunksDrawn;
+	}
+	//Query other layers
+	for(uint currLayer = 1; currLayer < layers && queryList.size() > 0; ++currLayer) {
+		std::vector<Chunk*> chunkPointers(chunksPerLayer,NULL);
+
+		//disable rendering state
+		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+		glDepthMask(GL_FALSE);
+		glDisable(GL_LIGHTING);
+
+		//generate and send the queries
+		int queriesSent = 0;
+		glGenOcclusionQueriesNV(chunksPerLayer, &queries[0]);
+		for (int i = 0; i < chunksPerLayer && queryList.size() > 0; ++i) {
+			Chunk* currChunk = queryList.top().second;
+			chunkPointers[i] = currChunk;
+			queryList.pop();
+
+			glBeginOcclusionQueryNV(queries[i]);
+			currChunk->drawBoundingBox();
+			glEndOcclusionQueryNV();
+			++queriesSent;
+		}
+
+		//enable rendering state
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+		glDepthMask(GL_TRUE);
+		glDisable(GL_LIGHTING);
+
+		//collect query results
+		for (int i = 0; i < queriesSent; ++i) {
+			//if we have pending query, get result
+			GLuint pixelCount;
+			glGetOcclusionQueryuivNV(queries[i], GL_PIXEL_COUNT_NV, &pixelCount);
+			//if seen, draw it
+			if (pixelCount != 0) {
+				chunkPointers[i]->draw();
+				++parentScene->chunksDrawn;
 			}
 		}
 	}
@@ -252,26 +322,16 @@ void World::draw() const {
 }
 
 void World::update(float deltaTime) {
-	chunksDrawn = 0;
 	updateStuff(deltaTime);
 	traceView(player,10);
 	int updateMax = 0; //maximum number of chunk redraws
 	for (int x = 0; x < WORLDWIDTH; ++x)
 		for (int y = 0; y < WORLDHEIGHT; ++y)
-			for (int z = 0; z < WORLDWIDTH; ++z) {
-				if (player->insideFrustum(vec3f(x*CHUNKSIZE+CHUNKSIZE/2,y*CHUNKSIZE+CHUNKSIZE/2,z*CHUNKSIZE+CHUNKSIZE/2)
-										  ,sqrt(3*(8*8)))) {
-					chunks[x][y][z]->outOfView = false;
-					++chunksDrawn;
-				}
-				else {
-					chunks[x][y][z]->outOfView = true;
-				}
+			for (int z = 0; z < WORLDWIDTH; ++z)
 				if (chunks[x][y][z]->markedForRedraw == true && updateMax < 10000) {
 					updateMax++;
 					chunks[x][y][z]->update(deltaTime);
 				}
-			}
 }
 
 //Based on: Fast Voxel Traversal Algorithm for Ray Tracing

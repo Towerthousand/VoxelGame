@@ -1,5 +1,5 @@
 #include "Arrow.hpp"
-#include "Player.hpp"
+#include "../Player.hpp"
 
 Arrow::Arrow(SceneMain* scene, const vec3f &pos, const vec3f &scale) :
 	Entity(scene,pos,scale) {

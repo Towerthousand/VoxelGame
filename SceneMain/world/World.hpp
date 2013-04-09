@@ -27,10 +27,10 @@ class World {
 		bool getOutOfBounds(int x, int y, int z) const;
 		Cube getCubeAbs(int x, int y, int z) const;
 		Cube getCubeRaw(int x, int y, int z) const;
-		void setCubeIDAbs(int x, int y, int z, short ID);
-		void setCubeLightAbs(int x, int y, int z, short light);
 		int getSkylightLevel(int x, int z) const;
 		bool getSkyAccess(int x, int y, int z) const;
+		void setCubeIDAbs(int x, int y, int z, short ID);
+		void setCubeLightAbs(int x, int y, int z, short light);
 
 		//main
 		void draw() const;
@@ -38,7 +38,6 @@ class World {
 		void traceView(const Player *playerCam, float tMax);
 
 		bool playerTargetsBlock;
-		int chunksDrawn;
 		vec3f targetedBlock;
 		vec3f last;
 

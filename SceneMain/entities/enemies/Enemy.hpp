@@ -1,7 +1,7 @@
 #ifndef ENEMY_HPP
 #define ENEMY_HPP
-#include "Entity.hpp"
-#include "Model.hpp"
+#include "../Entity.hpp"
+#include "../../Model.hpp"
 
 class Player;
 class Enemy : public Entity {

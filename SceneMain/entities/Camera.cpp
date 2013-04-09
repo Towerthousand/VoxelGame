@@ -1,5 +1,5 @@
 #include "Camera.hpp"
-#include "World.hpp"
+#include "../world/World.hpp"
 
 //
 // This implementation of "camera" has no z rotation (fuck quaternions)

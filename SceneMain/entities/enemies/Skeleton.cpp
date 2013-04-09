@@ -1,7 +1,7 @@
 #include "Skeleton.hpp"
-#include "Player.hpp"
-#include "SceneMain.hpp"
-#include "Arrow.hpp"
+#include "../Player.hpp"
+#include "../../SceneMain.hpp"
+#include "../items/Arrow.hpp"
 
 Skeleton::Skeleton(SceneMain* world, const vec3f &pos, Player* targetPlayer, const vec3f &scale)
 	: Enemy(world, pos, scale, targetPlayer), cooldown(0),
@@ -27,7 +27,7 @@ void Skeleton::update(float deltaTime) {
 			Arrow* na = new Arrow(parentScene,(pos+shootPosOffset));
 			na->vel = targetPlayer->camPos-(pos+shootPosOffset);
 			normalize(na->vel);
-			na->vel *= 30.0f;
+			na->vel *= 70.0f;
 			parentScene->addObject(na);
 		}
 	}

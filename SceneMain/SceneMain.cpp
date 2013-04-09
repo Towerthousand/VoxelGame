@@ -1,12 +1,12 @@
 #include "SceneMain.hpp"
 #include "Game.hpp"
-#include "Chunk.hpp"
-#include "Arrow.hpp"
-#include "Polla.hpp"
-#include "Skeleton.hpp"
+#include "world/Chunk.hpp"
+#include "entities/items/Arrow.hpp"
+#include "entities/items/Polla.hpp"
+#include "entities/enemies/Skeleton.hpp"
 
 SceneMain::SceneMain(Game &parent) :
-	Scene(parent), WORLDSEED(std::time(0)%1000),
+	Scene(parent), chunksDrawn(0), WORLDSEED(std::time(0)%1000),
 	player(new Player(this, vec3f(0,1,0))), world(this,player),
 	debugCounter(0.0), fpsCount(0) {
 }
@@ -108,7 +108,7 @@ void SceneMain::update(float deltaTime) {
 			++it;
 }
 
-void SceneMain::draw() {
+void SceneMain::draw() const {
 	//Move matrix to position (according to player)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -154,7 +154,7 @@ void SceneMain::draw() {
 	parent.font().getText("posZ").setString("Z: " + toString(player->pos.z));
 	parent.font().getText("rotY").setString("Rot Y: " + toString(player->camRot.y));
 	parent.font().getText("rotX").setString("Rot X: " + toString(player->camRot.x));
-	parent.font().getText("Chunks").setString("Chunks drawn: " + toString(world.chunksDrawn));
+	parent.font().getText("Chunks").setString("Chunks drawn: " + toString(chunksDrawn));
 
 	//SFML draws (until window.popGLStates())
 	glDisable(GL_CULL_FACE);

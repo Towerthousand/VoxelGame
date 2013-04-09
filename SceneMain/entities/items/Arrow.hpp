@@ -1,7 +1,7 @@
 #ifndef ARROW_H
 #define ARROW_H
-#include "Entity.hpp"
-#include "Model.hpp"
+#include "../Entity.hpp"
+#include "../../Model.hpp"
 
 class Player;
 class Arrow : public Entity {

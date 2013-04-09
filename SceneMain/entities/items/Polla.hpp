@@ -1,7 +1,7 @@
 #ifndef POLLA_HPP
 #define POLLA_HPP
-#include "Entity.hpp"
-#include "Model.hpp"
+#include "../Entity.hpp"
+#include "../../Model.hpp"
 
 class Player;
 class Polla : public Entity {

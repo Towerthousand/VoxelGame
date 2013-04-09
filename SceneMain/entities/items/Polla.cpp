@@ -1,5 +1,5 @@
 #include "Polla.hpp"
-#include "Player.hpp"
+#include "../Player.hpp"
 
 Polla::Polla(SceneMain* scene, const vec3f &pos, Player *player, const vec3f &scale) :
 	Entity(scene,pos,scale), followedPlayer(player) {

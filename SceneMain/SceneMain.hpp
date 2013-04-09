@@ -1,8 +1,8 @@
 #ifndef SCENEMAIN_HPP
 #define SCENEMAIN_HPP
-#include "../Scene.hpp"
-#include "World.hpp"
-#include "Player.hpp"
+#include "Scene.hpp"
+#include "world/World.hpp"
+#include "entities/Player.hpp"
 
 class Skeleton;
 class SceneMain : public Scene {
@@ -12,7 +12,7 @@ class SceneMain : public Scene {
 		~SceneMain();
 		bool init();
 		void update(float deltaTime);
-		void draw();
+		void draw() const;
 		void onKeyPressed(float deltaTime, sf::Keyboard::Key key);
 		void onKeyDown(float deltaTime, sf::Keyboard::Key key);
 		void onKeyReleased(float deltaTime, sf::Keyboard::Key key);
@@ -24,6 +24,8 @@ class SceneMain : public Scene {
 
 		void addObject(GameObject* object);
 		World& getWorld();
+
+		int chunksDrawn;
 		int WORLDSEED;
 		Player* player; //for easy access, so that you don't have to search the object vector each time
 

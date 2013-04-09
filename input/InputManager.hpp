@@ -1,6 +1,6 @@
 #ifndef INPUTMANAGER_HPP
 #define INPUTMANAGER_HPP
-#include "../tools.hpp"
+#include "tools.hpp"
 
 class InputManager {
 	public:

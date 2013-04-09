@@ -10,10 +10,12 @@ class Chunk { //16*16*16
 		//main
 		void update(float deltaTime);
 		void draw() const;
+		void drawBoundingBox() const;
 
 		bool outOfView;
 		bool markedForRedraw;
 		std::vector<std::vector<std::vector<Cube> > > cubes;
+		int vertexCount;
 	private:
 		//Getters & consultors
 		bool getOutOfBounds(int x, int y, int z) const;
@@ -28,7 +30,6 @@ class Chunk { //16*16*16
 		int ZPOS; //z pos of chunk inside world matrix
 		int VBOID;
 		World& parentWorld;
-		int vertexCount;
 		static const int textureIndexes[9][6];
 };
 

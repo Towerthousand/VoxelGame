@@ -1,5 +1,5 @@
 #include "Player.hpp"
-#include "World.hpp"
+#include "../world/World.hpp"
 
 Player::Player(SceneMain* scene, const vec3f& pos, const vec3f &scale) :
 	Entity(scene,pos,scale), selectedID(1), onFloor(false), isJumping(false),

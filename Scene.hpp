@@ -9,7 +9,7 @@ class Scene {
 		virtual ~Scene() {}
 		virtual bool init() = 0; //should call loadResources()
 		virtual void update(float deltaTime) = 0; //called by parent on parent.update()
-		virtual void draw() = 0; //called by parent on parent.draw()
+		virtual void draw() const = 0; //called by parent on parent.draw()
 		virtual void onKeyPressed(float deltaTime, sf::Keyboard::Key key) = 0; //called by parent on parent.update()
 		virtual void onKeyDown(float deltaTime, sf::Keyboard::Key key) = 0; //called by parent on parent.update()
 		virtual void onKeyReleased(float deltaTime, sf::Keyboard::Key key) = 0; //called by parent on parent.update()

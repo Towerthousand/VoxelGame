@@ -1,5 +1,5 @@
 #include "Enemy.hpp"
-#include "Player.hpp"
+#include "../Player.hpp"
 
 Enemy::Enemy(SceneMain* scene, const vec3f &pos, const vec3f &scale, Player* targetPlayer) : Entity(scene,pos,scale), targetPlayer(targetPlayer){
 }
