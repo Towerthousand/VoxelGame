@@ -22,7 +22,7 @@ class Player : public Entity , public Camera {
 		void makeFrustum();
 		bool insideFrustum(const vec3f &center, float radius) const; //sphere-plane check for frustum culling
 
-		short selectedID; //current blockID, used to place blocks
+		unsigned char selectedID; //current blockID, used to place blocks
 		bool onFloor;
 		bool isJumping;
 	private:

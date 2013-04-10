@@ -25,23 +25,24 @@ typedef sf::Vector2<float> vec2f;
 typedef sf::Vector2<int> vec2i;
 
 struct Vertex {
-		Vertex(float vx = 0.0, float vy = 0.0, float vz = 0.0,
-			   float tx = 0.0, float ty = 0.0,
-			   float cr = 1.0, float cg = 1.0, float cb = 1.0, float ca = 1.0) :
+		Vertex(short vx = 0, short vy = 0, short  vz = 0,
+			   short tx = 0, short ty = 0,
+			   unsigned char cr = 255, unsigned char cg = 255, unsigned char cb = 255, unsigned char ca = 255) :
 			vx(vx), vy(vy), vz(vz),
 			tx(tx), ty(ty),
 			cr(cr), cg(cg), cb(cb), ca(ca)
 		{}
-		char
+		short
 		vx,vy,vz,
-		tx,ty,
+		tx,ty;
+		unsigned char
 		cr,cg,cb,ca;
 };
 
 struct Cube {
-		Cube (short ID, short light) : ID(ID), light(light) {}
-		short ID;
-		short light;
+		Cube (unsigned char ID, unsigned char light) : ID(ID), light(light) {}
+		unsigned char ID;
+		unsigned char light;
 };
 
 //prototype random functions here (define in tools.cpp). Inlines go here too
@@ -55,7 +56,7 @@ std::string toString(float num);
 #define CHUNKSIZE 16
 #define PLAYER_HEIGHT -1.8
 #define UPDATERADIUS 16.0f //How many potential light blocks does changing a block affect? Not taking into account skylight.
-						   //Usually UPDATERADIUS = MAXLIGHT-MINLIGHT
+//Usually UPDATERADIUS = MAXLIGHT-MINLIGHT
 #define MAXLIGHT 20
 #define MINLIGHT 3
 #define DEG_TO_RAD ((2*M_PI)/360.0f)

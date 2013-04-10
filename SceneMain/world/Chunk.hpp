@@ -22,7 +22,7 @@ class Chunk { //16*16*16
 		Cube getCube(int x, int y, int z) const;
 		bool getSkyAccess(int x,int y, int z) const;
 
-		void pushCubeToArray(int x, int y, int z, int cubeID, std::vector<Vertex> &renderData);
+		void pushCubeToArray(short x, short y, short z, unsigned char cubeID, std::vector<Vertex> &renderData);
 		void makeVbo(std::vector<Vertex> &renderData);
 
 		int XPOS; //x pos of chunk inside world matrix

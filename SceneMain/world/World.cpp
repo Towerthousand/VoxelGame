@@ -206,7 +206,7 @@ bool World::getSkyAccess(int x, int y, int z) const {
 	return true;
 }
 
-void World::setCubeIDAbs(int x, int y, int z, short ID) { //set the id, calculate light (taking into account sky level)
+void World::setCubeIDAbs(int x, int y, int z, unsigned char ID) { //set the id, calculate light (taking into account sky level)
 	if (getOutOfBounds(x,y,z))
 		return;
 	chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE].ID = ID;
@@ -230,7 +230,7 @@ void World::setCubeIDAbs(int x, int y, int z, short ID) { //set the id, calculat
 	}
 }
 
-void World::setCubeLightAbs(int x, int y, int z, short light) { //set the light, mark for redraw
+void World::setCubeLightAbs(int x, int y, int z, unsigned char light) { //set the light, mark for redraw
 	if (getOutOfBounds(x,y,z))
 		return;
 	chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE].light = light;
@@ -251,7 +251,6 @@ void World::draw() const {
 																			 z*CHUNKSIZE+CHUNKSIZE/2)
 																		,sqrt(3*(8*8)));
 			}
-
 
 	//do occlusion culling here!
 	std::priority_queue<std::pair<float,Chunk*> > queryList; //chunks to be queried, ordered by distance
@@ -420,8 +419,8 @@ void World::traceView(const Player *playerCam, float tMax) {
 void World::calculateLight(vec3i source, vec2i radius) {
 	//BFS TO THE MAX
 	std::vector<vec3i> blocksToCheck[MAXLIGHT+1];
-	short* ID = 0;
-	short* light = 0;
+	unsigned char* ID = 0;
+	unsigned char* light = 0;
 	for(int x = source.x-radius.x; x <= source.x+radius.x; ++x) {
 		for(int y = source.y-radius.y; y <= source.y+radius.y; ++y) {
 			for(int z = source.z-radius.x; z <= source.z+radius.x; ++z) {

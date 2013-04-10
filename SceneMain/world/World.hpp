@@ -29,8 +29,8 @@ class World {
 		Cube getCubeRaw(int x, int y, int z) const;
 		int getSkylightLevel(int x, int z) const;
 		bool getSkyAccess(int x, int y, int z) const;
-		void setCubeIDAbs(int x, int y, int z, short ID);
-		void setCubeLightAbs(int x, int y, int z, short light);
+		void setCubeIDAbs(int x, int y, int z, unsigned char ID);
+		void setCubeLightAbs(int x, int y, int z, unsigned char light);
 
 		//main
 		void draw() const;

@@ -58,20 +58,6 @@ bool SceneMain::init() {
 	glScalef(1.0/512.0f,1.0/512.0f,1); //now textures are in pixel coords (only works for world texture)
 	//Center mouse
 	sf::Mouse::setPosition(vec2i(SCRWIDTH/2,SCRHEIGHT/2),parent.getWindow());
-	//Enable lights
-	glEnable(GL_LIGHTING);
-	glEnable(GL_COLOR_MATERIAL);
-	GLfloat diffuse[] = {0.3, 0.3, 0.3, 1.f};
-	GLfloat ambient[] = {0.2, 0.2, 0.2, 1.f};
-	GLfloat specular[] = {0.1, 0.1, 0.1, 1.f};
-	glEnable(GL_LIGHT0);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
-	glEnable(GL_LIGHT1);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, specular);
-	glLightfv(GL_LIGHT1, GL_AMBIENT, ambient);
 	// Add player
 	addObject(player);
 	outLog("* Init was succesful" );
@@ -116,12 +102,6 @@ void SceneMain::draw() const {
 	glRotatef(player->camRot.y, 0, 1, 0);
 	glTranslatef(-player->camPos.x, -player->camPos.y, -player->camPos.z);
 
-	//Draw global lights
-	GLfloat lightpos0[] = {-0.5, 0.7 , -0.3, 0.};
-	glLightfv(GL_LIGHT0, GL_POSITION, lightpos0);
-	GLfloat lightpos1[] = {0.4, 0.3 , 0.9, 0.};
-	glLightfv(GL_LIGHT1, GL_POSITION, lightpos1);
-
 	//Draw all the stuff
 	parent.textures().useTexture("lolwtf");
 	world.draw();
@@ -130,6 +110,7 @@ void SceneMain::draw() const {
 		(*it)->hitbox.draw();
 	}
 
+	//Draw crosshair
 	glPushMatrix();
 	glLoadIdentity();
 	glDisable(GL_TEXTURE_2D);
