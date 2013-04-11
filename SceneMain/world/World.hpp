@@ -20,17 +20,15 @@ class World {
 		~World();
 		//generators
 		bool loadDirbaio(const std::string &filePath);
-		void regenChunk(int x, int y, int z, int seed);
-		void initChunkLight(int x,int y, int z);
 
 		//Getters and setters
 		bool getOutOfBounds(int x, int y, int z) const;
-		Cube getCubeAbs(int x, int y, int z) const;
+		Cube getCube(int x, int y, int z) const;
 		Cube getCubeRaw(int x, int y, int z) const;
 		int getSkylightLevel(int x, int z) const;
 		bool getSkyAccess(int x, int y, int z) const;
-		void setCubeIDAbs(int x, int y, int z, unsigned char ID);
-		void setCubeLightAbs(int x, int y, int z, unsigned char light);
+		void setCubeID(int x, int y, int z, unsigned char ID);
+		void setCubeLight(int x, int y, int z, unsigned char light);
 
 		//main
 		void draw() const;

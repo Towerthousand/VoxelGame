@@ -5,7 +5,7 @@
 class World;
 class Chunk { //16*16*16
 	public:
-		Chunk(int x, int y, int z, World &world);
+		Chunk(int x, int y, int z, World *world);
 		~Chunk();
 		//main
 		void update(float deltaTime);
@@ -18,9 +18,7 @@ class Chunk { //16*16*16
 		int vertexCount;
 	private:
 		//Getters & consultors
-		bool getOutOfBounds(int x, int y, int z) const;
 		Cube getCube(int x, int y, int z) const;
-		bool getSkyAccess(int x,int y, int z) const;
 
 		void pushCubeToArray(short x, short y, short z, unsigned char cubeID, std::vector<Vertex> &renderData);
 		void makeVbo(std::vector<Vertex> &renderData);
@@ -29,7 +27,7 @@ class Chunk { //16*16*16
 		int YPOS; //y pos of chunk inside world matrix
 		int ZPOS; //z pos of chunk inside world matrix
 		int VBOID;
-		World& parentWorld;
+		World* parentWorld;
 		static const int textureIndexes[9][6];
 };
 

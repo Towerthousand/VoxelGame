@@ -23,7 +23,6 @@ World::~World() {
 }
 
 bool World::loadDirbaio(const std::string &filePath) {
-
 	sf::Clock clock;
 	clock.restart();
 	std::ifstream file(filePath.c_str());
@@ -47,7 +46,7 @@ bool World::loadDirbaio(const std::string &filePath) {
 	for (int x = 0; x < WORLDWIDTH; ++x) {
 		for (int y = 0; y < WORLDHEIGHT; ++y) {
 			for (int z = 0; z < WORLDWIDTH; ++z) {
-				regenChunk(x,y,z,0);
+				chunks[x][y][z] = new Chunk(x,y,z,this);
 			}
 		}
 	}
@@ -75,99 +74,6 @@ bool World::loadDirbaio(const std::string &filePath) {
 				   vec2i(WORLDWIDTH*CHUNKSIZE/2 + 1,WORLDHEIGHT*CHUNKSIZE/2 + 1));
 	outLog(" - Finished lighting. Time: " + toString((float)clock.restart().asSeconds()) + " seconds");
 	return true;
-	//this commented version expands the map so that every block is made of 4 blocks.
-	//	sf::Clock clock;
-	//	clock.restart();
-	//	std::ifstream file(filePath.c_str());
-	//	if(!file) {
-	//		outLog("#ERROR Could not load dirbaio \"" + filePath + "\"");
-	//		return false;
-	//	}
-	//	int sizeX = int(file.get()) << 24 | int(file.get()) << 16 | int(file.get()) << 8 | int(file.get());
-	//	int sizeY = int(file.get()) << 24 | int(file.get()) << 16 | int(file.get()) << 8 | int(file.get());
-	//	int sizeZ = int(file.get()) << 24 | int(file.get()) << 16 | int(file.get()) << 8 | int(file.get());
-	//	sizeX *= 2;
-	//	sizeY *= 2;
-	//	sizeZ *= 2;
-	//	WORLDWIDTH = sizeX/CHUNKSIZE;
-	//	WORLDHEIGHT = sizeY/CHUNKSIZE;
-	//	chunks.resize(WORLDWIDTH);
-	//	for(int i = 0; i < WORLDWIDTH; ++i)
-	//		chunks[i].resize(WORLDHEIGHT);
-	//	for(int i = 0; i < WORLDWIDTH; ++i)
-	//		for(int j = 0; j < WORLDHEIGHT; ++j)
-	//			chunks[i][j].resize(WORLDWIDTH);
-
-	//	outLog(" - Creating chunks...");
-	//	for (int x = 0; x < WORLDWIDTH; ++x)
-	//		for (int y = 0; y < WORLDHEIGHT; ++y)
-	//			for (int z = 0; z < WORLDWIDTH; ++z)
-	//				regenChunk(x,y,z,0);
-	//	outLog(" - Loading chunk data...");
-	//	Cube c(0,0);
-	//	for(int y = 0; y < sizeY/2; ++y)
-	//		for(int x = 0; x < sizeX/2; ++x)
-	//			for(int z = 0; z < sizeZ/2; ++z) {
-	//				c = Cube(file.get(),0);
-	//				int nX = x*2;
-	//				int nY = y*2;
-	//				int nZ = z*2;
-	//				chunks[nX    /CHUNKSIZE][nY    /CHUNKSIZE][nZ    /CHUNKSIZE]->cubes[nX    %CHUNKSIZE][nY    %CHUNKSIZE][nZ    %CHUNKSIZE] = c;
-	//				chunks[nX    /CHUNKSIZE][nY    /CHUNKSIZE][(nZ+1)/CHUNKSIZE]->cubes[nX    %CHUNKSIZE][nY    %CHUNKSIZE][(nZ+1)%CHUNKSIZE] = c;
-	//				chunks[nX    /CHUNKSIZE][(nY+1)/CHUNKSIZE][nZ    /CHUNKSIZE]->cubes[nX    %CHUNKSIZE][(nY+1)%CHUNKSIZE][nZ    %CHUNKSIZE] = c;
-	//				chunks[nX    /CHUNKSIZE][(nY+1)/CHUNKSIZE][(nZ+1)/CHUNKSIZE]->cubes[nX    %CHUNKSIZE][(nY+1)%CHUNKSIZE][(nZ+1)%CHUNKSIZE] = c;
-	//				chunks[(nX+1)/CHUNKSIZE][nY    /CHUNKSIZE][nZ    /CHUNKSIZE]->cubes[(nX+1)%CHUNKSIZE][nY    %CHUNKSIZE][nZ    %CHUNKSIZE] = c;
-	//				chunks[(nX+1)/CHUNKSIZE][nY    /CHUNKSIZE][(nZ+1)/CHUNKSIZE]->cubes[(nX+1)%CHUNKSIZE][nY    %CHUNKSIZE][(nZ+1)%CHUNKSIZE] = c;
-	//				chunks[(nX+1)/CHUNKSIZE][(nY+1)/CHUNKSIZE][nZ    /CHUNKSIZE]->cubes[(nX+1)%CHUNKSIZE][(nY+1)%CHUNKSIZE][nZ    %CHUNKSIZE] = c;
-	//				chunks[(nX+1)/CHUNKSIZE][(nY+1)/CHUNKSIZE][(nZ+1)/CHUNKSIZE]->cubes[(nX+1)%CHUNKSIZE][(nY+1)%CHUNKSIZE][(nZ+1)%CHUNKSIZE] = c;
-	//			}
-	//	file.close();
-	//	outLog(" - Fixing grass...");
-	//	for(int y = 0; y < sizeY; ++y)
-	//		for(int x = 0; x < sizeX; ++x)
-	//			for(int z = 0; z < sizeZ; ++z)
-	//				if(getCubeRaw(x,y,z).ID == 3)
-	//					if (getCubeAbs(x,y+1,z).ID != 0)
-	//						chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE] = Cube(1,0);
-
-	//	WORLDWIDTH /=2;
-	//	WORLDHEIGHT /=2;
-	//	for(int x = WORLDWIDTH; x < 2*WORLDWIDTH-1; ++x)
-	//		for(int y = WORLDWIDTH; y < 2*WORLDHEIGHT-1; ++y)
-	//			for(int z = WORLDWIDTH; z < 2*WORLDWIDTH-1; ++z)
-	//				delete chunks[x][y][z];
-	//	chunks.resize(WORLDWIDTH);
-	//	for(int i = 0; i < WORLDWIDTH; ++i)
-	//		chunks[i].resize(WORLDHEIGHT);
-	//	for(int i = 0; i < WORLDWIDTH; ++i)
-	//		for(int j = 0; j < WORLDHEIGHT; ++j)
-	//			chunks[i][j].resize(WORLDWIDTH);
-
-	//	outLog(" - Calculating sky levels...");
-	//	skyValues = std::vector<std::vector<int> >(CHUNKSIZE*WORLDWIDTH,
-	//											   std::vector<int>(CHUNKSIZE*WORLDWIDTH,-1));
-	//	for(int x = 0; x < CHUNKSIZE*WORLDWIDTH; ++x) {
-	//		for(int z = 0; z < CHUNKSIZE*WORLDWIDTH; ++z) {
-	//			skyValues[x][z] = getSkylightLevel(x,z);
-	//		}
-	//	}
-	//	outLog(" - Lighting chunks...");
-	//	calculateLight(vec3i(CHUNKSIZE*WORLDWIDTH/2,
-	//						 CHUNKSIZE*WORLDHEIGHT/2,
-	//						 CHUNKSIZE*WORLDWIDTH/2),
-	//				   vec2i(WORLDWIDTH*CHUNKSIZE/2 + 1,WORLDHEIGHT*CHUNKSIZE/2 + 1));
-	//	outLog(" - Finished lighting. Time: " + toString((float)clock.restart().asSeconds()) + " seconds");
-	//	return true;
-}
-
-void World::regenChunk(int x, int y, int z, int seed) {
-	if (chunks[x][y][z] != NULL)
-		delete chunks[x][y][z];
-	chunks[x][y][z] = new Chunk(x,y,z,*this);
-}
-
-void World::initChunkLight(int x,int y, int z) { //should only be called if upper chunks are loaded. Coords in chunk system.
-	calculateLight(vec3i(x*CHUNKSIZE+(CHUNKSIZE/2),y*CHUNKSIZE+(CHUNKSIZE/2),z*CHUNKSIZE+(CHUNKSIZE/2)),vec2i(CHUNKSIZE/2 +1,CHUNKSIZE/2 +1));
 }
 
 bool World::getOutOfBounds(int x, int y, int z) const{
@@ -181,7 +87,7 @@ bool World::getOutOfBounds(int x, int y, int z) const{
 	return false;
 }
 
-Cube World::getCubeAbs(int x, int y, int z) const {
+Cube World::getCube(int x, int y, int z) const {
 	if (getOutOfBounds(x,y,z))
 		return Cube(0,MAXLIGHT);
 	return getCubeRaw(x,y,z);
@@ -193,7 +99,7 @@ Cube World::getCubeRaw(int x, int y, int z) const {
 
 int World::getSkylightLevel(int x, int z) const { //X and Z in cube coords
 	for(int y = CHUNKSIZE*WORLDHEIGHT-1; y >= 0; --y) {
-		if(getCubeAbs(x,y,z).ID != 0) {
+		if(getCube(x,y,z).ID != 0) {
 			return y;
 		}
 	}
@@ -206,7 +112,7 @@ bool World::getSkyAccess(int x, int y, int z) const {
 	return true;
 }
 
-void World::setCubeIDAbs(int x, int y, int z, unsigned char ID) { //set the id, calculate light (taking into account sky level)
+void World::setCubeID(int x, int y, int z, unsigned char ID) { //set the id, calculate light (taking into account sky level)
 	if (getOutOfBounds(x,y,z))
 		return;
 	chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE].ID = ID;
@@ -230,7 +136,7 @@ void World::setCubeIDAbs(int x, int y, int z, unsigned char ID) { //set the id, 
 	}
 }
 
-void World::setCubeLightAbs(int x, int y, int z, unsigned char light) { //set the light, mark for redraw
+void World::setCubeLight(int x, int y, int z, unsigned char light) { //set the light, mark for redraw
 	if (getOutOfBounds(x,y,z))
 		return;
 	chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE].light = light;
@@ -265,7 +171,7 @@ void World::draw() const {
 					queryList.push(std::pair<float,Chunk*>(-dist,chunks[x][y][z]));
 				}
 
-	int layers = 10;
+	int layers = 5;
 	int chunksPerLayer = queryList.size()/layers + int(queryList.size()%layers > 0); //chunks per pass
 	std::vector<GLuint> queries(chunksPerLayer,0);
 
@@ -277,7 +183,7 @@ void World::draw() const {
 		++parentScene->chunksDrawn;
 	}
 	//Query other layers
-	for(uint currLayer = 1; currLayer < layers && queryList.size() > 0; ++currLayer) {
+	for(int currLayer = 1; currLayer < layers && queryList.size() > 0; ++currLayer) {
 		std::vector<Chunk*> chunkPointers(chunksPerLayer,NULL);
 
 		//disable rendering state
@@ -321,24 +227,21 @@ void World::draw() const {
 }
 
 void World::update(float deltaTime) {
-	updateStuff(deltaTime);
+	//updateStuff(deltaTime);
 	traceView(player,10);
-	int updateMax = 0; //maximum number of chunk redraws
 	for (int x = 0; x < WORLDWIDTH; ++x)
 		for (int y = 0; y < WORLDHEIGHT; ++y)
 			for (int z = 0; z < WORLDWIDTH; ++z)
-				if (chunks[x][y][z]->markedForRedraw == true && updateMax < 10000) {
-					updateMax++;
+				if (chunks[x][y][z]->markedForRedraw == true)
 					chunks[x][y][z]->update(deltaTime);
-				}
 }
 
-//Based on: Fast Voxel Traversal Algorithm for Ray Tracing
+//Based on: Fast Voxel Traversal Algorithm for Ray Tracinge
 //By: John Amanatides et al.
 //Implemented by Jordi "BuD" Santiago Provencio
 void World::traceView(const Player *playerCam, float tMax) {
 	if (!getOutOfBounds(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z)) &&
-		getCubeAbs(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z)).ID != 0) {
+		getCube(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z)).ID != 0) {
 		playerTargetsBlock = true;
 		targetedBlock = vec3f(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z));
 		return;
@@ -406,7 +309,7 @@ void World::traceView(const Player *playerCam, float tMax) {
 				tMaxc.z= tMaxc.z + tDelta.z;
 			}
 		}
-		if(!getOutOfBounds(vox.x,vox.y,vox.z) && getCubeAbs(vox.x,vox.y,vox.z).ID != 0) {
+		if(!getOutOfBounds(vox.x,vox.y,vox.z) && getCube(vox.x,vox.y,vox.z).ID != 0) {
 			playerTargetsBlock = true;
 			targetedBlock = vox;
 			return;
@@ -483,7 +386,7 @@ void World::processCubeLighting(const vec3i& source, const vec3i& offset, std::v
 			if(sub.light
 			   < src.light-1) {
 				queue.push_back(subject);
-				setCubeLightAbs(subject.x,subject.y,subject.z,src.light-1);
+				setCubeLight(subject.x,subject.y,subject.z,src.light-1);
 			}
 		}
 	}
@@ -496,8 +399,8 @@ void World::updateStuff(float deltaTime) { //only to be called by world.update()
 			int x = rand()%(CHUNKSIZE*WORLDWIDTH);
 			int y = rand()%(CHUNKSIZE*WORLDHEIGHT);
 			int z = rand()%(CHUNKSIZE*WORLDWIDTH);
-			if (getCubeAbs(x,y+1,z).ID != 0 && getCubeAbs(x,y,z).ID == 3) {
-				setCubeIDAbs(x,y,z,1);
+			if (getCube(x,y+1,z).ID != 0 && getCube(x,y,z).ID == 3) {
+				setCubeID(x,y,z,1);
 			}
 		}
 	}
