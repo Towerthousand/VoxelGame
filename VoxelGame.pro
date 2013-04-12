@@ -29,7 +29,8 @@ SOURCES += \
 	$$PWD/SceneMain/entities/items/Polla.cpp \
 	$$PWD/SceneMain/entities/enemies/Enemy.cpp \
 	$$PWD/SceneMain/entities/enemies/Skeleton.cpp \
-    graphics/Shader.cpp
+    graphics/Shader.cpp \
+    graphics/Shadermanager.cpp
 
 HEADERS += \
     $$PWD/Scene.hpp \
@@ -56,6 +57,7 @@ HEADERS += \
 	$$PWD/SceneMain/entities/items/Polla.hpp \
 	$$PWD/SceneMain/entities/enemies/Enemy.hpp \
 	$$PWD/SceneMain/entities/enemies/Skeleton.hpp \
-    graphics/Shader.hpp
+    graphics/Shader.hpp \
+    graphics/Shadermanager.hpp
 
 OTHER_FILES +=

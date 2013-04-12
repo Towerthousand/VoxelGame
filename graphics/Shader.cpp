@@ -6,33 +6,32 @@ Shader::Shader() {
 Shader::~Shader() {
 }
 
-bool Shader::loadFromFile(GLenum type, std::string filePath) {
-	std::ifstream file;
-	file.open(filePath,std::ios::in);
-	if(!file)
-		return false; //Could not open file
+GLuint& Shader::getHandle() {
+	return shaderHandle;
+}
 
-	int length;
+bool Shader::loadFromFile(GLenum type, const std::string& filePath) {
 	std::vector<char> fileContents;
-	if (!getFileContents("resources/vertex.glsl",fileContents,length))
+	if (!getFileContents("resources/vertex.glsl",fileContents,this->length)) {
+		outLog("#ERROR Failed to get the contents from " + filePath);
 		return false;
-	GLuint shader;
-	shader = glCreateShader(type);
-	glShaderSource(shader, 1, (const GLchar**)&fileContents, &length);
-	glCompileShader(shader);
-	int shader_ok;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &shader_ok);
-	  if (!shader_ok) {
-		  outLog( "#ERROR Failed to compile: " + filePath);
-		  glDeleteShader(shader);
-		  return false;
-	  }
-	  else outLog(toString(shader_ok));
+	}
+	shaderHandle = glCreateShader(type);
+	glShaderSource(shaderHandle, 1, (const GLchar**)&fileContents, &length);
+	glCompileShader(shaderHandle);
+	int compiled;
+	glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &compiled);
+	if (!compiled) {
+		outLog( "#ERROR Failed to compile: " + filePath);
+		glDeleteShader(shaderHandle);
+		return false;
+	}
+	else outLog( " - Compiled " + filePath + " successfully.");
 	return true;
 }
 
-bool Shader::getFileContents(const std::string& filename, std::vector<char>& buffer, int &fileLength) {
-	std::ifstream file(filename.c_str(), std::ios_base::binary);
+bool Shader::getFileContents(const std::string& filePath, std::vector<char>& buffer, int &fileLength) {
+	std::ifstream file(filePath.c_str(), std::ios_base::binary);
 	if (!file)
 		return false;
 	file.seekg(0, std::ios_base::end);
