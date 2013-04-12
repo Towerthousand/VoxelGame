@@ -1,5 +1,5 @@
 #include "Game.hpp"
-
+#include "graphics/Shader.hpp"
 Game::Game() : currentScene(NULL), nextScene(NULL) {
 	window.create(sf::VideoMode(SCRWIDTH,SCRHEIGHT,32), WINDOW_TITLE ,sf::Style::Default,CONTEXT_SETTINGS_OPENGL);
 	window.setMouseCursorVisible(false);

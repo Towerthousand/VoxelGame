@@ -57,3 +57,5 @@ HEADERS += \
 	$$PWD/SceneMain/entities/enemies/Enemy.hpp \
 	$$PWD/SceneMain/entities/enemies/Skeleton.hpp \
     graphics/Shader.hpp
+
+OTHER_FILES +=

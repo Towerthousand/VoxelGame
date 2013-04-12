@@ -12,14 +12,12 @@ World::World(SceneMain* parentScene, Player* player) :
 }
 
 World::~World() {
-	for (int x = 0; x < WORLDWIDTH; ++x) {
-		for (int y = 0; y < WORLDHEIGHT; ++y) {
+	for (int x = 0; x < WORLDWIDTH; ++x)
+		for (int y = 0; y < WORLDHEIGHT; ++y)
 			for (int z = 0; z < WORLDWIDTH; ++z) {
 				delete chunks[x][y][z];
 				chunks[x][y][z] = NULL;
 			}
-		}
-	}
 }
 
 bool World::loadDirbaio(const std::string &filePath) {
@@ -43,30 +41,22 @@ bool World::loadDirbaio(const std::string &filePath) {
 			chunks[i][j].resize(WORLDWIDTH);
 
 	outLog(" - Creating chunks...");
-	for (int x = 0; x < WORLDWIDTH; ++x) {
-		for (int y = 0; y < WORLDHEIGHT; ++y) {
-			for (int z = 0; z < WORLDWIDTH; ++z) {
+	for (int x = 0; x < WORLDWIDTH; ++x)
+		for (int y = 0; y < WORLDHEIGHT; ++y)
+			for (int z = 0; z < WORLDWIDTH; ++z)
 				chunks[x][y][z] = new Chunk(x,y,z,this);
-			}
-		}
-	}
 	outLog(" - Loading chunk data...");
-	for(int y = 0; y < sizeY; ++y) {
-		for(int x = 0; x < sizeX; ++x) {
-			for(int z = 0; z < sizeZ; ++z) {
+	for(int y = 0; y < sizeY; ++y)
+		for(int x = 0; x < sizeX; ++x)
+			for(int z = 0; z < sizeZ; ++z)
 				chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE] = Cube(file.get(),0);
-			}
-		}
-	}
 	file.close();
 	outLog(" - Calculating sky levels...");
 	skyValues = std::vector<std::vector<int> >(CHUNKSIZE*WORLDWIDTH,
 											   std::vector<int>(CHUNKSIZE*WORLDWIDTH,-1));
-	for(int x = 0; x < CHUNKSIZE*WORLDWIDTH; ++x) {
-		for(int z = 0; z < CHUNKSIZE*WORLDWIDTH; ++z) {
+	for(int x = 0; x < CHUNKSIZE*WORLDWIDTH; ++x)
+		for(int z = 0; z < CHUNKSIZE*WORLDWIDTH; ++z)
 			skyValues[x][z] = getSkylightLevel(x,z);
-		}
-	}
 	outLog(" - Lighting chunks...");
 	calculateLight(vec3i(CHUNKSIZE*WORLDWIDTH/2,
 						 CHUNKSIZE*WORLDHEIGHT/2,
@@ -98,11 +88,9 @@ Cube World::getCubeRaw(int x, int y, int z) const {
 }
 
 int World::getSkylightLevel(int x, int z) const { //X and Z in cube coords
-	for(int y = CHUNKSIZE*WORLDHEIGHT-1; y >= 0; --y) {
-		if(getCube(x,y,z).ID != 0) {
+	for(int y = CHUNKSIZE*WORLDHEIGHT-1; y >= 0; --y)
+		if(getCube(x,y,z).ID != 0)
 			return y;
-		}
-	}
 	return -1;
 }
 
@@ -153,8 +141,8 @@ void World::draw() const {
 					chunks[x][y][z]->outOfView = true;
 				else
 					chunks[x][y][z]->outOfView = !player->insideFrustum(vec3f(x*CHUNKSIZE+CHUNKSIZE/2,
-																			 y*CHUNKSIZE+CHUNKSIZE/2,
-																			 z*CHUNKSIZE+CHUNKSIZE/2)
+																			  y*CHUNKSIZE+CHUNKSIZE/2,
+																			  z*CHUNKSIZE+CHUNKSIZE/2)
 																		,sqrt(3*(8*8)));
 			}
 
