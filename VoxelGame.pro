@@ -3,7 +3,7 @@ CONFIG -= qt
 LIBS += -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lGLU
 INCLUDEPATH += $$PWD/
 QMAKE_CXXFLAGS += -std=c++11
-CXX_FLAGS += -O2
+CXX_FLAGS += -O3
 SOURCES += \
     $$PWD/main.cpp \
     $$PWD/Game.cpp \
@@ -28,7 +28,9 @@ SOURCES += \
 	$$PWD/SceneMain/entities/items/Arrow.cpp \
 	$$PWD/SceneMain/entities/items/Polla.cpp \
 	$$PWD/SceneMain/entities/enemies/Enemy.cpp \
-	$$PWD/SceneMain/entities/enemies/Skeleton.cpp
+	$$PWD/SceneMain/entities/enemies/Skeleton.cpp \
+    graphics/Shader.cpp \
+    graphics/Shadermanager.cpp
 
 HEADERS += \
     $$PWD/Scene.hpp \
@@ -54,4 +56,8 @@ HEADERS += \
 	$$PWD/SceneMain/entities/items/Arrow.hpp \
 	$$PWD/SceneMain/entities/items/Polla.hpp \
 	$$PWD/SceneMain/entities/enemies/Enemy.hpp \
-	$$PWD/SceneMain/entities/enemies/Skeleton.hpp
+	$$PWD/SceneMain/entities/enemies/Skeleton.hpp \
+    graphics/Shader.hpp \
+    graphics/Shadermanager.hpp
+
+OTHER_FILES +=

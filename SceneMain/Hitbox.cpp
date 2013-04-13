@@ -35,7 +35,7 @@ bool Hitbox::collidesWithHitbox(const Hitbox &hitbox, const vec3f &offset) const
 }
 
 bool Hitbox::pointCollidesWithWorld(const vec3f& point) const {
-	if(parent->parentScene->getWorld().getCubeAbs(floor(point.x),floor(point.y),floor(point.z)).ID != 0)
+	if(parent->parentScene->getWorld().getCube(floor(point.x),floor(point.y),floor(point.z)).ID != 0)
 		return true;
 	return false;
 }

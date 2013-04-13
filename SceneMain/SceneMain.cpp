@@ -29,7 +29,7 @@ bool SceneMain::loadResources() {
 		return false;
 	if(!Skeleton::model.loadVoxelization("resources/mob.vox"))
 		return false;
-	outLog("* Loading chunks" );
+	outLog("* Loading new world" );
 	if (!world.loadDirbaio("resources/out.bin"))
 		return false;
 	return true;
@@ -105,10 +105,8 @@ void SceneMain::draw() const {
 	//Draw all the stuff
 	parent.textures().useTexture("lolwtf");
 	world.draw();
-	for(std::list<GameObject*>::const_iterator it = objects.begin();it != objects.end(); ++it) {
+	for(std::list<GameObject*>::const_iterator it = objects.begin();it != objects.end(); ++it)
 		(*it)->draw();
-		(*it)->hitbox.draw();
-	}
 
 	//Draw crosshair
 	glPushMatrix();
@@ -235,12 +233,12 @@ void SceneMain::onMouseButtonPressed(float deltaTime, sf::Mouse::Button button) 
 	switch(button) {
 		case sf::Mouse::Left: //delete block
 			if(world.playerTargetsBlock) {
-				world.setCubeIDAbs(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z,0);
+				world.setCubeID(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z,0);
 			}
 			break;
 		case sf::Mouse::Right: //place block
 			if(world.playerTargetsBlock) {
-				world.setCubeIDAbs(world.last.x,world.last.y,world.last.z,player->selectedID);
+				world.setCubeID(world.last.x,world.last.y,world.last.z,player->selectedID);
 			}
 			break;
 		case sf::Mouse::Middle: { //Arrow!

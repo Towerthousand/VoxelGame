@@ -62,7 +62,7 @@ std::string toString(float num);
 #define DEG_TO_RAD ((2*M_PI)/360.0f)
 #define FOV 60.0f //degrees
 #define ZNEAR 0.01f
-#define ZFAR 500.0f
+#define ZFAR 1000.0f
 #define TEXSIZE 8
 #define GRAVITY -40
 extern int SCRWIDTH;
