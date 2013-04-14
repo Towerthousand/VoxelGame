@@ -48,206 +48,190 @@ bool ShaderManager::makeProgram(const std::string& vertexShaderID, const std::st
 	return true;
 }
 
+void ShaderManager::useProgram(const std::string &programID) {
+	GLuint program = shaderPrograms[programID];
+	GLint current;
+	glGetIntegerv(GL_CURRENT_PROGRAM,&current);
+	if(GLuint(current) != program)
+		glUseProgram(program);
+}
+
 GLint ShaderManager::getUniLoc(const std::string& programID, const std::string &uniformID) {
 	GLuint program = shaderPrograms[programID];
-	glUseProgram();
-	GLint loc = glGetUniformLocation(programID, name);
-
-	if (loc == -1)
-		printf("No such uniform named \"%s\"\n", name);
-
-	checkGLError("Get uni loc");  // Check for OpenGL errors
-	return loc;
+	useProgram(programID);
+	GLint location = glGetUniformLocation(program, uniformID.c_str());
+	if (location == -1)
+		outLog("#ERROR When trying to get uniform from \"" + programID + "\": no uniform named " + uniformID);
+	return location;
 }
 
-void Shader::setParameter(const std::string& shaderID,const std::string& name, float x) {
-	GLuint program = shaderPrograms[shaderID];
+/////////////////////////////////////////////FLOATS
 
-	// Enable program
+void ShaderManager::sendUniform1f(const std::string& programID,const std::string& uniformID, float x) {
+	GLuint program = shaderPrograms[programID];
 	glUseProgram(program);
-
-	// Get parameter location and assign it new values
-	GLint location = glGetUniformLocationARB(m_shaderProgram, name.c_str());
-	if (location != -1)
-		glCheck(glUniform1fARB(location, x));
-	else
-		err() << "Parameter \"" << name << "\" not found in shader" << std::endl;
-
-	// Disable program
-	glCheck(glUseProgramObjectARB(program));
+	GLint location = getUniLoc(programID, uniformID);
+	if (location == -1) //no such uniform error
+		return;
+	glUniform1f(location, x);
 }
 
-void Shader::setParameter(const std::string& name, float x, float y)
-{
-	if (m_shaderProgram)
-	{
-		ensureGlContext();
-
-		// Enable program
-		GLhandleARB program = glGetHandleARB(GL_PROGRAM_OBJECT_ARB);
-		glCheck(glUseProgramObjectARB(m_shaderProgram));
-
-		// Get parameter location and assign it new values
-		GLint location = glGetUniformLocationARB(m_shaderProgram, name.c_str());
-		if (location != -1)
-			glCheck(glUniform2fARB(location, x, y));
-		else
-			err() << "Parameter \"" << name << "\" not found in shader" << std::endl;
-
-		// Disable program
-		glCheck(glUseProgramObjectARB(program));
-	}
+void ShaderManager::sendUniform2f(const std::string& programID,const std::string& uniformID
+						   , float x, float y) {
+	GLuint program = shaderPrograms[programID];
+	glUseProgram(program);
+	GLint location = getUniLoc(programID, uniformID);
+	if (location == -1) //no such uniform error
+		return;
+	glUniform2f(location, x, y);
 }
 
-void Shader::setParameter(const std::string& name, float x, float y, float z)
-{
-	if (m_shaderProgram)
-	{
-		ensureGlContext();
-
-		// Enable program
-		GLhandleARB program = glGetHandleARB(GL_PROGRAM_OBJECT_ARB);
-		glCheck(glUseProgramObjectARB(m_shaderProgram));
-
-		// Get parameter location and assign it new values
-		GLint location = glGetUniformLocationARB(m_shaderProgram, name.c_str());
-		if (location != -1)
-			glCheck(glUniform3fARB(location, x, y, z));
-		else
-			err() << "Parameter \"" << name << "\" not found in shader" << std::endl;
-
-		// Disable program
-		glCheck(glUseProgramObjectARB(program));
-	}
+void ShaderManager::sendUniform2f(const std::string& programID,const std::string& uniformID, const vec2f& v) {
+	sendUniform2f(programID, uniformID, v.x, v.y);
 }
 
-void Shader::setParameter(const std::string& name, float x, float y, float z, float w)
-{
-	if (m_shaderProgram)
-	{
-		ensureGlContext();
-
-		// Enable program
-		GLhandleARB program = glGetHandleARB(GL_PROGRAM_OBJECT_ARB);
-		glCheck(glUseProgramObjectARB(m_shaderProgram));
-
-		// Get parameter location and assign it new values
-		GLint location = glGetUniformLocationARB(m_shaderProgram, name.c_str());
-		if (location != -1)
-			glCheck(glUniform4fARB(location, x, y, z, w));
-		else
-			err() << "Parameter \"" << name << "\" not found in shader" << std::endl;
-
-		// Disable program
-		glCheck(glUseProgramObjectARB(program));
-	}
+void ShaderManager::sendUniform3f(const std::string& programID,const std::string& uniformID
+						   , float x, float y, float z) {
+	GLuint program = shaderPrograms[programID];
+	glUseProgram(program);
+	GLint location = getUniLoc(programID, uniformID);
+	if (location == -1) //no such uniform error
+		return;
+	glUniform3f(location, x, y, z);
 }
 
-void Shader::setParameter(const std::string& name, const Vector2f& v)
-{
-	setParameter(name, v.x, v.y);
+void ShaderManager::sendUniform3f(const std::string& programID,const std::string& uniformID, const vec3f& v) {
+	sendUniform3f(programID, uniformID, v.x, v.y, v.z);
 }
 
-void Shader::setParameter(const std::string& name, const Vector3f& v)
-{
-	setParameter(name, v.x, v.y, v.z);
+void ShaderManager::sendUniform4f(const std::string& programID,const std::string& uniformID
+						   , float x, float y, float z, float w) {
+	GLuint program = shaderPrograms[programID];
+	glUseProgram(program);
+	GLint location = getUniLoc(programID, uniformID);
+	if (location == -1) //no such uniform error
+		return;
+	glUniform4f(location, x, y, z, w);
 }
 
-void Shader::setParameter(const std::string& name, const Color& color)
-{
-	setParameter(name, color.r / 255.f, color.g / 255.f, color.b / 255.f, color.a / 255.f);
+/////////////////////////////////////////////INTEGERS
+
+void ShaderManager::sendUniform1i(const std::string& programID,const std::string& uniformID, int x) {
+	GLuint program = shaderPrograms[programID];
+	glUseProgram(program);
+	GLint location = getUniLoc(programID, uniformID);
+	if (location == -1) //no such uniform error
+		return;
+	glUniform1i(location, x);
 }
 
-void Shader::setParameter(const std::string& name, const sf::Transform& transform)
-{
-	if (m_shaderProgram)
-	{
-		ensureGlContext();
-
-		// Enable program
-		GLhandleARB program = glGetHandleARB(GL_PROGRAM_OBJECT_ARB);
-		glCheck(glUseProgramObjectARB(m_shaderProgram));
-
-		// Get parameter location and assign it new values
-		GLint location = glGetUniformLocationARB(m_shaderProgram, name.c_str());
-		if (location != -1)
-			glCheck(glUniformMatrix4fvARB(location, 1, GL_FALSE, transform.getMatrix()));
-		else
-			err() << "Parameter \"" << name << "\" not found in shader" << std::endl;
-
-		// Disable program
-		glCheck(glUseProgramObjectARB(program));
-	}
+void ShaderManager::sendUniform2i(const std::string& programID,const std::string& uniformID
+						   , int x, int y) {
+	GLuint program = shaderPrograms[programID];
+	glUseProgram(program);
+	GLint location = getUniLoc(programID, uniformID);
+	if (location == -1) //no such uniform error
+		return;
+	glUniform2i(location, x, y);
 }
 
-void Shader::setParameter(const std::string& name, const Texture& texture)
-{
-	if (m_shaderProgram)
-	{
-		ensureGlContext();
-
-		// Find the location of the variable in the shader
-		int location = glGetUniformLocationARB(m_shaderProgram, name.c_str());
-		if (location == -1)
-		{
-			err() << "Texture \"" << name << "\" not found in shader" << std::endl;
-			return;
-		}
-
-		// Store the location -> texture mapping
-		TextureTable::iterator it = m_textures.find(location);
-		if (it == m_textures.end())
-		{
-			// New entry, make sure there are enough texture units
-			static const GLint maxUnits = getMaxTextureUnits();
-			if (m_textures.size() + 1 >= static_cast<std::size_t>(maxUnits))
-			{
-				err() << "Impossible to use texture \"" << name << "\" for shader: all available texture units are used" << std::endl;
-				return;
-			}
-
-			m_textures[location] = &texture;
-		}
-		else
-		{
-			// Location already used, just replace the texture
-			it->second = &texture;
-		}
-	}
+void ShaderManager::sendUniform2i(const std::string& programID,const std::string& uniformID, const vec2i& v) {
+	sendUniform2i(programID, uniformID, v.x, v.y);
 }
 
-void Shader::setParameter(const std::string& name, CurrentTextureType)
-{
-	if (m_shaderProgram)
-	{
-		ensureGlContext();
-
-		// Find the location of the variable in the shader
-		m_currentTexture = glGetUniformLocationARB(m_shaderProgram, name.c_str());
-		if (m_currentTexture == -1)
-			err() << "Texture \"" << name << "\" not found in shader" << std::endl;
-	}
+void ShaderManager::sendUniform3i(const std::string& programID,const std::string& uniformID
+						   , int x, int y, int z) {
+	GLuint program = shaderPrograms[programID];
+	glUseProgram(program);
+	GLint location = getUniLoc(programID, uniformID);
+	if (location == -1) //no such uniform error
+		return;
+	glUniform3i(location, x, y, z);
 }
 
-void Shader::bind(const Shader* shader)
-{
-	ensureGlContext();
+void ShaderManager::sendUniform3i(const std::string& programID,const std::string& uniformID, const vec3i& v) {
+	sendUniform3i(programID, uniformID, v.x, v.y, v.z);
+}
 
-	if (shader && shader->m_shaderProgram)
-	{
-		// Enable the program
-		glCheck(glUseProgramObjectARB(shader->m_shaderProgram));
+void ShaderManager::sendUniform4i(const std::string& programID,const std::string& uniformID
+						   , int x, int y, int z, int w) {
+	GLuint program = shaderPrograms[programID];
+	glUseProgram(program);
+	GLint location = getUniLoc(programID, uniformID);
+	if (location == -1) //no such uniform error
+		return;
+	glUniform4i(location, x, y, z, w);
+}
 
-		// Bind the textures
-		shader->bindTextures();
+/////////////////////////////////////////////UNSIGNED INTEGERS
 
-		// Bind the current texture
-		if (shader->m_currentTexture != -1)
-			glCheck(glUniform1iARB(shader->m_currentTexture, 0));
-	}
-	else
-	{
-		// Bind no shader
-		glCheck(glUseProgramObjectARB(0));
-	}
+void ShaderManager::sendUniform1ui(const std::string& programID,const std::string& uniformID, uint x) {
+	GLuint program = shaderPrograms[programID];
+	glUseProgram(program);
+	GLint location = getUniLoc(programID, uniformID);
+	if (location == -1) //no such uniform error
+		return;
+	glUniform1ui(location, x);
+}
+
+void ShaderManager::sendUniform2ui(const std::string& programID,const std::string& uniformID
+							, uint x, uint y) {
+	GLuint program = shaderPrograms[programID];
+	glUseProgram(program);
+	GLint location = getUniLoc(programID, uniformID);
+	if (location == -1) //no such uniform error
+		return;
+	glUniform2ui(location, x, y);
+}
+
+void ShaderManager::sendUniform3ui(const std::string& programID,const std::string& uniformID
+							, uint x, uint y, uint z) {
+	GLuint program = shaderPrograms[programID];
+	glUseProgram(program);
+	GLint location = getUniLoc(programID, uniformID);
+	if (location == -1) //no such uniform error
+		return;
+	glUniform3ui(location, x, y, z);
+}
+
+void ShaderManager::sendUniform4ui(const std::string& programID,const std::string& uniformID
+							, uint x, uint y, uint z, uint w) {
+	GLuint program = shaderPrograms[programID];
+	glUseProgram(program);
+	GLint location = getUniLoc(programID, uniformID);
+	if (location == -1) //no such uniform error
+		return;
+	glUniform4ui(location, x, y, z, w);
+}
+
+/////////////////////////////////////////////MATRIX
+
+void ShaderManager::sendUniformMat2f(const std::string& programID,const std::string& uniformID
+							  , const float * value) {
+	GLuint program = shaderPrograms[programID];
+	glUseProgram(program);
+	GLint location = getUniLoc(programID, uniformID);
+	if (location == -1) //no such uniform error
+		return;
+	glUniformMatrix2fv(location, 1, GL_FALSE, value);
+}
+
+void ShaderManager::sendUniformMat3f(const std::string& programID,const std::string& uniformID
+							  , const float * value) {
+	GLuint program = shaderPrograms[programID];
+	glUseProgram(program);
+	GLint location = getUniLoc(programID, uniformID);
+	if (location == -1) //no such uniform error
+		return;
+	glUniformMatrix3fv(location, 1, GL_FALSE, value);
+}
+
+void ShaderManager::sendUniformMat4f(const std::string& programID,const std::string& uniformID
+							  , const float * value) {
+	GLuint program = shaderPrograms[programID];
+	glUseProgram(program);
+	GLint location = getUniLoc(programID, uniformID);
+	if (location == -1) //no such uniform error
+		return;
+	glUniformMatrix4fv(location, 1, GL_FALSE, value);
 }
