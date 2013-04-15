@@ -52,13 +52,13 @@ bool Model::loadVoxelization(const std::string &filePath) {
 }
 
 
-void Model::draw(const vec3f &pos,  const float m[16], const vec3f &scale) const {
+void Model::draw(const vec3f &pos,  const mat4f model, const vec3f &scale) const {
 	vec3f radius = vec3f(modelWidth*scale.x,modelHeight*scale.y,modelDepth*scale.z)*0.5f;
 	glBindBuffer(GL_ARRAY_BUFFER, VBOID);
 	glPushMatrix();
 
 	glTranslatef(pos.x,pos.y,pos.z);
-	glMultMatrixf(m);
+	glMultMatrixf(model.v);
 	glTranslatef(-radius.x,-radius.y,-radius.z);
 	glScalef(scale.x,scale.y,scale.z);
 

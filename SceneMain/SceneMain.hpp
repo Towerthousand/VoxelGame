@@ -2,9 +2,8 @@
 #define SCENEMAIN_HPP
 #include "Scene.hpp"
 #include "world/World.hpp"
-#include "entities/Player.hpp"
 
-class Skeleton;
+class GameObject;
 class SceneMain : public Scene {
 	public:
 		//virtual overrides

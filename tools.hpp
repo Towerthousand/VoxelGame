@@ -53,7 +53,6 @@ std::string toString(float num);
 #define CHUNKSIZE 16
 #define PLAYER_HEIGHT -1.8
 #define UPDATERADIUS 16.0f //How many potential light blocks does changing a block affect? Not taking into account skylight.
-//Usually UPDATERADIUS = MAXLIGHT-MINLIGHT
 #define MAXLIGHT 20
 #define MINLIGHT 3
 #define DEG_TO_RAD ((2*M_PI)/360.0f)

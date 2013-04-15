@@ -3,10 +3,15 @@
 #include "tools.hpp"
 
 class Game;
+class ShaderManager;
+class InputManager;
+class TextureManager;
+class FontManager;
+class AudioManager;
 class Scene {
 	public:
-		Scene(Game &parent) : parent(parent) {} //should NOT do anything apart from being called
-		virtual ~Scene() {}
+		Scene(Game &parent); //should NOT do anything apart from being called
+		virtual ~Scene();
 		virtual bool init() = 0; //should call loadResources()
 		virtual void update(float deltaTime) = 0; //called by parent on parent.update()
 		virtual void draw() const = 0; //called by parent on parent.draw()
@@ -18,7 +23,12 @@ class Scene {
 		virtual void onMouseButtonReleased(float deltaTime, sf::Mouse::Button button) = 0; //called by parent on parent.update()
 		virtual void onMouseMoved(float deltaTime, int dx, int dy) = 0; //called by parent on parent.update()
 		virtual void onClose() = 0; //close scene-wide stuff
-		
+
+		ShaderManager &getShaders();
+		InputManager &getInputs();
+		TextureManager &getTextures();
+		FontManager &getFonts();
+		AudioManager &getAudios();
 	protected:
 		Game& parent;
 		virtual bool loadResources() = 0; //load stuff with parent.resources

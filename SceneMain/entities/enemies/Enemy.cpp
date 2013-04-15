@@ -32,10 +32,10 @@ void Enemy::lookAtPlayer() {
 		right.normalize();
 		vec3f up = back^right;
 		up.normalize();
-		m[0 ] = right.x; m[4 ] = up.x; m[8 ] = back.x; m[12] = 0;
-		m[1 ] = right.y; m[5 ] = up.y; m[9 ] = back.y; m[13] = 0;
-		m[2 ] = right.z; m[6 ] = up.z; m[10] = back.z; m[14] = 0;
-		m[3 ] = 0;       m[7 ] = 0;    m[11] = 0;      m[15] = 1;
+		modelMatrix = mat4f(right.x, up.x, back.x, 0,
+							right.y, up.y, back.y, 0,
+							right.z, up.z, back.z, 0,
+							0      , 0   , 0     , 1);
 	}
 }
 

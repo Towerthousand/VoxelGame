@@ -24,6 +24,8 @@ class ShaderManager {
 		void sendUniform3f(const std::string& programID,const std::string& uniformID
 					  , float x, float y, float z);
 		void sendUniform4f(const std::string& programID,const std::string& uniformID
+					  , const vec4f& v);
+		void sendUniform4f(const std::string& programID,const std::string& uniformID
 					  , float x, float y, float z, float w);
 
 		//INTEGER
@@ -38,15 +40,23 @@ class ShaderManager {
 		void sendUniform3i(const std::string& programID,const std::string& uniformID
 					  , int x, int y, int z);
 		void sendUniform4i(const std::string& programID,const std::string& uniformID
+					  , const vec4i& v);
+		void sendUniform4i(const std::string& programID,const std::string& uniformID
 					  , int x, int y, int z, int w);
 
 		//UNSIGNED INTEGER
 		void sendUniform1ui(const std::string& programID,const std::string& uniformID
 					   , uint x);
 		void sendUniform2ui(const std::string& programID,const std::string& uniformID
+					  , const vec2ui& v);
+		void sendUniform2ui(const std::string& programID,const std::string& uniformID
 					   , uint x, uint y);
 		void sendUniform3ui(const std::string& programID,const std::string& uniformID
+					  , const vec3ui& v);
+		void sendUniform3ui(const std::string& programID,const std::string& uniformID
 					   , uint x, uint y, uint z);
+		void sendUniform4ui(const std::string& programID,const std::string& uniformID
+					  , const vec4ui& v);
 		void sendUniform4ui(const std::string& programID,const std::string& uniformID
 					   , uint x, uint y, uint z, uint w);
 

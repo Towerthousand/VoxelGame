@@ -1,6 +1,7 @@
 #include "SceneMain.hpp"
 #include "Game.hpp"
 #include "world/Chunk.hpp"
+#include "entities/Player.hpp"
 #include "entities/items/Arrow.hpp"
 #include "entities/items/Polla.hpp"
 #include "entities/enemies/Skeleton.hpp"
@@ -19,6 +20,12 @@ SceneMain::~SceneMain() {
 }
 
 bool SceneMain::loadResources() {
+	if(!getShaders().loadVertexShader("shaders/vertex.glsl", "VERTEX"))
+		return false;
+	if(!parent.shaders().loadFragmentShader("shaders/fragment.glsl", "FRAGMENT"))
+		return false;
+	if(!parent.shaders().makeProgram("VERTEX","FRAGMENT","PROGRAM"))
+		return false;
 	if(!parent.textures().loadTexture("lolwtf","resources/blocks" + toString(TEXSIZE) +".png"))
 		return false;
 	if(!parent.audio().loadMusic("troll","resources/troll.ogg"))
@@ -61,6 +68,9 @@ bool SceneMain::init() {
 	// Add player
 	addObject(player);
 	outLog("* Init was succesful" );
+	//setup shaders
+	glActiveTexture(GL_TEXTURE0);
+	parent.shaders().sendUniform1i("PROGRAM","tex0",0);
 	return true;
 }
 
@@ -95,6 +105,7 @@ void SceneMain::update(float deltaTime) {
 }
 
 void SceneMain::draw() const {
+	parent.shaders().useProgram("PROGRAM");
 	//Move matrix to position (according to player)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -108,6 +119,7 @@ void SceneMain::draw() const {
 	for(std::list<GameObject*>::const_iterator it = objects.begin();it != objects.end(); ++it)
 		(*it)->draw();
 
+	glUseProgram(0);
 	//Draw crosshair
 	glPushMatrix();
 	glLoadIdentity();
@@ -245,7 +257,7 @@ void SceneMain::onMouseButtonPressed(float deltaTime, sf::Mouse::Button button) 
 			float m[16];
 			glGetFloatv(GL_MODELVIEW_MATRIX, m);
 			vec3f dir(m[2],m[6],m[10]);//same as the player's pov
-			Skeleton * np = new Skeleton(this,player->camPos,player);
+			Polla * np = new Polla(this,player->camPos,player);
 			np->vel -= vec3f(dir.x*30.0,dir.y*30.0,dir.z*30.0);
 			addObject(np);
 

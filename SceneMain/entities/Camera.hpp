@@ -11,6 +11,8 @@ class Camera { //Just rotates in a human-like manner. Thought to be used with Ga
 
 		vec2f camRot;
 		vec3f camPos;
+
+		mat4f viewMatrix;
 };
 
 #endif // CAMERA_HPP

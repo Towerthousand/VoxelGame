@@ -13,6 +13,5 @@ class Shader {
 
 	private:
 		GLuint shaderHandle;
-		int length;
 };
 #endif // SHADER_HPP

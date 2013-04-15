@@ -17,11 +17,11 @@ void Arrow::update(float deltaTime) {
 }
 
 void Arrow::draw() const {
-	model.draw(pos-hitbox.radius,m,scale);
+	model.draw(pos-hitbox.radius,modelMatrix,scale);
 }
 
 void Arrow::movePos(float deltaTime) {
-	vec3f offset(-m[8]*0.6,-m[9]*0.6,-m[10]*0.6);//offset determines arrow's not position
+	vec3f offset(-modelMatrix(0,2)*0.6,-modelMatrix(1,2)*0.6,-modelMatrix(2,2)*0.6);//offset determines arrow's not position
 	if(!hitbox.collidesWithWorld(offset)) {
 		//Position
 		vel += acc*deltaTime; //a = const, v = at
@@ -48,16 +48,16 @@ void Arrow::movePos(float deltaTime) {
 			right.normalize();
 			vec3f up = back^right;
 			up.normalize();
-			m[0 ] = right.x; m[4 ] = up.x; m[8 ] = back.x; m[12] = 0;
-			m[1 ] = right.y; m[5 ] = up.y; m[9 ] = back.y; m[13] = 0;
-			m[2 ] = right.z; m[6 ] = up.z; m[10] = back.z; m[14] = 0;
-			m[3 ] = 0;       m[7 ] = 0;    m[11] = 0;      m[15] = 1;
+			modelMatrix = mat4f(right.x, up.x, back.x, 0,
+								right.y, up.y, back.y, 0,
+								right.z, up.z, back.z, 0,
+								0      , 0   , 0     , 1);
 		}
 		else if(!hitbox.collidesWithWorld(offset)){ //no x or z velocity, fall straight down
-			m[0 ] = 1; m[4 ] = 0; m[8 ] = 0; m[12] = 0;
-			m[1 ] = 0; m[5 ] = 0; m[9 ] = 1; m[13] = 0;
-			m[2 ] = 0; m[6 ] =-1; m[10] = 0; m[14] = 0;
-			m[3 ] = 0; m[7 ] = 0; m[11] = 0; m[15] = 1;
+			modelMatrix = mat4f(1, 0, 0, 0,
+								0, 1, 0, 0,
+								0, 0, 1, 0,
+								0, 0, 0, 1);
 		}
 	}
 }

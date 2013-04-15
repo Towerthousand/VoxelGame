@@ -1,4 +1,3 @@
-
 #ifndef GAME_HPP
 #define GAME_HPP
 
@@ -30,6 +29,7 @@
 #include "audio/AudioManager.hpp"
 #include "input/InputManager.hpp"
 #include "SceneMain/SceneMain.hpp"
+#include "graphics/ShaderManager.hpp"
 
 class Game {
 	public:
@@ -51,6 +51,7 @@ class Game {
 		FontManager &font() { return fontManager; }
 		AudioManager &audio() { return audioManager; }
 		InputManager &input() { return inputManager; }
+		ShaderManager &shaders() { return shaderManager; }
 		
 		bool isRunning;
 	private:
@@ -96,6 +97,7 @@ class Game {
 		FontManager fontManager;
 		AudioManager audioManager;
 		InputManager inputManager;
+		ShaderManager shaderManager;
 };
 
 #endif //GAME_HPP

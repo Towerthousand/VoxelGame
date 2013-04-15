@@ -1,4 +1,4 @@
-#include "Shadermanager.hpp"
+#include "ShaderManager.hpp"
 
 ShaderManager::ShaderManager() {
 }
@@ -20,7 +20,7 @@ bool ShaderManager::loadVertexShader(const std::string &filePath, const std::str
 bool ShaderManager::loadFragmentShader(const std::string &filePath, const std::string &shaderID) {
 	outLog("* Loading new fragment shader: \"" + shaderID + "\" from " + filePath);
 	Shader newShader;
-	if (!newShader.loadFromFile(GL_VERTEX_SHADER,filePath)) {
+	if (!newShader.loadFromFile(GL_FRAGMENT_SHADER,filePath)) {
 		outLog("#ERROR Failed to load fragment shader resource as \"" + shaderID + "\" from filepath " + filePath);
 		return false;
 	}
@@ -45,6 +45,7 @@ bool ShaderManager::makeProgram(const std::string& vertexShaderID, const std::st
 		glDeleteProgram(program);
 		return false;
 	}
+	shaderPrograms[programID] = program;
 	return true;
 }
 
@@ -59,7 +60,7 @@ void ShaderManager::useProgram(const std::string &programID) {
 GLint ShaderManager::getUniLoc(const std::string& programID, const std::string &uniformID) {
 	GLuint program = shaderPrograms[programID];
 	useProgram(programID);
-	GLint location = glGetUniformLocation(program, uniformID.c_str());
+	GLint location = glGetUniformLocation(program, (GLchar *) uniformID.c_str());
 	if (location == -1)
 		outLog("#ERROR When trying to get uniform from \"" + programID + "\": no uniform named " + uniformID);
 	return location;
@@ -114,6 +115,10 @@ void ShaderManager::sendUniform4f(const std::string& programID,const std::string
 	glUniform4f(location, x, y, z, w);
 }
 
+void ShaderManager::sendUniform4f(const std::string& programID,const std::string& uniformID, const vec4f& v){
+	sendUniform4f(programID, uniformID, v.x, v.y, v.z, v.w);
+}
+
 /////////////////////////////////////////////INTEGERS
 
 void ShaderManager::sendUniform1i(const std::string& programID,const std::string& uniformID, int x) {
@@ -163,6 +168,10 @@ void ShaderManager::sendUniform4i(const std::string& programID,const std::string
 	glUniform4i(location, x, y, z, w);
 }
 
+void ShaderManager::sendUniform4i(const std::string& programID,const std::string& uniformID, const vec4i& v){
+	sendUniform4i(programID, uniformID, v.x, v.y, v.z, v.w);
+}
+
 /////////////////////////////////////////////UNSIGNED INTEGERS
 
 void ShaderManager::sendUniform1ui(const std::string& programID,const std::string& uniformID, uint x) {
@@ -184,6 +193,10 @@ void ShaderManager::sendUniform2ui(const std::string& programID,const std::strin
 	glUniform2ui(location, x, y);
 }
 
+void ShaderManager::sendUniform2ui(const std::string& programID,const std::string& uniformID, const vec2ui& v) {
+	sendUniform2ui(programID, uniformID, v.x, v.y);
+}
+
 void ShaderManager::sendUniform3ui(const std::string& programID,const std::string& uniformID
 							, uint x, uint y, uint z) {
 	GLuint program = shaderPrograms[programID];
@@ -194,6 +207,10 @@ void ShaderManager::sendUniform3ui(const std::string& programID,const std::strin
 	glUniform3ui(location, x, y, z);
 }
 
+void ShaderManager::sendUniform3ui(const std::string& programID,const std::string& uniformID, const vec3ui& v) {
+	sendUniform3ui(programID, uniformID, v.x, v.y, v.z);
+}
+
 void ShaderManager::sendUniform4ui(const std::string& programID,const std::string& uniformID
 							, uint x, uint y, uint z, uint w) {
 	GLuint program = shaderPrograms[programID];
@@ -202,6 +219,10 @@ void ShaderManager::sendUniform4ui(const std::string& programID,const std::strin
 	if (location == -1) //no such uniform error
 		return;
 	glUniform4ui(location, x, y, z, w);
+}
+
+void ShaderManager::sendUniform4ui(const std::string& programID,const std::string& uniformID, const vec4ui& v){
+	sendUniform4ui(programID, uniformID, v.x, v.y, v.z, v.w);
 }
 
 /////////////////////////////////////////////MATRIX

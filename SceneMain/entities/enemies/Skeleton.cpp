@@ -38,7 +38,7 @@ void Skeleton::update(float deltaTime) {
 }
 
 void Skeleton::draw() const {
-	model.draw(pos, m,scale);
+	model.draw(pos, modelMatrix,scale);
 }
 
 Model Skeleton::model;

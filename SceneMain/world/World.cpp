@@ -1,5 +1,6 @@
 #include "World.hpp"
 #include "Chunk.hpp"
+#include "../entities/Player.hpp"
 #include "../SceneMain.hpp"
 
 World::World(SceneMain* parentScene, Player* player) :
