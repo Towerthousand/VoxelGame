@@ -20,13 +20,13 @@ void Skeleton::update(float deltaTime) {
 	movePos(deltaTime);
 
 	cooldown -= deltaTime;
-	if (norm(targetPlayer->pos-pos) < 20 ) {
+	if ((targetPlayer->pos-pos).module() < 20 ) {
 		lookAtPlayer();
 		if (cooldown <= 0) {
 			cooldown = 1;
 			Arrow* na = new Arrow(parentScene,(pos+shootPosOffset));
 			na->vel = targetPlayer->camPos-(pos+shootPosOffset);
-			normalize(na->vel);
+			na->vel.normalize();
 			na->vel *= 70.0f;
 			parentScene->addObject(na);
 		}

@@ -155,7 +155,7 @@ void World::draw() const {
 		for(int y = 0; y < WORLDHEIGHT; ++y)
 			for(int z = 0; z < WORLDWIDTH; ++z)
 				if(!chunks[x][y][z]->outOfView) {
-					dist = norm(vec3f(x*CHUNKSIZE,y*CHUNKSIZE,z*CHUNKSIZE) + vec3f(CHUNKSIZE/2,CHUNKSIZE/2,CHUNKSIZE/2) - parentScene->player->pos);
+					dist = (vec3f(x*CHUNKSIZE,y*CHUNKSIZE,z*CHUNKSIZE) + vec3f(CHUNKSIZE/2,CHUNKSIZE/2,CHUNKSIZE/2) - parentScene->player->pos).module();
 					queryList.push(std::pair<float,Chunk*>(-dist,chunks[x][y][z]));
 				}
 

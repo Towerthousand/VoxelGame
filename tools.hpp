@@ -16,13 +16,10 @@
 #include <cmath>
 #include <queue>
 #include <utility>
-#include "Math.hpp"
+#include "BudMath.hpp"
 #include <list>
 
-typedef sf::Vector3<float> vec3f;
-typedef sf::Vector3<int> vec3i;
-typedef sf::Vector2<float> vec2f;
-typedef sf::Vector2<int> vec2i;
+using namespace math;
 
 struct Vertex {
 		Vertex(short vx = 0, short vy = 0, short  vz = 0,

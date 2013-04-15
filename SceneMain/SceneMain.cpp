@@ -57,7 +57,7 @@ bool SceneMain::init() {
 	glLoadIdentity();
 	glScalef(1.0/512.0f,1.0/512.0f,1); //now textures are in pixel coords (only works for world texture)
 	//Center mouse
-	sf::Mouse::setPosition(vec2i(SCRWIDTH/2,SCRHEIGHT/2),parent.getWindow());
+	sf::Mouse::setPosition(sf::Vector2i(SCRWIDTH/2,SCRHEIGHT/2),parent.getWindow());
 	// Add player
 	addObject(player);
 	outLog("* Init was succesful" );
@@ -79,7 +79,7 @@ void SceneMain::update(float deltaTime) {
 	}
 	//Kill game objects far away from player
 	for(std::list<GameObject*>::iterator it = objects.begin(); it != objects.end(); ++it)
-		if (std::fabs(norm((*it)->pos-player->pos)) > 200)
+		if (std::abs(((*it)->pos-player->pos).module()) > 200)
 			(*it)->isAlive = false;
 	//Erase dead game objects
 	for(std::list<GameObject*>::iterator it = objects.begin(); it != objects.end();)
@@ -274,7 +274,7 @@ void SceneMain::onMouseMoved(float deltaTime, int dx, int dy) {
 	if (parent.input().focus){
 		player->rotateX(dy*0.5);
 		player->rotateY(dx*0.5);
-		sf::Mouse::setPosition(vec2i(SCRWIDTH/2, SCRHEIGHT/2),parent.getWindow());
+		sf::Mouse::setPosition(sf::Vector2i(SCRWIDTH/2, SCRHEIGHT/2),parent.getWindow());
 		parent.input().setMousePos(SCRWIDTH/2, SCRHEIGHT/2);
 	}
 }

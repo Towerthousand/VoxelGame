@@ -24,7 +24,7 @@ bool FontManager::makeText(const std::string& textID, const std::string& textStr
 					   text.getLocalBounds().height/2);
 	text.setOrigin(text.getOrigin().x + text.getLocalBounds().left, //deviation restored
 				   text.getOrigin().y + text.getLocalBounds().top); //deviation restored
-	text.setPosition(position);
+	text.setPosition(sf::Vector2f(position.x,position.y));
 	texts[textID] = text;
 	return true;
 }

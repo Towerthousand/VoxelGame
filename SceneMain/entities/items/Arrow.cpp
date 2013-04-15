@@ -40,14 +40,14 @@ void Arrow::movePos(float deltaTime) {
 
 		//rotation
 		vec3f dummyUp(0,1,0);
-		if(norm(cross(dummyUp, vel)) != 0) {
+		if((dummyUp^vel).module() != 0) {
 			vec3f back = -vel;
-			normalize(back);
+			back.normalize();
 			vec3f dummyUp(0,1,0);
-			vec3f right = cross(dummyUp,back);
-			normalize(right);
-			vec3f up = cross(back,right);
-			normalize(up);
+			vec3f right = dummyUp^back;
+			right.normalize();
+			vec3f up = back^right;
+			up.normalize();
 			m[0 ] = right.x; m[4 ] = up.x; m[8 ] = back.x; m[12] = 0;
 			m[1 ] = right.y; m[5 ] = up.y; m[9 ] = back.y; m[13] = 0;
 			m[2 ] = right.z; m[6 ] = up.z; m[10] = back.z; m[14] = 0;

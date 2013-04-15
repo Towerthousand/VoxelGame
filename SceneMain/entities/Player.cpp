@@ -125,10 +125,10 @@ bool Player::insideFrustum( const vec3f &center, float radius) const {
 		//construct the plane with a normal and a point
 		vec3f v = frustumPlanes[i][1]-frustumPlanes[i][0];
 		vec3f u = frustumPlanes[i][2]-frustumPlanes[i][0];
-		vec3f n = cross(v,u); //normal n = (Ax,By,Cz), point [0] = (p1,p2,p3)
-		normalize(n);
-		D = -dot(n,frustumPlanes[i][0]); //A*p1*x + B*p2*y + C*p3*z + D = 0 => D = -dot(n,P)
-		distance = dot(n,center) + D;//Solve the equation using the player's pos instead
+		vec3f n = v^u; //normal n = (Ax,By,Cz), point [0] = (p1,p2,p3)
+		n.normalize();
+		D = -n*frustumPlanes[i][0]; //A*p1*x + B*p2*y + C*p3*z + D = 0 => D = -dot(n,P)
+		distance = n*center + D;//Solve the equation using the player's pos instead
 		//of a point in the plane.
 		if (distance < -radius)
 			return false; //not inside this player's view
