@@ -11,17 +11,22 @@ GLuint& Shader::getHandle() {
 }
 
 bool Shader::loadFromFile(GLenum type, const std::string& filePath) {
+	glDeleteShader(shaderHandle);
+	shaderHandle = 0;
+	//Load
 	std::vector<char> fileContents;
 	int length;
 	if (!getFileContents(filePath,fileContents,length)) {
 		outLog("#ERROR Failed to get the contents from " + filePath);
 		return false;
 	}
+	//Create
 	shaderHandle = glCreateShader(type);
-	for (int i = 0; i < fileContents.size(); ++i)
-		std::cout << fileContents[i];
-	std::cout << std::endl;
+//	for (int i = 0; i < fileContents.size(); ++i) //output shader
+//		std::cout << fileContents[i];
+//	std::cout << std::endl;
 	glShaderSource(shaderHandle, 1, (const GLchar**)&fileContents, &length);
+	//Compile
 	glCompileShader(shaderHandle);
 	int compiled;
 	glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &compiled);

@@ -6,12 +6,11 @@ class Shader {
 	public:
 		Shader();
 		~Shader();
-
-		bool loadFromFile(GLenum type, const std::string &filePath);
-		bool getFileContents(const std::string& filePath, std::vector<char>& buffer, int &fileLength);
 		GLuint &getHandle();
+		bool loadFromFile(GLenum type, const std::string &filePath);
 
 	private:
+		bool getFileContents(const std::string& filePath, std::vector<char>& buffer, int &fileLength);
 		GLuint shaderHandle;
 };
 #endif // SHADER_HPP

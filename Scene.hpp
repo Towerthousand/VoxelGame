@@ -3,7 +3,7 @@
 #include "tools.hpp"
 
 class Game;
-class ShaderManager;
+class RenderState;
 class InputManager;
 class TextureManager;
 class FontManager;
@@ -24,11 +24,11 @@ class Scene {
 		virtual void onMouseMoved(float deltaTime, int dx, int dy) = 0; //called by parent on parent.update()
 		virtual void onClose() = 0; //close scene-wide stuff
 
-		ShaderManager &getShaders();
 		InputManager &getInputs();
 		TextureManager &getTextures();
 		FontManager &getFonts();
 		AudioManager &getAudios();
+		RenderState &getState();
 	protected:
 		Game& parent;
 		virtual bool loadResources() = 0; //load stuff with parent.resources

@@ -4,6 +4,7 @@
 #include "world/World.hpp"
 
 class GameObject;
+class ShaderProgram;
 class SceneMain : public Scene {
 	public:
 		//virtual overrides
@@ -23,9 +24,9 @@ class SceneMain : public Scene {
 
 		void addObject(GameObject* object);
 		World& getWorld();
+		const ShaderProgram& getShader(const std::string& ID) const;
 
 		int chunksDrawn;
-		int WORLDSEED;
 		Player* player; //for easy access, so that you don't have to search the object vector each time
 
 	private:
@@ -33,9 +34,9 @@ class SceneMain : public Scene {
 
 		World world;
 		std::list<GameObject*> objects;
+		std::map<std::string,ShaderProgram> shaders;
 		float debugCounter;
 		int fpsCount;
-		sf::Clock clock;
 };
 
 #endif // SCENEMAIN_HPP

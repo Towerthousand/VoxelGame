@@ -211,8 +211,6 @@ void World::draw() const {
 			}
 		}
 	}
-	if (playerTargetsBlock)
-		drawWireCube(targetedBlock);
 }
 
 void World::update(float deltaTime) {

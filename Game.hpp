@@ -29,7 +29,7 @@
 #include "audio/AudioManager.hpp"
 #include "input/InputManager.hpp"
 #include "SceneMain/SceneMain.hpp"
-#include "graphics/ShaderManager.hpp"
+#include "RenderState.hpp"
 
 class Game {
 	public:
@@ -51,7 +51,7 @@ class Game {
 		FontManager &font() { return fontManager; }
 		AudioManager &audio() { return audioManager; }
 		InputManager &input() { return inputManager; }
-		ShaderManager &shaders() { return shaderManager; }
+		RenderState &state() { return renderState; }
 		
 		bool isRunning;
 	private:
@@ -97,7 +97,7 @@ class Game {
 		FontManager fontManager;
 		AudioManager audioManager;
 		InputManager inputManager;
-		ShaderManager shaderManager;
+		RenderState renderState;
 };
 
 #endif //GAME_HPP

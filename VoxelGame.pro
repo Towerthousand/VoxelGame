@@ -29,8 +29,9 @@ SOURCES += \
     $$PWD/SceneMain/entities/enemies/Enemy.cpp \
     $$PWD/SceneMain/entities/enemies/Skeleton.cpp \
     $$PWD/graphics/Shader.cpp \
-	$$PWD/graphics/ShaderManager.cpp \
-    Scene.cpp
+	$$PWD/graphics/ShaderProgram.cpp \
+    Scene.cpp \
+    RenderState.cpp
 
 HEADERS += \
     $$PWD/Scene.hpp \
@@ -57,9 +58,12 @@ HEADERS += \
     $$PWD/SceneMain/entities/enemies/Enemy.hpp \
     $$PWD/SceneMain/entities/enemies/Skeleton.hpp \
     $$PWD/graphics/Shader.hpp \
-	$$PWD/graphics/ShaderManager.hpp \
-    $$PWD/BudMath.hpp
+	$$PWD/graphics/ShaderProgram.hpp \
+    $$PWD/BudMath.hpp \
+	$$PWD/RenderState.hpp
 
 OTHER_FILES += \
-    shaders/vertex.glsl \
-    shaders/fragment.glsl
+    shaders/terrain_fragment.glsl \
+    shaders/terrain_vertex.glsl \
+    shaders/model_vertex.glsl \
+    shaders/model_fragment.glsl

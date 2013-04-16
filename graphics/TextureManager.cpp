@@ -19,12 +19,14 @@ bool TextureManager::loadTexture(const std::string& textureID, const std::string
 	return true;
 }
 
-void TextureManager::useTexture(const std::string& textureID) {
+void TextureManager::useTexture(const std::string& textureID, GLenum texUnit) {
+	glActiveTexture(texUnit);
 	if (textureBank.count(textureID) == 0) {
 		textureBank.erase(textureID);
 		outLog("#WARNING Trying to bind unexisting textureID: \"" + textureID + "\"");
 	}
 	else textureBank[textureID].bind();
+	glActiveTexture(GL_TEXTURE0);
 }
 
 void TextureManager::deleteTexture(const std::string& textureID) {

@@ -35,6 +35,9 @@ class World {
 		void update(float deltaTime);
 		void traceView(const Player *playerCam, float tMax);
 
+		//this should go in graphicutils or something
+		void drawWireCube(const vec3f& pos) const;
+
 		bool playerTargetsBlock;
 		vec3f targetedBlock;
 		vec3f last;
@@ -43,7 +46,6 @@ class World {
 		void calculateLight(vec3i source, vec2i radius);
 		void processCubeLighting(const vec3i& source, const vec3i& offset, std::vector<vec3i> &queue);
 		void updateStuff(float deltaTime);
-		void drawWireCube(const vec3f& pos) const;
 
 		SceneMain* parentScene;
 		Player* player;

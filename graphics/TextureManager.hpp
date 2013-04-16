@@ -9,7 +9,7 @@ class TextureManager
 		~TextureManager();
 
 		bool loadTexture(const std::string& textureID, const std::string& filePath);
-		void useTexture(const std::string& textureID);
+		void useTexture(const std::string& textureID, GLenum texUnit);
 		void deleteTexture(const std::string& textureID);
 	private:
 		std::map<std::string,Texture> textureBank;

@@ -7,35 +7,38 @@
 #include "entities/enemies/Skeleton.hpp"
 
 SceneMain::SceneMain(Game &parent) :
-	Scene(parent), chunksDrawn(0), WORLDSEED(std::time(0)%1000),
+	Scene(parent), chunksDrawn(0),
 	player(new Player(this, vec3f(0,1,0))), world(this,player),
 	debugCounter(0.0), fpsCount(0) {
 }
 
 SceneMain::~SceneMain() {
-	for(std::list<GameObject*>::iterator it = objects.begin(); it != objects.end(); ++it) {
-		if(*it != NULL)
-			delete *it;
-	}
 }
 
 bool SceneMain::loadResources() {
-	if(!getShaders().loadVertexShader("shaders/vertex.glsl", "VERTEX"))
+	//shaders
+	ShaderProgram s;
+	if(!s.makeProgram("shaders/terrain_vertex.glsl","shaders/terrain_fragment.glsl"))
 		return false;
-	if(!parent.shaders().loadFragmentShader("shaders/fragment.glsl", "FRAGMENT"))
+	shaders["TERRAIN"] = s;
+	s = ShaderProgram();
+	if(!s.makeProgram("shaders/model_vertex.glsl","shaders/model_fragment.glsl"))
 		return false;
-	if(!parent.shaders().makeProgram("VERTEX","FRAGMENT","PROGRAM"))
-		return false;
+	shaders["MODEL"] = s;
+	//textures
 	if(!parent.textures().loadTexture("lolwtf","resources/blocks" + toString(TEXSIZE) +".png"))
 		return false;
+	//music
 	if(!parent.audio().loadMusic("troll","resources/troll.ogg"))
 		return false;
+	//models
 	if(!Arrow::model.loadVoxelization("resources/arrow.vox"))
 		return false;
 	if(!Polla::model.loadVoxelization("resources/pene.vox"))
 		return false;
 	if(!Skeleton::model.loadVoxelization("resources/mob.vox"))
 		return false;
+	//terrain
 	outLog("* Loading new world" );
 	if (!world.loadDirbaio("resources/out.bin"))
 		return false;
@@ -60,6 +63,7 @@ bool SceneMain::init() {
 	parent.font().makeText("Updates","",20,vec2f(10,130),sf::Color::White,sf::Text::Bold,false);
 	parent.font().makeText("FPS","",20,vec2f(10,150),sf::Color::White,sf::Text::Bold,false);
 	//Set up textures
+	glActiveTexture(GL_TEXTURE0);
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
 	glScalef(1.0/512.0f,1.0/512.0f,1); //now textures are in pixel coords (only works for world texture)
@@ -70,7 +74,7 @@ bool SceneMain::init() {
 	outLog("* Init was succesful" );
 	//setup shaders
 	glActiveTexture(GL_TEXTURE0);
-	parent.shaders().sendUniform1i("PROGRAM","tex0",0);
+	getShader("TERRAIN").sendUniform1i("tex0",0);
 	return true;
 }
 
@@ -105,7 +109,6 @@ void SceneMain::update(float deltaTime) {
 }
 
 void SceneMain::draw() const {
-	parent.shaders().useProgram("PROGRAM");
 	//Move matrix to position (according to player)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -114,12 +117,18 @@ void SceneMain::draw() const {
 	glTranslatef(-player->camPos.x, -player->camPos.y, -player->camPos.z);
 
 	//Draw all the stuff
-	parent.textures().useTexture("lolwtf");
+	getShader("TERRAIN").use();
+	parent.textures().useTexture("lolwtf", GL_TEXTURE0);
+	//world
 	world.draw();
+	getShader("MODEL").use();
+	if (world.playerTargetsBlock)
+		world.drawWireCube(world.targetedBlock);
+	//models
 	for(std::list<GameObject*>::const_iterator it = objects.begin();it != objects.end(); ++it)
 		(*it)->draw();
-
 	glUseProgram(0);
+
 	//Draw crosshair
 	glPushMatrix();
 	glLoadIdentity();
@@ -292,10 +301,14 @@ void SceneMain::onMouseMoved(float deltaTime, int dx, int dy) {
 }
 
 void SceneMain::onClose() {
-	outLog("* Closing scene: Main" );
-
 	parent.textures().deleteTexture("lolwtf");
 	parent.audio().deleteMusic("troll");
+
+	outLog("* Deleting GameObjects on SceneMain" );
+	for(std::list<GameObject*>::iterator it = objects.begin(); it != objects.end(); ++it) {
+		if(*it != NULL)
+			delete *it;
+	}
 }
 
 void SceneMain::addObject(GameObject* object) {
@@ -304,4 +317,8 @@ void SceneMain::addObject(GameObject* object) {
 
 World& SceneMain::getWorld() {
 	return world;
+}
+
+const ShaderProgram &SceneMain::getShader(const std::string& ID) const {
+	return shaders.at(ID);
 }
