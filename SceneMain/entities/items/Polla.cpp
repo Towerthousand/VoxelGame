@@ -1,5 +1,7 @@
 #include "Polla.hpp"
 #include "../Player.hpp"
+#include "../../SceneMain.hpp"
+#include "../../../Game.hpp"
 
 Polla::Polla(SceneMain* scene, const vec3f &pos, Player *player, const vec3f &scale) :
 	Entity(scene,pos,scale), followedPlayer(player) {
@@ -10,19 +12,46 @@ Polla::~Polla() {
 }
 
 void Polla::update(float deltaTime) {
-	vel += vec3f((followedPlayer->pos.x-pos.x+0.6)/100,(followedPlayer->pos.y-pos.y+0.6)/100,(followedPlayer->pos.z-pos.z+0.6)/100);
 	movePos(deltaTime);
+	updateMatrix();
+}
+
+void Polla::updateMatrix() {
+	modelMatrix = mat4f::fromIdentity();
+	modelMatrix.translate(pos.x,pos.y,pos.z);
+	//rotation
+	vec3f dummyUp(0,1,0);
+	if((dummyUp^vel).module() != 0) {
+		vec3f back = -vel;
+		back.normalize();
+		vec3f right = dummyUp^back;
+		right.normalize();
+		vec3f up = back^right;
+		up.normalize();
+		modelMatrix *= mat4f(right.x, up.x, back.x, 0,
+							right.y, up.y, back.y, 0,
+							right.z, up.z, back.z, 0,
+							0      , 0   , 0     , 1);
+	}
+	vec3f radius = vec3f(model.modelWidth*scale.x,
+						 model.modelHeight*scale.y,
+						 model.modelDepth*scale.z)*0.5f;
+	modelMatrix.translate(-radius.x,-radius.y,-radius.z); //translate to center, after rotation
+	modelMatrix.scale(scale.x,scale.y,scale.z);
 }
 
 void Polla::draw() const{
-	vec3f newScale = scale;
-	newScale.z *= std::abs(std::sin(GLOBALCLOCK.getElapsedTime().asSeconds()*5));
-	model.draw(pos-hitbox.radius,modelMatrix,newScale);
+	mat4f poppedMat = parentScene->getState().model;
+	parentScene->getState().model = modelMatrix;
+	parentScene->getState().updateShaderUniforms(parentScene->getShader("MODEL"));
+	model.draw();
+	parentScene->getState().model = poppedMat;
 }
 
 void Polla::movePos(float deltaTime) {
-
-	//Position
+	vel += vec3f((followedPlayer->pos.x-pos.x+0.6),
+				 (followedPlayer->pos.y-pos.y+0.6),
+				 (followedPlayer->pos.z-pos.z+0.6)) * deltaTime;
 	vec3f disp = vel*deltaTime; //deltaX = x0 + vt (intended displacement)
 	if (hitbox.collidesWithWorld(vec3f(disp.x,0,0)) ||
 		hitbox.collidesWithWorld(vec3f(0,disp.y,0)) ||
@@ -34,21 +63,6 @@ void Polla::movePos(float deltaTime) {
 	disp = vel*deltaTime; //corrected displacement
 	disp.y += std::sin(GLOBALCLOCK.getElapsedTime().asSeconds()*10)/50;
 	pos += disp;
-
-	//rotation
-	vec3f dummyUp(0,1,0);
-	if((dummyUp^vel).module() != 0) {
-		vec3f back = -vel;
-		back.normalize();
-		vec3f right = dummyUp^back;
-		right.normalize();
-		vec3f up = back^right;
-		up.normalize();
-		modelMatrix = mat4f(right.x, up.x, back.x, 0,
-							right.y, up.y, back.y, 0,
-							right.z, up.z, back.z, 0,
-							0      , 0   , 0     , 1);
-	}
 }
 
 Model Polla::model = Model();

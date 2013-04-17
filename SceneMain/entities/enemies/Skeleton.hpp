@@ -8,6 +8,7 @@ class Skeleton : public Enemy {
 		~Skeleton();
 
 		void update(float deltaTime);
+		void updateMatrix();
 		void draw() const;
 
 		static Model model;

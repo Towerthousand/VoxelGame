@@ -2,6 +2,7 @@
 #include "Chunk.hpp"
 #include "../entities/Player.hpp"
 #include "../SceneMain.hpp"
+#include "../../Game.hpp"
 
 World::World(SceneMain* parentScene, Player* player) :
 	playerTargetsBlock(false), targetedBlock(0,0,0),
@@ -45,7 +46,7 @@ bool World::loadDirbaio(const std::string &filePath) {
 	for (int x = 0; x < WORLDWIDTH; ++x)
 		for (int y = 0; y < WORLDHEIGHT; ++y)
 			for (int z = 0; z < WORLDWIDTH; ++z)
-				chunks[x][y][z] = new Chunk(x,y,z,this);
+				chunks[x][y][z] = new Chunk(x,y,z,parentScene);
 	outLog(" - Loading chunk data...");
 	for(int y = 0; y < sizeY; ++y)
 		for(int x = 0; x < sizeX; ++x)
@@ -134,7 +135,7 @@ void World::setCubeLight(int x, int y, int z, unsigned char light) { //set the l
 
 void World::draw() const {
 	parentScene->chunksDrawn = 0;
-	//empty culing
+	//empty culling
 	for (int x = 0; x < WORLDWIDTH; ++x)
 		for (int y = 0; y < WORLDHEIGHT; ++y)
 			for (int z = 0; z < WORLDWIDTH; ++z) {
@@ -154,16 +155,15 @@ void World::draw() const {
 	float dist = 0;
 	for(int x = 0; x < WORLDWIDTH; ++x)
 		for(int y = 0; y < WORLDHEIGHT; ++y)
-			for(int z = 0; z < WORLDWIDTH; ++z)
+			for(int z = 0; z < WORLDWIDTH; ++z) {
 				if(!chunks[x][y][z]->outOfView) {
 					dist = (vec3f(x*CHUNKSIZE,y*CHUNKSIZE,z*CHUNKSIZE) + vec3f(CHUNKSIZE/2,CHUNKSIZE/2,CHUNKSIZE/2) - parentScene->player->pos).module();
 					queryList.push(std::pair<float,Chunk*>(-dist,chunks[x][y][z]));
 				}
+			}
 
-	int layers = 5;
+	int layers = 10;
 	int chunksPerLayer = queryList.size()/layers + int(queryList.size()%layers > 0); //chunks per pass
-	std::vector<GLuint> queries(chunksPerLayer,0);
-
 	//first layer is always drawn
 	for(int i = 0; i < chunksPerLayer && queryList.size() > 0; i++) {
 		std::pair<float,Chunk*> c = queryList.top();
@@ -173,6 +173,7 @@ void World::draw() const {
 	}
 	//Query other layers
 	for(int currLayer = 1; currLayer < layers && queryList.size() > 0; ++currLayer) {
+		std::vector<GLuint> queries(chunksPerLayer,0);
 		std::vector<Chunk*> chunkPointers(chunksPerLayer,NULL);
 
 		//disable rendering state
@@ -182,15 +183,15 @@ void World::draw() const {
 
 		//generate and send the queries
 		int queriesSent = 0;
-		glGenOcclusionQueriesNV(chunksPerLayer, &queries[0]);
+		glGenQueries(chunksPerLayer, &queries[0]);
 		for (int i = 0; i < chunksPerLayer && queryList.size() > 0; ++i) {
 			Chunk* currChunk = queryList.top().second;
 			chunkPointers[i] = currChunk;
 			queryList.pop();
 
-			glBeginOcclusionQueryNV(queries[i]);
+			glBeginQuery(GL_ANY_SAMPLES_PASSED,queries[i]);
 			currChunk->drawBoundingBox();
-			glEndOcclusionQueryNV();
+			glEndQuery(GL_ANY_SAMPLES_PASSED);
 			++queriesSent;
 		}
 
@@ -202,14 +203,18 @@ void World::draw() const {
 		//collect query results
 		for (int i = 0; i < queriesSent; ++i) {
 			//if we have pending query, get result
-			GLuint pixelCount;
-			glGetOcclusionQueryuivNV(queries[i], GL_PIXEL_COUNT_NV, &pixelCount);
+			GLint seen;
+			glGetQueryObjectiv(queries[i],GL_QUERY_RESULT, &seen);
 			//if seen, draw it
-			if (pixelCount != 0) {
+			if (seen > 0) {
 				chunkPointers[i]->draw();
 				++parentScene->chunksDrawn;
 			}
+			else
+				chunkPointers[i]->drawBoundingBox();
 		}
+		//delete the queries
+		glDeleteQueries(queries.size(),&queries[0]);
 	}
 }
 
@@ -395,17 +400,19 @@ void World::updateStuff(float deltaTime) { //only to be called by world.update()
 }
 
 void World::drawWireCube(const vec3f &pos) const {
-	glPushMatrix();
+	mat4f poppedMat = parentScene->getState().model;
+	parentScene->getState().model.translate(pos.x-0.0025,pos.y-0.0025,pos.z-0.0025);
+	parentScene->getState().model.scale(1.005,1.005,1.005);
+	parentScene->getState().updateShaderUniforms(parentScene->getShader("MODEL"));
+	parentScene->getShader("MODEL").use();
 	glLineWidth(1.5);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glColor4f(0.0,0.0,0.0,0.5);
 	glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
-	glTranslatef(pos.x-0.0025,pos.y-0.0025,pos.z-0.0025);
-	glScalef(1.005,1.005,1.005);
 	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glColor4f(1.0,1.0,1.0,1.0);
-	glPopMatrix();
+	parentScene->getState().model = poppedMat;
 }
 
 const int World::vertexPoints[8][3] = {

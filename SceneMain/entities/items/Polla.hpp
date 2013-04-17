@@ -10,6 +10,7 @@ class Polla : public Entity {
 		~Polla();
 
 		void update(float deltaTime);
+		void updateMatrix();
 		void draw() const;
 		void movePos(float deltaTime);
 

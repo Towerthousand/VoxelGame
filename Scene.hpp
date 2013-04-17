@@ -24,11 +24,11 @@ class Scene {
 		virtual void onMouseMoved(float deltaTime, int dx, int dy) = 0; //called by parent on parent.update()
 		virtual void onClose() = 0; //close scene-wide stuff
 
-		InputManager &getInputs();
-		TextureManager &getTextures();
-		FontManager &getFonts();
-		AudioManager &getAudios();
-		RenderState &getState();
+		InputManager &getInputs() const;
+		TextureManager &getTextures() const;
+		FontManager &getFonts() const;
+		AudioManager &getAudios() const;
+		RenderState &getState() const;
 	protected:
 		Game& parent;
 		virtual bool loadResources() = 0; //load stuff with parent.resources

@@ -64,17 +64,15 @@ bool SceneMain::init() {
 	parent.font().makeText("FPS","",20,vec2f(10,150),sf::Color::White,sf::Text::Bold,false);
 	//Set up textures
 	glActiveTexture(GL_TEXTURE0);
-	glMatrixMode(GL_TEXTURE);
-	glLoadIdentity();
-	glScalef(1.0/512.0f,1.0/512.0f,1); //now textures are in pixel coords (only works for world texture)
+	getState().texture[0] = mat4f::fromScale(1.0/512.0f,1.0/512.0f,1); //now texture0 is in pixel coords
 	//Center mouse
 	sf::Mouse::setPosition(sf::Vector2i(SCRWIDTH/2,SCRHEIGHT/2),parent.getWindow());
 	// Add player
 	addObject(player);
 	outLog("* Init was succesful" );
 	//setup shaders
-	glActiveTexture(GL_TEXTURE0);
-	getShader("TERRAIN").sendUniform1i("tex0",0);
+	getState().initShaderUniforms(getShader("TERRAIN"));
+	getState().initShaderUniforms(getShader("MODEL"));
 	return true;
 }
 
@@ -109,44 +107,20 @@ void SceneMain::update(float deltaTime) {
 }
 
 void SceneMain::draw() const {
+	//calculate perspective matrix
+	getState().projection = mat4f::fromPerspective(FOV,ZNEAR,ZFAR,float(SCRWIDTH)/float(SCRHEIGHT));
 	//Move matrix to position (according to player)
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glRotatef(player->camRot.x, 1, 0, 0);
-	glRotatef(player->camRot.y, 0, 1, 0);
-	glTranslatef(-player->camPos.x, -player->camPos.y, -player->camPos.z);
-
+	getState().view = player->viewMatrix;
 	//Draw all the stuff
-	getShader("TERRAIN").use();
 	parent.textures().useTexture("lolwtf", GL_TEXTURE0);
 	//world
 	world.draw();
-	getShader("MODEL").use();
 	if (world.playerTargetsBlock)
 		world.drawWireCube(world.targetedBlock);
 	//models
 	for(std::list<GameObject*>::const_iterator it = objects.begin();it != objects.end(); ++it)
 		(*it)->draw();
 	glUseProgram(0);
-
-	//Draw crosshair
-	glPushMatrix();
-	glLoadIdentity();
-	glDisable(GL_TEXTURE_2D);
-	glDisable(GL_DEPTH_TEST);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glLineWidth(2.0);
-	glBegin(GL_LINES);
-	glColor3f(1,1,1);
-	glVertex3f(-0.0002,      0,-0.01);
-	glVertex3f( 0.0002,      0,-0.01);
-	glVertex3f(      0,-0.0002,-0.01);
-	glVertex3f(      0, 0.0002,-0.01);
-	glEnd();
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_TEXTURE_2D);
-	glPopMatrix();
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	//Debug tags
 	parent.font().getText("posX").setString("X: " + toString(player->pos.x));
@@ -263,10 +237,8 @@ void SceneMain::onMouseButtonPressed(float deltaTime, sf::Mouse::Button button) 
 			}
 			break;
 		case sf::Mouse::Middle: { //Arrow!
-			float m[16];
-			glGetFloatv(GL_MODELVIEW_MATRIX, m);
-			vec3f dir(m[2],m[6],m[10]);//same as the player's pov
-			Polla * np = new Polla(this,player->camPos,player);
+			vec3f dir(getState().view(0,2), getState().view(1,2), getState().view(2,2));//same as the player's pov
+			Arrow * np = new Arrow(this,player->camPos);
 			np->vel -= vec3f(dir.x*30.0,dir.y*30.0,dir.z*30.0);
 			addObject(np);
 

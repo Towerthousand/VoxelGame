@@ -1,7 +1,9 @@
 #include "Chunk.hpp"
 #include "World.hpp"
+#include "../SceneMain.hpp"
+#include "../../Game.hpp"
 
-Chunk::Chunk(int x, int y, int z, World* world) :
+Chunk::Chunk(int x, int y, int z, SceneMain* scene) :
 	outOfView(false), markedForRedraw(false),
 	cubes(CHUNKSIZE,std::vector<std::vector<Cube> >
 		  (CHUNKSIZE,std::vector<Cube>
@@ -9,7 +11,10 @@ Chunk::Chunk(int x, int y, int z, World* world) :
 	vertexCount(0),
 	XPOS(x), YPOS(y), ZPOS(z),
 	VBOID(1),
-	parentWorld(world) {
+	modelMatrix(mat4f::fromIdentity()),
+	parentScene(scene) {
+	modelMatrix.translate(XPOS*CHUNKSIZE,YPOS*CHUNKSIZE,ZPOS*CHUNKSIZE);
+	modelMatrix.scale(0.5,0.5,0.5);
 	glGenBuffers(1, (GLuint*) &VBOID);
 }
 
@@ -17,7 +22,7 @@ Chunk::~Chunk() {
 }
 
 Cube Chunk::getCube(int x, int y, int z) const {
-	return parentWorld->getCube(x+(XPOS*CHUNKSIZE),y+(YPOS*CHUNKSIZE),z+(ZPOS*CHUNKSIZE));
+	return parentScene->getWorld().getCube(x+(XPOS*CHUNKSIZE),y+(YPOS*CHUNKSIZE),z+(ZPOS*CHUNKSIZE));
 }
 
 void Chunk::update(float deltaTime) {
@@ -42,10 +47,11 @@ void Chunk::update(float deltaTime) {
 
 void Chunk::draw() const {
 	if(vertexCount != 0) {
+		mat4f poppedMat = parentScene->getState().model;
+		parentScene->getState().model = modelMatrix;
+		parentScene->getState().updateShaderUniforms(parentScene->getShader("TERRAIN"));
+		parentScene->getShader("TERRAIN").use();
 		glBindBuffer(GL_ARRAY_BUFFER, VBOID);
-		glPushMatrix();
-		glTranslatef(XPOS*CHUNKSIZE,YPOS*CHUNKSIZE,ZPOS*CHUNKSIZE);
-		glScalef(0.5,0.5,0.5);
 
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -60,49 +66,21 @@ void Chunk::draw() const {
 		glDisableClientState(GL_COLOR_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
-		glPopMatrix();
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		parentScene->getState().model = poppedMat;
 	}
 }
 
 void Chunk::drawBoundingBox() const {
-	glPushMatrix();
-	glTranslatef(XPOS*CHUNKSIZE,YPOS*CHUNKSIZE,ZPOS*CHUNKSIZE);
-	glScalef(CHUNKSIZE,CHUNKSIZE,CHUNKSIZE);
-	glColor4f(1,0,0,1);
-	glBegin(GL_QUADS);
-	glVertex3f(1, 0, 0);
-	glVertex3f(1, 0, 1);
-	glVertex3f(0, 0, 1);
-	glVertex3f(0, 0, 0);
-
-	glVertex3f(0, 1, 0);
-	glVertex3f(0, 1, 1);
-	glVertex3f(1, 1, 1);
-	glVertex3f(1, 1, 0);
-
-	glVertex3f(0, 0, 1);
-	glVertex3f(0, 1, 1);
-	glVertex3f(0, 1, 0);
-	glVertex3f(0, 0, 0);
-
-	glVertex3f(1, 0, 0);
-	glVertex3f(1, 1, 0);
-	glVertex3f(1, 1, 1);
-	glVertex3f(1, 0, 1);
-
-	glVertex3f(0, 1, 0);
-	glVertex3f(1, 1, 0);
-	glVertex3f(1, 0, 0);
-	glVertex3f(0, 0, 0);
-
-	glVertex3f(0, 0, 1);
-	glVertex3f(1, 0, 1);
-	glVertex3f(1, 1, 1);
-	glVertex3f(0, 1, 1);
-	glEnd();
-
-	glPopMatrix();
+	mat4f poppedMat = parentScene->getState().model;
+	parentScene->getState().model = modelMatrix;
+	parentScene->getState().updateShaderUniforms(parentScene->getShader("MODEL"));
+	parentScene->getShader("MODEL").use();
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
+	glDrawArrays(GL_QUADS,0,24);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	parentScene->getState().model = poppedMat;
 }
 
 void Chunk::pushCubeToArray(short x,short y, short z,unsigned char cubeID, std::vector<Vertex> &renderData) { //I DON'T KNOW HOW TO MAKE THIS COMPACT
@@ -345,3 +323,37 @@ const int Chunk::textureIndexes[9][6] = { //order is front, back, left, right, b
 										  {8,8,8,8,8,8}, //7 = planks
 										  {9,9,9,9,9,9}  //8 = sand
 										};
+
+const float Chunk::vertices[24][3] = { //instead of unit coords I do them in absolute so that I can use
+									   //the same modelMatrix for both the chunk and the bbox. Remember
+									   //that chunk's VBO is x2 scaled, so bbox must also be x2
+	{2*CHUNKSIZE,2*CHUNKSIZE,2*CHUNKSIZE}, // 0
+	{0,2*CHUNKSIZE,2*CHUNKSIZE}, // 1
+	{0,0,2*CHUNKSIZE}, // 2
+	{2*CHUNKSIZE,0,2*CHUNKSIZE}, // 3 //front
+
+	{2*CHUNKSIZE,2*CHUNKSIZE,0}, // 4
+	{2*CHUNKSIZE,0,0}, // 5
+	{0,0,0}, // 6
+	{0,2*CHUNKSIZE,0}, // 7 //back
+
+	{0,2*CHUNKSIZE,2*CHUNKSIZE}, // 1
+	{0,2*CHUNKSIZE,0}, // 2 //left
+	{0,0,0}, // 6
+	{0,0,2*CHUNKSIZE}, // 5
+
+	{2*CHUNKSIZE,2*CHUNKSIZE,2*CHUNKSIZE}, // 0
+	{2*CHUNKSIZE,0,2*CHUNKSIZE}, // 3 //right
+	{2*CHUNKSIZE,0,0}, // 7
+	{2*CHUNKSIZE,2*CHUNKSIZE,0}, // 4
+
+	{2*CHUNKSIZE,2*CHUNKSIZE,2*CHUNKSIZE}, // 0
+	{2*CHUNKSIZE,2*CHUNKSIZE,0}, // 1 //top
+	{0,2*CHUNKSIZE,0}, // 5
+	{0,2*CHUNKSIZE,2*CHUNKSIZE}, // 4
+
+	{0,0,2*CHUNKSIZE}, // 2
+	{0,0,0}, // 3 //bottom
+	{2*CHUNKSIZE,0,0}, // 7
+	{2*CHUNKSIZE,0,2*CHUNKSIZE}, // 6
+};

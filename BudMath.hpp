@@ -442,8 +442,8 @@ struct mat3
 	mat3(const T val[16]) {*this = val;}
 	mat3(const mat3 &mat) {*this = mat;}
 	mat3(T a00, T a01, T a02,
-	     T a10, T a11, T a12,
-	     T a20, T a21, T a22) //row-major constructor
+		 T a10, T a11, T a12,
+		 T a20, T a21, T a22) //row-major constructor
 	{
 		v[0] = a00; v[1] = a10; v[2] = a20;
 		v[3] = a01; v[4] = a11; v[5] = a21;
@@ -543,8 +543,8 @@ struct mat4
 		v[12]= a03; v[13]= a13; v[14]= a23; v[15]= a33;
 	}
 
-	T &operator()(unsigned int x, unsigned int y) {
-		return v[4*x + y];
+	T &operator()(unsigned int x, unsigned int y) const {
+		return const_cast<T&>(v[4*x + y]);
 	}
 
 	T *operator[](unsigned int i) {
@@ -598,17 +598,17 @@ struct mat4
 		return mat4<T>().identity();
 	}
 
-	static mat4<T> fromRotateRad(T angle, const vec3<T> &axis) {
+	static mat4<T> fromRotateRad(T angle, vec3<T> axis) {
 		double c = cos(angle);
 		double s = sin(angle);
 		double t = 1.0f - c;
 
 		vec3<T> a = axis.normalized();
 		return mat4(
-		    t * a.x * a.x + c, t * a.x * a.y - s * a.z, t * a.x * a.z + s * a.y, 0,
-		    t * a.x * a.y + s * a.z, t * a.y * a.y + c, t * a.y * a.z - s * a.x, 0,
-		    t * a.x * a.z - s * a.y, t * a.y * a.z + s * a.x, t * a.z * a.z + c, 0,
-		    0, 0, 0, 1);
+			t * a.x * a.x + c, t * a.x * a.y - s * a.z, t * a.x * a.z + s * a.y, 0,
+			t * a.x * a.y + s * a.z, t * a.y * a.y + c, t * a.y * a.z - s * a.x, 0,
+			t * a.x * a.z - s * a.y, t * a.y * a.z + s * a.x, t * a.z * a.z + c, 0,
+			0, 0, 0, 1);
 	}
 
 	static mat4<T> fromRotateRad(T angle, T x, T y, T z) {
@@ -650,9 +650,9 @@ struct mat4
 	static mat4<T> fromFrustrum(T l, T r, T b, T t, T n, T f) {
 		return mat4<T>(
 		(2 * n)/(r - l),               0,      (r + l) / (r - l),                    0,
-			      0, (2 * n)/(t - b),      (t + b) / (t - b),                    0,
-			      0,               0, -1 * (f + n) / (f - n), (-2 * f * n)/(f - n),
-			      0,               0,                     -1,                    0);
+				  0, (2 * n)/(t - b),      (t + b) / (t - b),                    0,
+				  0,               0, -1 * (f + n) / (f - n), (-2 * f * n)/(f - n),
+				  0,               0,                     -1,                    0);
 	}
 
 	static mat4<T> fromOrtho(T l, T r, T b, T t, T n, T f) {
@@ -661,6 +661,13 @@ struct mat4
 			0, 2/(t - b),         0, (t + b)/(b - t),
 			0,         0, 2/(n - f), (f + n)/(n - f),
 			0,         0,         0,               1);
+	}
+
+	static mat4<T> fromPerspective(T fovyInDegrees, T znear, T zfar, T aspectRatio) {
+		float ymax, xmax;
+		ymax = znear * tanf(fovyInDegrees * M_PI / 360.0);
+		xmax = ymax * aspectRatio;
+		return mat4<T>::fromFrustrum(-xmax, xmax, -ymax, ymax, znear, zfar);
 	}
 
 	mat4<T> &rotate(T angle, T x, T y, T z) {
@@ -898,19 +905,19 @@ vec2<T> operator * (U num, const vec2<T> &a) {
 template <typename T, typename U>
 vec3<T> operator * (const mat3<T> &a, const vec3<U> &v)
 {
-    vec3<T> res;
+	vec3<T> res;
 
-    res.x = a.v[0]*v.x + a.v[3]*v.y + a.v[6]*v.z;
-    res.y = a.v[1]*v.x + a.v[4]*v.y + a.v[7]*v.z;
-    res.z = a.v[2]*v.x + a.v[5]*v.y + a.v[8]*v.z;
+	res.x = a.v[0]*v.x + a.v[3]*v.y + a.v[6]*v.z;
+	res.y = a.v[1]*v.x + a.v[4]*v.y + a.v[7]*v.z;
+	res.z = a.v[2]*v.x + a.v[5]*v.y + a.v[8]*v.z;
 
-    return res;
+	return res;
 }
 
 template <typename T, typename U>
 vec3<T> operator * (const vec3<T> &v, const mat3<U> &a)
 {
-    return a.transpose() * v;
+	return a.transpose() * v;
 }
 
 //cross product
@@ -1034,7 +1041,7 @@ vec4<T> operator*(const mat4<T> &a, const vec4<U> &v) {
 
 template <typename T, typename U>
 vec4<T> operator*(const vec4<T> &v, const mat4<U> &a) {
-    return a.transpose()*v;
+	return a.transpose()*v;
 }
 
 //dot product

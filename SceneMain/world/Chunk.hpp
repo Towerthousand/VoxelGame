@@ -2,10 +2,10 @@
 #define CHUNK_HPP
 #include "tools.hpp"
 
-class World;
+class SceneMain;
 class Chunk { //16*16*16
 	public:
-		Chunk(int x, int y, int z, World *world);
+		Chunk(int x, int y, int z, SceneMain *scene);
 		~Chunk();
 		//main
 		void update(float deltaTime);
@@ -27,8 +27,10 @@ class Chunk { //16*16*16
 		int YPOS; //y pos of chunk inside world matrix
 		int ZPOS; //z pos of chunk inside world matrix
 		int VBOID;
-		World* parentWorld;
+		mat4f modelMatrix; //precalculated, since chunks do not transform ever
+		SceneMain* parentScene;
 		static const int textureIndexes[9][6];
+		static const float vertices[24][3];
 };
 
 #endif // CHUNK_HPP

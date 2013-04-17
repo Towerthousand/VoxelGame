@@ -31,14 +31,10 @@ bool ShaderProgram::makeProgram(const std::string& filePathVertex, const std::st
 }
 
 void ShaderProgram::use() const {
-	GLint current;
-	glGetIntegerv(GL_CURRENT_PROGRAM,&current);
-	if(GLuint(current) != programHandle)
-		glUseProgram(programHandle);
+	glUseProgram(programHandle);
 }
 
 GLint ShaderProgram::getUniLoc(const std::string &uniformID) const {
-	use();
 	return glGetUniformLocation(programHandle, (GLchar *) uniformID.c_str());
 }
 

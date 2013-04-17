@@ -16,6 +16,7 @@ class Player : public Entity , public Camera {
 		Player(SceneMain* scene, const vec3f &pos, const vec3f &scale = vec3f(1,1,1)); //Player is bind to a world on creation, and will use it for collisions.
 		~Player();
 		void update(float deltaTime);
+		void updateCamera();
 		void draw() const;
 
 		void drawFrustum() const;

@@ -11,6 +11,7 @@ class Entity : public GameObject { //Stuff that moves (Players, arrows, objects,
 
 		virtual void draw() const;
 		virtual void update(float deltaTime);
+		virtual void updateMatrix();
 		virtual void movePos(float deltaTime);
 
 		vec3f vel; //velocity

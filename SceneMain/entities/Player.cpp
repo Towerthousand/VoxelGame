@@ -1,5 +1,7 @@
 #include "Player.hpp"
 #include "../world/World.hpp"
+#include "../SceneMain.hpp"
+#include "../../Game.hpp"
 
 Player::Player(SceneMain* scene, const vec3f& pos, const vec3f &scale) :
 	Entity(scene,pos,scale), selectedID(1), onFloor(false), isJumping(false),
@@ -17,20 +19,29 @@ Player::~Player() {
 void Player::update(float deltaTime) {
 	//move and update camera position
 	movePos(deltaTime); //this handles collisions
-	camPos = pos + vec3f(0,1.5,0);
 	makeFrustum();
+	updateCamera();
 
+	//feedback to be used by the scene
 	onFloor = hitbox.collidesWithWorld(vec3f(0,-0.1,0));
 	isJumping = (vel.y > 0);
 
+	//Limit movement
 	vel.x = 0; // Player only accelerates vertically, so speed.x doesn't carry
 	vel.y = std::fmax(-70,vel.y);
 	vel.z = 0; // Player only accelerates vertically, so speed.z doesn't carry
 }
 
+void Player::updateCamera() {
+	camPos = pos + vec3f(0,1.5,0);
+	viewMatrix = mat4f::fromIdentity();
+	viewMatrix.rotate(camRot.x, 1, 0, 0);
+	viewMatrix.rotate(camRot.y, 0, 1, 0);
+	viewMatrix.translate(-camPos.x, -camPos.y, -camPos.z);
+}
+
 void Player::draw() const {
-	//draw crosshair. this shouldn't be here, it is not a "part" of the 3D enviorment. This
-	//should be a sfml draw in SceneMain::draw();
+	//draw the model when there is one...
 }
 
 void Player::drawFrustum() const {
@@ -52,12 +63,11 @@ void Player::drawFrustum() const {
 
 void Player::makeFrustum() {
 	//calculate frustum with dir, pos , znear, zfar, fov, screen ratio
-	float m[16];
-	glGetFloatv(GL_MODELVIEW_MATRIX, m);
+	mat4f view = parentScene->getState().view;
 	vec3f
-			dir(m[2],m[6],m[10]),//same as the player's pov
-			side(m[0], m[4], m[8]), //x of the camera in world coords
-			up(m[1], m[5], m[9]); //up vector of the camera i world coords
+			dir(view(0,2), view(1,2), view(2,2)),//same as the player's pov
+			side(view(0,0), view(1,0), view(2,0)), //x of the camera in world coords
+			up(view(0,1), view(1,1), view(2,1)); //up vector of the camera in world coords
 
 	float tfov = (float)tan(DEG_TO_RAD * FOV * 0.5) ; //half FOV in rads
 	float ratio = float(SCRWIDTH)/float(SCRHEIGHT);

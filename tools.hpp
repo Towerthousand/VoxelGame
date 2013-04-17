@@ -61,6 +61,7 @@ std::string toString(float num);
 #define ZFAR 1000.0f
 #define TEXSIZE 8
 #define GRAVITY -40
+#define MAX_TEXTURES 1
 extern int SCRWIDTH;
 extern int SCRHEIGHT;
 extern bool WINDOWFOCUS;

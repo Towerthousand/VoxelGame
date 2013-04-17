@@ -1,4 +1,6 @@
+uniform mat4 modelViewProjectionMatrix;
+
 void main () {
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+        gl_Position = modelViewProjectionMatrix * gl_Vertex;
 	gl_FrontColor = gl_Color;
 }

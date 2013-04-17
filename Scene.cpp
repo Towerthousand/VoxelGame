@@ -3,8 +3,8 @@
 
 Scene::Scene(Game &parent) : parent(parent) {}
 Scene::~Scene() {}
-RenderState& Scene::getState() { return parent.state(); }
-InputManager& Scene::getInputs() { return parent.input(); }
-TextureManager& Scene::getTextures() { return parent.textures(); }
-FontManager& Scene::getFonts() { return parent.font(); }
-AudioManager& Scene::getAudios() { return parent.audio(); }
+RenderState& Scene::getState() const { return parent.state(); }
+InputManager& Scene::getInputs() const { return parent.input(); }
+TextureManager& Scene::getTextures() const { return parent.textures(); }
+FontManager& Scene::getFonts() const { return parent.font(); }
+AudioManager& Scene::getAudios() const { return parent.audio(); }

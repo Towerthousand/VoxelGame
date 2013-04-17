@@ -16,11 +16,16 @@ void Enemy::update(float deltaTime) {
 	movePos(deltaTime);
 }
 
+
+void Enemy::updateMatrix() {
+	Entity::updateMatrix();
+}
+
 void Enemy::draw() const {
 	Entity::draw();
 }
 
-void Enemy::lookAtPlayer() {
+void Enemy::lookAtPlayer() { //rotates current model matrix to look at player
 	//rotation
 	vec3f front = targetPlayer->pos-pos;
 	front.y = 0;
@@ -32,10 +37,10 @@ void Enemy::lookAtPlayer() {
 		right.normalize();
 		vec3f up = back^right;
 		up.normalize();
-		modelMatrix = mat4f(right.x, up.x, back.x, 0,
-							right.y, up.y, back.y, 0,
-							right.z, up.z, back.z, 0,
-							0      , 0   , 0     , 1);
+		modelMatrix *= mat4f(right.x, up.x, back.x, 0,
+							 right.y, up.y, back.y, 0,
+							 right.z, up.z, back.z, 0,
+							 0      , 0   , 0     , 1);
 	}
 }
 

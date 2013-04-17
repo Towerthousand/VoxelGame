@@ -15,6 +15,10 @@ void Entity::update(float deltaTime) {
 	GameObject::update(deltaTime);
 }
 
+void Entity::updateMatrix() {
+	GameObject::updateMatrix();
+}
+
 void Entity::movePos(float deltaTime) { //collisons
 	//vel.y = std::fmax(-70,vel.y);
 	vel += acc*deltaTime; //a = const, v = at

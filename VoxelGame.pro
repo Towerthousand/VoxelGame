@@ -8,9 +8,13 @@ SOURCES += \
     $$PWD/main.cpp \
     $$PWD/Game.cpp \
     $$PWD/tools.cpp \
+    $$PWD/Scene.cpp \
+    $$PWD/RenderState.cpp \
     $$PWD/graphics/FontManager.cpp \
     $$PWD/graphics/Texture.cpp \
     $$PWD/graphics/TextureManager.cpp \
+    $$PWD/graphics/Shader.cpp \
+    $$PWD/graphics/ShaderProgram.cpp \
     $$PWD/audio/AudioManager.cpp \
     $$PWD/audio/Effect.cpp \
     $$PWD/audio/Music.cpp \
@@ -28,18 +32,18 @@ SOURCES += \
     $$PWD/SceneMain/entities/items/Polla.cpp \
     $$PWD/SceneMain/entities/enemies/Enemy.cpp \
     $$PWD/SceneMain/entities/enemies/Skeleton.cpp \
-    $$PWD/graphics/Shader.cpp \
-	$$PWD/graphics/ShaderProgram.cpp \
-    Scene.cpp \
-    RenderState.cpp
 
 HEADERS += \
     $$PWD/Scene.hpp \
     $$PWD/Game.hpp \
     $$PWD/tools.hpp \
+    $$PWD/BudMath.hpp \
+    $$PWD/RenderState.hpp \
     $$PWD/graphics/FontManager.hpp \
     $$PWD/graphics/Texture.hpp \
     $$PWD/graphics/TextureManager.hpp \
+    $$PWD/graphics/Shader.hpp \
+    $$PWD/graphics/ShaderProgram.hpp \
     $$PWD/audio/AudioManager.hpp \
     $$PWD/audio/Effect.hpp \
     $$PWD/audio/Music.hpp \
@@ -56,11 +60,7 @@ HEADERS += \
     $$PWD/SceneMain/entities/items/Arrow.hpp \
     $$PWD/SceneMain/entities/items/Polla.hpp \
     $$PWD/SceneMain/entities/enemies/Enemy.hpp \
-    $$PWD/SceneMain/entities/enemies/Skeleton.hpp \
-    $$PWD/graphics/Shader.hpp \
-	$$PWD/graphics/ShaderProgram.hpp \
-    $$PWD/BudMath.hpp \
-	$$PWD/RenderState.hpp
+    $$PWD/SceneMain/entities/enemies/Skeleton.hpp
 
 OTHER_FILES += \
     shaders/terrain_fragment.glsl \
