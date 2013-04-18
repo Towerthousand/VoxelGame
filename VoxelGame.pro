@@ -24,7 +24,7 @@ SOURCES += \
     $$PWD/SceneMain/Model.cpp \
     $$PWD/SceneMain/Hitbox.cpp \
     $$PWD/SceneMain/world/Chunk.cpp \
-    $$PWD/SceneMain/world/World.cpp \
+	$$PWD/SceneMain/world/World.cpp \
     $$PWD/SceneMain/entities/Entity.cpp \
     $$PWD/SceneMain/entities/Camera.cpp \
     $$PWD/SceneMain/entities/Player.cpp \
@@ -32,6 +32,8 @@ SOURCES += \
     $$PWD/SceneMain/entities/items/Polla.cpp \
     $$PWD/SceneMain/entities/enemies/Enemy.cpp \
     $$PWD/SceneMain/entities/enemies/Skeleton.cpp \
+    SceneMain/world/generator/ChunkGenerator.cpp \
+    SceneMain/world/generator/Function.cpp
 
 HEADERS += \
     $$PWD/Scene.hpp \
@@ -53,14 +55,16 @@ HEADERS += \
     $$PWD/SceneMain/Model.hpp \
     $$PWD/SceneMain/Hitbox.hpp \
     $$PWD/SceneMain/world/Chunk.hpp \
-    $$PWD/SceneMain/world/World.hpp \
+	$$PWD/SceneMain/world/World.hpp \
     $$PWD/SceneMain/entities/Entity.hpp \
     $$PWD/SceneMain/entities/Camera.hpp \
     $$PWD/SceneMain/entities/Player.hpp \
     $$PWD/SceneMain/entities/items/Arrow.hpp \
     $$PWD/SceneMain/entities/items/Polla.hpp \
     $$PWD/SceneMain/entities/enemies/Enemy.hpp \
-    $$PWD/SceneMain/entities/enemies/Skeleton.hpp
+    $$PWD/SceneMain/entities/enemies/Skeleton.hpp \
+    SceneMain/world/generator/ChunkGenerator.hpp \
+    SceneMain/world/generator/Function.hpp
 
 OTHER_FILES += \
     shaders/terrain_fragment.glsl \
