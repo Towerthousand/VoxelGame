@@ -5,7 +5,7 @@
 ChunkGenerator::ChunkGenerator(SceneMain* scene) : parentScene(scene) {
 }
 
-ChunkGenerator::~WorldGenerator() {
+ChunkGenerator::~ChunkGenerator() {
 }
 
 Chunk* ChunkGenerator::getChunk(int x, int y, int z) {
