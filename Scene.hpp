@@ -8,7 +8,7 @@ class InputManager;
 class TextureManager;
 class FontManager;
 class AudioManager;
-class Scene {
+class Scene { //abstract
 	public:
 		Scene(Game &parent); //should NOT do anything apart from being called
 		virtual ~Scene();
@@ -31,7 +31,7 @@ class Scene {
 		RenderState &getState() const;
 	protected:
 		Game& parent;
-		virtual bool loadResources() = 0; //load stuff with parent.resources
+		virtual bool loadResources() = 0; //load stuff with managers
 };
 
 #endif // SCENE_HPP

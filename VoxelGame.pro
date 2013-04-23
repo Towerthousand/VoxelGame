@@ -33,9 +33,7 @@ SOURCES += \
     $$PWD/SceneMain/entities/enemies/Enemy.cpp \
     $$PWD/SceneMain/entities/enemies/Skeleton.cpp \
     SceneMain/world/generator/ChunkGenerator.cpp \
-    SceneMain/world/generator/Function.cpp \
-    SceneMain/world/generator/Function3D.cpp \
-    SceneMain/world/generator/Function2D.cpp
+    SceneMain/world/generator/Function3DSimplex.cpp
 
 HEADERS += \
     $$PWD/Scene.hpp \
@@ -66,9 +64,9 @@ HEADERS += \
     $$PWD/SceneMain/entities/enemies/Enemy.hpp \
     $$PWD/SceneMain/entities/enemies/Skeleton.hpp \
     SceneMain/world/generator/ChunkGenerator.hpp \
-    SceneMain/world/generator/Function.hpp \
     SceneMain/world/generator/Function3D.hpp \
-    SceneMain/world/generator/Function2D.hpp
+    SceneMain/world/generator/Function2D.hpp \
+    SceneMain/world/generator/Function3DSimplex.hpp
 
 OTHER_FILES += \
     shaders/terrain_fragment.glsl \
