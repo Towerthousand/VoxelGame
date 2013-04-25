@@ -77,6 +77,7 @@ bool SceneMain::init() {
 }
 
 void SceneMain::update(float deltaTime) {
+
 	++fpsCount;
 	debugCounter += deltaTime;
 	if (debugCounter > 1) {
@@ -122,6 +123,7 @@ void SceneMain::draw() const {
 		(*it)->draw();
 	glUseProgram(0);
 
+	glBindBuffer(GL_ARRAY_BUFFER,0);
 	//Debug tags
 	parent.font().getText("posX").setString("X: " + toString(player->pos.x));
 	parent.font().getText("posY").setString("Y: " + toString(player->pos.y));
@@ -241,7 +243,6 @@ void SceneMain::onMouseButtonPressed(float deltaTime, sf::Mouse::Button button) 
 			Polla * np = new Polla(this,player->camPos,player);
 			np->vel -= vec3f(dir.x*30.0,dir.y*30.0,dir.z*30.0);
 			addObject(np);
-
 			break;
 		}
 		default:

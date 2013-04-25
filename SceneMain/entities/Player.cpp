@@ -131,10 +131,12 @@ void Player::makeFrustum() {
 
 bool Player::insideFrustum( const vec3f &center, float radius) const {
 	float distance,D;
-	for(int i=0; i < 6; i++) {
+	for(int i=0; i < 4; i++) {
 		//construct the plane with a normal and a point
 		vec3f v = frustumPlanes[i][1]-frustumPlanes[i][0];
 		vec3f u = frustumPlanes[i][2]-frustumPlanes[i][0];
+		u.normalize();
+		v.normalize();
 		vec3f n = v^u; //normal n = (Ax,By,Cz), point [0] = (p1,p2,p3)
 		n.normalize();
 		D = -n*frustumPlanes[i][0]; //A*p1*x + B*p2*y + C*p3*z + D = 0 => D = -dot(n,P)

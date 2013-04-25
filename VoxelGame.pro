@@ -32,8 +32,18 @@ SOURCES += \
     $$PWD/SceneMain/entities/items/Polla.cpp \
     $$PWD/SceneMain/entities/enemies/Enemy.cpp \
     $$PWD/SceneMain/entities/enemies/Skeleton.cpp \
-    SceneMain/world/generator/ChunkGenerator.cpp \
-    SceneMain/world/generator/Function3DSimplex.cpp
+	$$PWD/SceneMain/world/generator/ChunkGenerator.cpp \
+	$$PWD/SceneMain/world/generator/Function3DSimplex.cpp \
+	$$PWD/SceneMain/world/generator/Function3DYcoord.cpp \
+	$$PWD/SceneMain/world/generator/Function3DAdd.cpp \
+	$$PWD/SceneMain/world/generator/Function3DSub.cpp \
+	$$PWD/SceneMain/world/generator/Function2DConst.cpp \
+	$$PWD/SceneMain/world/generator/Function3DDiv.cpp \
+    SceneMain/world/generator/FunctionTerrrainVolume.cpp \
+    SceneMain/world/generator/FunctionTerrainOverlay.cpp \
+    SceneMain/world/generator/Function2DSimplex.cpp \
+    SceneMain/world/generator/FunctionTerrainHeightmap.cpp \
+    SceneMain/world/generator/FunctionTerrainJoin.cpp
 
 HEADERS += \
     $$PWD/Scene.hpp \
@@ -63,13 +73,24 @@ HEADERS += \
     $$PWD/SceneMain/entities/items/Polla.hpp \
     $$PWD/SceneMain/entities/enemies/Enemy.hpp \
     $$PWD/SceneMain/entities/enemies/Skeleton.hpp \
-    SceneMain/world/generator/ChunkGenerator.hpp \
-    SceneMain/world/generator/Function3D.hpp \
-    SceneMain/world/generator/Function2D.hpp \
-    SceneMain/world/generator/Function3DSimplex.hpp
+	$$PWD/SceneMain/world/generator/ChunkGenerator.hpp \
+	$$PWD/SceneMain/world/generator/Function3D.hpp \
+	$$PWD/SceneMain/world/generator/Function2D.hpp \
+	$$PWD/SceneMain/world/generator/Function3DSimplex.hpp \
+	$$PWD/SceneMain/world/generator/Function3DYcoord.hpp \
+	$$PWD/SceneMain/world/generator/Function3DAdd.hpp \
+	$$PWD/SceneMain/world/generator/Function3DSub.hpp \
+	$$PWD/SceneMain/world/generator/Function2DConst.hpp \
+	$$PWD/SceneMain/world/generator/Function3DDiv.hpp \
+	$$PWD/SceneMain/world/generator/FunctionTerrain.hpp \
+    SceneMain/world/generator/FunctionTerrrainVolume.hpp \
+    SceneMain/world/generator/FunctionTerrainOverlay.hpp \
+    SceneMain/world/generator/Function2DSimplex.hpp \
+    SceneMain/world/generator/FunctionTerrainHeightmap.hpp \
+    SceneMain/world/generator/FunctionTerrainJoin.hpp
 
 OTHER_FILES += \
-    shaders/terrain_fragment.glsl \
-    shaders/terrain_vertex.glsl \
-    shaders/model_vertex.glsl \
-    shaders/model_fragment.glsl
+	$$PWD/shaders/terrain_fragment.glsl \
+	$$PWD/shaders/terrain_vertex.glsl \
+	$$PWD/shaders/model_vertex.glsl \
+	$$PWD/shaders/model_fragment.glsl

@@ -7,6 +7,7 @@
 World::World(SceneMain* parentScene, Player* player) :
 	playerTargetsBlock(false), targetedBlock(0,0,0),
 	last(0,0,0), parentScene(parentScene), player(player),
+	chunkGen(parentScene, rand()),
 	chunks(0,std::vector<std::vector<Chunk*> >
 		   (0,std::vector<Chunk*>
 			(0,NULL))),
@@ -42,17 +43,23 @@ bool World::loadDirbaio(const std::string &filePath) {
 		for(int j = 0; j < WORLDHEIGHT; ++j)
 			chunks[i][j].resize(WORLDWIDTH);
 
-	outLog(" - Creating chunks...");
+	//	outLog(" - Creating chunks...");
+	//	for (int x = 0; x < WORLDWIDTH; ++x)
+	//		for (int y = 0; y < WORLDHEIGHT; ++y)
+	//			for (int z = 0; z < WORLDWIDTH; ++z)
+	//				chunks[x][y][z] = new Chunk(x,y,z,parentScene);
+	//	outLog(" - Loading chunk data...");
+	//	for(int y = 0; y < sizeY; ++y)
+	//		for(int x = 0; x < sizeX; ++x)
+	//			for(int z = 0; z < sizeZ; ++z)
+	//				chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE] = Cube(file.get(),0);
+	file.close();
+	////////////////////////LOLASO
 	for (int x = 0; x < WORLDWIDTH; ++x)
 		for (int y = 0; y < WORLDHEIGHT; ++y)
 			for (int z = 0; z < WORLDWIDTH; ++z)
-				chunks[x][y][z] = new Chunk(x,y,z,parentScene);
-	outLog(" - Loading chunk data...");
-	for(int y = 0; y < sizeY; ++y)
-		for(int x = 0; x < sizeX; ++x)
-			for(int z = 0; z < sizeZ; ++z)
-				chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE] = Cube(file.get(),0);
-	file.close();
+				chunks[x][y][z] = chunkGen.getChunk(x,y,z);
+	////////////////////////LOLASO
 	outLog(" - Calculating sky levels...");
 	skyValues = std::vector<std::vector<int> >(CHUNKSIZE*WORLDWIDTH,
 											   std::vector<int>(CHUNKSIZE*WORLDWIDTH,-1));
@@ -139,13 +146,13 @@ void World::draw() const {
 	for (int x = 0; x < WORLDWIDTH; ++x)
 		for (int y = 0; y < WORLDHEIGHT; ++y)
 			for (int z = 0; z < WORLDWIDTH; ++z) {
+				vec3f center(x*CHUNKSIZE+CHUNKSIZE/2,y*CHUNKSIZE+CHUNKSIZE/2,z*CHUNKSIZE+CHUNKSIZE/2);
 				if (chunks[x][y][z]->vertexCount == 0)
 					chunks[x][y][z]->outOfView = true;
+				else if (abs((player->pos - center).module()) < CHUNKSIZE*5)
+					chunks[x][y][z]->outOfView = false;
 				else
-					chunks[x][y][z]->outOfView = !player->insideFrustum(vec3f(x*CHUNKSIZE+CHUNKSIZE/2,
-																			  y*CHUNKSIZE+CHUNKSIZE/2,
-																			  z*CHUNKSIZE+CHUNKSIZE/2)
-																		,sqrt(3*(8*8)));
+					chunks[x][y][z]->outOfView = !player->insideFrustum(center,sqrt(3*((CHUNKSIZE/2)*(CHUNKSIZE/2))));
 			}
 
 	//do occlusion culling here!

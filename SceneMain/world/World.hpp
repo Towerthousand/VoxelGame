@@ -1,6 +1,7 @@
 #ifndef WORLD_HPP
 #define WORLD_HPP
 #include "tools.hpp"
+#include "generator/ChunkGenerator.hpp"
 
 //chunk grid coords:
 //0 <= x < WORLDWIDTH*CHUNKSIZE
@@ -49,6 +50,7 @@ class World {
 
 		SceneMain* parentScene;
 		Player* player;
+		ChunkGenerator chunkGen;
 		std::vector<std::vector<std::vector<Chunk*> > > chunks;
 		std::vector<std::vector<int> > skyValues;
 		float updateStuffTimer;
