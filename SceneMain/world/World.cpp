@@ -43,22 +43,22 @@ bool World::loadDirbaio(const std::string &filePath) {
 		for(int j = 0; j < WORLDHEIGHT; ++j)
 			chunks[i][j].resize(WORLDWIDTH);
 
-	//	outLog(" - Creating chunks...");
-	//	for (int x = 0; x < WORLDWIDTH; ++x)
-	//		for (int y = 0; y < WORLDHEIGHT; ++y)
-	//			for (int z = 0; z < WORLDWIDTH; ++z)
-	//				chunks[x][y][z] = new Chunk(x,y,z,parentScene);
-	//	outLog(" - Loading chunk data...");
-	//	for(int y = 0; y < sizeY; ++y)
-	//		for(int x = 0; x < sizeX; ++x)
-	//			for(int z = 0; z < sizeZ; ++z)
-	//				chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE] = Cube(file.get(),0);
+		outLog(" - Creating chunks...");
+		for (int x = 0; x < WORLDWIDTH; ++x)
+			for (int y = 0; y < WORLDHEIGHT; ++y)
+				for (int z = 0; z < WORLDWIDTH; ++z)
+					chunks[x][y][z] = new Chunk(x,y,z,parentScene);
+		outLog(" - Loading chunk data...");
+		for(int y = 0; y < sizeY; ++y)
+			for(int x = 0; x < sizeX; ++x)
+				for(int z = 0; z < sizeZ; ++z)
+					chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE] = Cube(file.get(),0);
 	file.close();
 	////////////////////////LOLASO
-	for (int x = 0; x < WORLDWIDTH; ++x)
-		for (int y = 0; y < WORLDHEIGHT; ++y)
-			for (int z = 0; z < WORLDWIDTH; ++z)
-				chunks[x][y][z] = chunkGen.getChunk(x,y,z);
+//	for (int x = 0; x < WORLDWIDTH; ++x)
+//		for (int y = 0; y < WORLDHEIGHT; ++y)
+//			for (int z = 0; z < WORLDWIDTH; ++z)
+//				chunks[x][y][z] = chunkGen.getChunk(x,y,z);
 	////////////////////////LOLASO
 	outLog(" - Calculating sky levels...");
 	skyValues = std::vector<std::vector<int> >(CHUNKSIZE*WORLDWIDTH,

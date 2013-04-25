@@ -19,6 +19,7 @@ class Scene { //abstract
 		virtual void onKeyDown(float deltaTime, sf::Keyboard::Key key) = 0; //called by parent on parent.update()
 		virtual void onKeyReleased(float deltaTime, sf::Keyboard::Key key) = 0; //called by parent on parent.update()
 		virtual void onMouseButtonPressed(float deltaTime, sf::Mouse::Button button) = 0; //called by parent on parent.update()
+		virtual void onJoystickButtonPressed(float deltaTime, uint key) = 0; //called by parent on parent.update()
 		virtual void onMouseButtonDown(float deltaTime, sf::Mouse::Button button) = 0; //called by parent on parent.update()
 		virtual void onMouseButtonReleased(float deltaTime, sf::Mouse::Button button) = 0; //called by parent on parent.update()
 		virtual void onMouseMoved(float deltaTime, int dx, int dy) = 0; //called by parent on parent.update()

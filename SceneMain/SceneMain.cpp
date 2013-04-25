@@ -8,8 +8,7 @@
 
 SceneMain::SceneMain(Game &parent) :
 	Scene(parent), chunksDrawn(0),
-	player(new Player(this, vec3f(0,1,0))), world(this,player),
-	debugCounter(0.0), fpsCount(0) {
+	player(new Player(this, vec3f(0,1,0))), world(this,player) {
 }
 
 SceneMain::~SceneMain() {
@@ -51,17 +50,12 @@ bool SceneMain::init() {
 	if (!loadResources())
 		return false;
 	//Init music
-	//parent.audio().musicBank["troll"]->getTrack().play();
-	//parent.audio().musicBank["troll"]->getTrack().setLoop(true);
+	parent.audio().musicBank["troll"]->getTrack().play();
+	parent.audio().musicBank["troll"]->getTrack().setLoop(true);
 	//Init debug tags
-	parent.font().makeText("posX","",20,vec2f(10,10),sf::Color::White,sf::Text::Bold,false);
-	parent.font().makeText("posY","",20,vec2f(10,30),sf::Color::White,sf::Text::Bold,false);
-	parent.font().makeText("posZ","",20,vec2f(10,50),sf::Color::White,sf::Text::Bold,false);
-	parent.font().makeText("rotY","",20,vec2f(10,70),sf::Color::White,sf::Text::Bold,false);
-	parent.font().makeText("rotX","",20,vec2f(10,90),sf::Color::White,sf::Text::Bold,false);
-	parent.font().makeText("Chunks","",20,vec2f(10,110),sf::Color::White,sf::Text::Bold,false);
-	parent.font().makeText("Updates","",20,vec2f(10,130),sf::Color::White,sf::Text::Bold,false);
-	parent.font().makeText("FPS","",20,vec2f(10,150),sf::Color::White,sf::Text::Bold,false);
+	parent.font().makeText("comandes","Select = Random spawn\n\nStart = Exit\n\nSquare = POLLA\n\nX = Jump\n\nL1/R1 = Put/delete block\n\nL2/R2 = Change block type\n\nLeft Joystick: Walk\n\nRight Joystick: Look"
+						   ,20,vec2f(10,30),sf::Color::White,sf::Text::Bold,false);
+	parent.font().makeText("block","",50,vec2f(10,206),sf::Color::White,sf::Text::Bold,false);
 	//Set up textures
 	glActiveTexture(GL_TEXTURE0);
 	getState().texture[0] = mat4f::fromScale(1.0/512.0f,1.0/512.0f,1); //now texture0 is in pixel coords
@@ -77,15 +71,47 @@ bool SceneMain::init() {
 }
 
 void SceneMain::update(float deltaTime) {
+	//view
+	float xPos = sf::Joystick::getAxisPosition(0,sf::Joystick::Z);
+	float xSign = xPos < 0 ? -1 : 1;
+	xPos = std::fabs(xPos);
+	xPos = std::max(0.0f, (xPos - 20)/(100-20));
+	xPos = xSign * xPos * xPos;
+	player->rotateY((xPos)*200*deltaTime);
 
-	++fpsCount;
-	debugCounter += deltaTime;
-	if (debugCounter > 1) {
-		parent.font().getText("FPS").setString("FPS: " + toString(fpsCount));
-		parent.font().getText("Updates").setString("Updates: " + toString(1337));
-		debugCounter -= 1;
-		fpsCount = 0;
+	float yPos = sf::Joystick::getAxisPosition(0,sf::Joystick::R);
+	float ySign = yPos < 0 ? -1 : 1;
+	yPos = std::fabs(yPos);
+	yPos = std::max(0.0f, (yPos - 20)/(100-20));
+	yPos = ySign * yPos * yPos;
+	player->rotateX((yPos)*200*deltaTime);
+
+	//movement
+	const float vel = 10.0f;
+	vec2f dir(sin(player->camRot.y*DEG_TO_RAD), -cos(player->camRot.y*DEG_TO_RAD));
+	xPos = sf::Joystick::getAxisPosition(0,sf::Joystick::X);
+	if(xPos < -30) {
+		player->vel.x += dir.y*vel;
+		player->vel.z += -dir.x*vel;
 	}
+	else if (xPos > 30) {
+		player->vel.x += -dir.y*vel;
+		player->vel.z += dir.x*vel;
+	}
+	yPos = sf::Joystick::getAxisPosition(0,sf::Joystick::Y);
+	if(yPos < -30) {
+		player->vel.x += dir.x*vel;
+		player->vel.z += dir.y*vel;
+	}
+	else if (yPos > 30) {
+		player->vel.x += -dir.x*vel;
+		player->vel.z += -dir.y*vel;
+	}
+
+	if(sf::Joystick::isButtonPressed(0,2))
+		if (player->onFloor && !player->isJumping)
+			player->vel.y = 15;
+
 	world.update(deltaTime);
 	for(std::list<GameObject*>::iterator it = objects.begin();it != objects.end(); ++it) {
 		(*it)->update(deltaTime);
@@ -125,24 +151,40 @@ void SceneMain::draw() const {
 
 	glBindBuffer(GL_ARRAY_BUFFER,0);
 	//Debug tags
-	parent.font().getText("posX").setString("X: " + toString(player->pos.x));
-	parent.font().getText("posY").setString("Y: " + toString(player->pos.y));
-	parent.font().getText("posZ").setString("Z: " + toString(player->pos.z));
-	parent.font().getText("rotY").setString("Rot Y: " + toString(player->camRot.y));
-	parent.font().getText("rotX").setString("Rot X: " + toString(player->camRot.x));
-	parent.font().getText("Chunks").setString("Chunks drawn: " + toString(chunksDrawn));
+	switch (player->selectedID) {
+		case 1:
+			parent.font().getText("block").setString("Current Block: Dirt");
+			break;
+		case 2:
+			parent.font().getText("block").setString("Current Block: Stone");
+			break;
+		case 3:
+			parent.font().getText("block").setString("Current Block: Grass");
+			break;
+		case 4:
+			parent.font().getText("block").setString("Current Block: Light");
+			break;
+		case 5:
+			parent.font().getText("block").setString("Current Block: Cobblestone");
+			break;
+		case 6:
+			parent.font().getText("block").setString("Current Block: Wood");
+			break;
+		case 7:
+			parent.font().getText("block").setString("Current Block: Wooden Planks");
+			break;
+		case 8:
+			parent.font().getText("block").setString("Current Block: Sand");
+			break;
+		default:
+			break;
+	}
 
 	//SFML draws (until window.popGLStates())
 	glDisable(GL_CULL_FACE);
 	parent.getWindow().pushGLStates();
-	parent.getWindow().draw(parent.font().getText("posX"));
-	parent.getWindow().draw(parent.font().getText("posY"));
-	parent.getWindow().draw(parent.font().getText("posZ"));
-	parent.getWindow().draw(parent.font().getText("rotY"));
-	parent.getWindow().draw(parent.font().getText("rotX"));
-	parent.getWindow().draw(parent.font().getText("Chunks"));
-	parent.getWindow().draw(parent.font().getText("Updates"));
-	parent.getWindow().draw(parent.font().getText("FPS"));
+	parent.getWindow().draw(parent.font().getText("block"));
+	parent.getWindow().draw(parent.font().getText("comandes"));
 	parent.getWindow().popGLStates();
 	glEnable(GL_CULL_FACE);
 }
@@ -183,6 +225,54 @@ void SceneMain::onKeyPressed(float deltaTime, sf::Keyboard::Key key) {
 			break;
 		case sf::Keyboard::Escape:
 			parent.close();
+			break;
+		default:
+			break;
+	}
+}
+
+void SceneMain::onJoystickButtonPressed(float deltaTime, uint key) {
+	switch(key) {
+		case 9: { //new spawnpoint
+			vec3f newPos(0,0,0);
+			newPos.x = rand()%(WORLDWIDTH*CHUNKSIZE);
+			newPos.z = rand()%(WORLDWIDTH*CHUNKSIZE);
+			newPos.y = world.getSkylightLevel(newPos.x,newPos.z) + player->hitbox.radius.y + 0.5; //0.5 extra
+			player->pos = newPos + vec3f(0.5,1,0.5);
+		}
+			break;
+		case 8:
+			parent.close();
+			break;
+		case 6: //delete block
+			if(world.playerTargetsBlock) {
+				world.setCubeID(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z,0);
+			}
+			break;
+		case 7: //place block
+			if(world.playerTargetsBlock) {
+				world.setCubeID(world.last.x,world.last.y,world.last.z,player->selectedID);
+			}
+			break;
+		case 3: { //Arrow!
+			vec3f dir(getState().view(0,2), getState().view(1,2), getState().view(2,2));//same as the player's pov
+			Polla * np = new Polla(this,player->camPos,player);
+			np->vel -= vec3f(dir.x*30.0,dir.y*30.0,dir.z*30.0);
+			addObject(np);
+		}
+			break;
+		case 4:
+			player->selectedID = std::max(player->selectedID-1,1);
+			break;
+		case 5:
+			player->selectedID = std::min(player->selectedID+1,8);
+			break;
+		case : {
+			vec3f dir(getState().view(0,2), getState().view(1,2), getState().view(2,2));//same as the player's pov
+			Arrow * na = new Arrow(this,player->camPos);
+			na->vel -= vec3f(dir.x*30.0,dir.y*30.0,dir.z*30.0);
+			addObject(na);
+		}
 			break;
 		default:
 			break;

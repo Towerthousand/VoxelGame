@@ -17,6 +17,7 @@ class SceneMain : public Scene {
 		void onKeyDown(float deltaTime, sf::Keyboard::Key key);
 		void onKeyReleased(float deltaTime, sf::Keyboard::Key key);
 		void onMouseButtonPressed(float deltaTime, sf::Mouse::Button button);
+		void onJoystickButtonPressed(float deltaTime, uint key);
 		void onMouseButtonDown(float deltaTime, sf::Mouse::Button button);
 		void onMouseButtonReleased(float deltaTime, sf::Mouse::Button button);
 		void onMouseMoved(float deltaTime, int dx, int dy);
@@ -35,8 +36,6 @@ class SceneMain : public Scene {
 		World world;
 		std::list<GameObject*> objects;
 		std::map<std::string,ShaderProgram> shaders;
-		float debugCounter;
-		int fpsCount;
 };
 
 #endif // SCENEMAIN_HPP

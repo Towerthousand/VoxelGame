@@ -1,7 +1,7 @@
 #include "Game.hpp"
 
 Game::Game() : currentScene(NULL), nextScene(NULL) {
-	window.create(sf::VideoMode(SCRWIDTH,SCRHEIGHT,32), WINDOW_TITLE ,sf::Style::Default,CONTEXT_SETTINGS_OPENGL);
+	window.create(sf::VideoMode(SCRWIDTH,SCRHEIGHT,32), WINDOW_TITLE ,sf::Style::None,CONTEXT_SETTINGS_OPENGL);
 	window.setMouseCursorVisible(false);
 	window.setKeyRepeatEnabled(false);
 	window.setVerticalSyncEnabled(false);
@@ -110,6 +110,9 @@ void Game::update(float deltaTime) {
 				break;
 			case sf::Event::KeyReleased:
 				inputManager.releaseKey(event.key.code);
+				break;
+			case sf::Event::JoystickButtonPressed:
+				currentScene->onJoystickButtonPressed(deltaTime,event.joystickButton.button);
 				break;
 			default:
 				break;

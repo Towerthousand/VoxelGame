@@ -55,6 +55,7 @@ void Arrow::draw() const {
 	mat4f poppedMat = parentScene->getState().model;
 	parentScene->getState().model = modelMatrix;
 	parentScene->getState().updateShaderUniforms(parentScene->getShader("MODEL"));
+	parentScene->getShader("MODEL").sendUniform1f("shadow",1-float(parentScene->getWorld().getCube(pos.x,pos.y,pos.z).light)/MAXLIGHT);
 	model.draw();
 	parentScene->getState().model = poppedMat;
 }
