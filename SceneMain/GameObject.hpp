@@ -14,11 +14,13 @@ class GameObject { //Static objects that have a position and rotation but don't 
 		virtual void draw() const;
 
 		bool isAlive;
-		SceneMain* parentScene;
 		vec3f pos;
 		vec3f scale;
 		Hitbox hitbox;
+	protected:
+		SceneMain* parentScene;
 		mat4f modelMatrix;
+		friend class Hitbox;
 };
 
 #endif // GAMEOBJECT_HPP

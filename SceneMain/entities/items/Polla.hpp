@@ -10,12 +10,14 @@ class Polla : public Entity {
 		~Polla();
 
 		void update(float deltaTime);
-		void updateMatrix();
 		void draw() const;
-		void movePos(float deltaTime);
 
-		Player* followedPlayer;
 		static Model model;
+	private:
+		void updateMatrix();
+		void movePos(float deltaTime);
+		Player* followedPlayer;
+		float ambientLight;
 };
 
 #endif // POLLA_HPP

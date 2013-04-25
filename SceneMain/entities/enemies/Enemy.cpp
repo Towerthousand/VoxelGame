@@ -16,13 +16,16 @@ void Enemy::update(float deltaTime) {
 	movePos(deltaTime);
 }
 
+void Enemy::draw() const {
+	Entity::draw();
+}
+
+void Enemy::movePos(float deltaTime) {
+	Entity::movePos(deltaTime);
+}
 
 void Enemy::updateMatrix() {
 	Entity::updateMatrix();
-}
-
-void Enemy::draw() const {
-	Entity::draw();
 }
 
 void Enemy::lookAtPlayer() { //rotates current model matrix to look at player
@@ -43,8 +46,3 @@ void Enemy::lookAtPlayer() { //rotates current model matrix to look at player
 							 0      , 0   , 0     , 1);
 	}
 }
-
-void Enemy::movePos(float deltaTime) {
-	Entity::movePos(deltaTime);
-}
-

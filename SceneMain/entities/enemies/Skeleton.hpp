@@ -8,12 +8,15 @@ class Skeleton : public Enemy {
 		~Skeleton();
 
 		void update(float deltaTime);
-		void updateMatrix();
 		void draw() const;
 
 		static Model model;
+	private:
+		void updateMatrix();
+
 		float cooldown;
 		vec3f shootPosOffset;//where does the arrow exit from (offset from pos)
+		float ambientLight;
 };
 
 #endif // SKELETON_HPP

@@ -10,13 +10,13 @@ class Enemy : public Entity {
 		virtual ~Enemy();
 
 		virtual void update(float deltaTime);
-		virtual void updateMatrix();
 		virtual void draw() const;
-		virtual void movePos(float deltaTime);
-
-		virtual void lookAtPlayer();
 
 		Player* targetPlayer;
+	protected:
+		virtual void movePos(float deltaTime);
+		virtual void updateMatrix();
+		virtual void lookAtPlayer();
 };
 
 #endif // ENEMY_HPP

@@ -4,7 +4,7 @@
 #include "../../../Game.hpp"
 
 Arrow::Arrow(SceneMain* scene, const vec3f &pos, const vec3f &scale) :
-	Entity(scene,pos,scale) {
+	Entity(scene,pos,scale), ambientLight(0) {
 	this->acc = vec3f(0,GRAVITY,0);
 	this->pos = pos;
 	this->scale = scale;
@@ -16,7 +16,20 @@ Arrow::~Arrow() {
 
 void Arrow::update(float deltaTime) {
 	movePos(deltaTime);
+	updateMatrix();
+	if(parentScene->getWorld().getCube(pos.x,pos.y,pos.z).ID == 0)
+		ambientLight = float(parentScene->getWorld().getCube(pos.x,pos.y,pos.z).light)/MAXLIGHT;
 }
+
+void Arrow::draw() const {
+	mat4f poppedMat = parentScene->getState().model;
+	parentScene->getState().model = modelMatrix;
+	parentScene->getState().updateShaderUniforms(parentScene->getShader("MODEL"));
+	parentScene->getShader("MODEL").sendUniform1f("ambientLight",ambientLight);
+	model.draw();
+	parentScene->getState().model = poppedMat;
+}
+
 void Arrow::updateMatrix() {
 	vec3f offset(-modelMatrix(0,2)*0.6,-modelMatrix(1,2)*0.6,-modelMatrix(2,2)*0.6);//offset determines arrow's notch position
 	if(!hitbox.collidesWithWorld(offset)) {
@@ -38,10 +51,7 @@ void Arrow::updateMatrix() {
 								 0      , 0   , 0     , 1);
 		}
 		else { //no x or z velocity, fall straight down
-			modelMatrix *= mat4f(1, 0, 0, 0,
-								 0, 1, 0, 0,
-								 0, 0, 1, 0,
-								 0, 0, 0, 1);
+			modelMatrix *= mat4f::fromRotate(-90,1,0,0);
 		}
 		vec3f radius = vec3f(model.modelWidth*scale.x,
 							 model.modelHeight*scale.y,
@@ -49,14 +59,6 @@ void Arrow::updateMatrix() {
 		modelMatrix.translate(-radius.x,-radius.y,-radius.z); //translate to center, after rotation
 		modelMatrix.scale(scale.x,scale.y,scale.z);
 	}
-}
-
-void Arrow::draw() const {
-	mat4f poppedMat = parentScene->getState().model;
-	parentScene->getState().model = modelMatrix;
-	parentScene->getState().updateShaderUniforms(parentScene->getShader("MODEL"));
-	model.draw();
-	parentScene->getState().model = poppedMat;
 }
 
 void Arrow::movePos(float deltaTime) {

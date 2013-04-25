@@ -2,8 +2,9 @@
 #include "SceneMain.hpp"
 
 GameObject::GameObject(SceneMain* scene, const vec3f &pos, const vec3f &scale) :
-	isAlive(true), parentScene(scene),
-	pos(pos), scale(scale), hitbox(this, Hitbox::POINT, vec3f(0,0,0)),
+	isAlive(true), pos(pos), scale(scale),
+	hitbox(this, Hitbox::POINT, vec3f(0,0,0)),
+	parentScene(scene),
 	modelMatrix(mat4f::fromIdentity()) {
 }
 

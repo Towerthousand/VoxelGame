@@ -10,11 +10,14 @@ class Arrow : public Entity {
 		~Arrow();
 
 		void update(float deltaTime);
-		void updateMatrix();
 		void draw() const;
-		void movePos(float deltaTime);
 
 		static Model model;
+
+	private:
+		void updateMatrix();
+		void movePos(float deltaTime);
+		float ambientLight;
 };
 
 #endif // ARROW_H

@@ -5,7 +5,7 @@
 
 Player::Player(SceneMain* scene, const vec3f& pos, const vec3f &scale) :
 	Entity(scene,pos,scale), selectedID(1), onFloor(false), isJumping(false),
-	frustumPlanes(6,std::vector<vec3f> //6 planes
+	frustumPlanes(4,std::vector<vec3f> //4 planes (near and far not used)
 				  (4,vec3f(0,0,0)))	{//4 points per plane
 	hitbox.type = Hitbox::BOX;
 	hitbox.radius = vec3f(0.6*scale.x,1.6*scale.y,0.6*scale.z);
@@ -32,14 +32,6 @@ void Player::update(float deltaTime) {
 	vel.z = 0; // Player only accelerates vertically, so speed.z doesn't carry
 }
 
-void Player::updateCamera() {
-	camPos = pos + vec3f(0,1.5,0);
-	viewMatrix = mat4f::fromIdentity();
-	viewMatrix.rotate(camRot.x, 1, 0, 0);
-	viewMatrix.rotate(camRot.y, 0, 1, 0);
-	viewMatrix.translate(-camPos.x, -camPos.y, -camPos.z);
-}
-
 void Player::draw() const {
 	//draw the model when there is one...
 }
@@ -49,17 +41,45 @@ void Player::drawFrustum() const {
 	//instead of every update and call drawFrustum() every draw
 	//to see the culling from outside.
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	for (int i = 0; i < 6; ++i) {
+	for (int i = 0; i < frustumPlanes.size(); ++i) {
 		glPushMatrix();
 		glColor4f(0.0,0.0,0.0,1);
 		glBegin(GL_LINE_STRIP);
 		for(int j = 0; j < 5; ++j)
-		glVertex3f(frustumPlanes[i][j%4].x,frustumPlanes[i][j%4].y,frustumPlanes[i][j%4].z);
+			glVertex3f(frustumPlanes[i][j%4].x,frustumPlanes[i][j%4].y,frustumPlanes[i][j%4].z);
 		glEnd();
 		glColor4f(1.0,1.0,1.0,1.0);
 		glPopMatrix();
 	}
 }
+
+bool Player::insideFrustum( const vec3f &center, float radius) const {
+	float distance,D;
+	for(int i=0; i < frustumPlanes.size(); i++) {
+		//construct the plane with a normal and a point
+		vec3f v = frustumPlanes[i][1]-frustumPlanes[i][0];
+		vec3f u = frustumPlanes[i][2]-frustumPlanes[i][0];
+		u.normalize();
+		v.normalize();
+		vec3f n = v^u; //normal n = (Ax,By,Cz), point [0] = (p1,p2,p3)
+		n.normalize();
+		D = -n*frustumPlanes[i][0]; //A*p1*x + B*p2*y + C*p3*z + D = 0 => D = -dot(n,P)
+		distance = n*center + D;//Solve the equation using the player's pos instead
+		//of a point in the plane.
+		if (distance < -radius)
+			return false; //not inside this player's view
+	}
+	return true;
+}
+
+void Player::updateCamera() {
+	camPos = pos + vec3f(0,1.5,0);
+	viewMatrix = mat4f::fromIdentity();
+	viewMatrix.rotate(camRot.x, 1, 0, 0);
+	viewMatrix.rotate(camRot.y, 0, 1, 0);
+	viewMatrix.translate(-camPos.x, -camPos.y, -camPos.z);
+}
+
 
 void Player::makeFrustum() {
 	//calculate frustum with dir, pos , znear, zfar, fov, screen ratio
@@ -117,33 +137,4 @@ void Player::makeFrustum() {
 	frustumPlanes[RIGHT][1] = ftr;
 	frustumPlanes[RIGHT][2] = fbr;
 	frustumPlanes[RIGHT][3] = nbr;
-
-	frustumPlanes[NEAR][0] = ntl;
-	frustumPlanes[NEAR][1] = ntr;
-	frustumPlanes[NEAR][2] = nbr;
-	frustumPlanes[NEAR][3] = nbl;
-
-	frustumPlanes[FAR][0] = ftr;
-	frustumPlanes[FAR][1] = ftl;
-	frustumPlanes[FAR][2] = fbl;
-	frustumPlanes[FAR][3] = fbr;
-}
-
-bool Player::insideFrustum( const vec3f &center, float radius) const {
-	float distance,D;
-	for(int i=0; i < 4; i++) {
-		//construct the plane with a normal and a point
-		vec3f v = frustumPlanes[i][1]-frustumPlanes[i][0];
-		vec3f u = frustumPlanes[i][2]-frustumPlanes[i][0];
-		u.normalize();
-		v.normalize();
-		vec3f n = v^u; //normal n = (Ax,By,Cz), point [0] = (p1,p2,p3)
-		n.normalize();
-		D = -n*frustumPlanes[i][0]; //A*p1*x + B*p2*y + C*p3*z + D = 0 => D = -dot(n,P)
-		distance = n*center + D;//Solve the equation using the player's pos instead
-		//of a point in the plane.
-		if (distance < -radius)
-			return false; //not inside this player's view
-	}
-	return true;
 }
