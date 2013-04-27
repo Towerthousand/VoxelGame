@@ -39,11 +39,11 @@ SOURCES += \
 	$$PWD/SceneMain/world/generator/Function3DSub.cpp \
 	$$PWD/SceneMain/world/generator/Function2DConst.cpp \
 	$$PWD/SceneMain/world/generator/Function3DDiv.cpp \
-    SceneMain/world/generator/FunctionTerrrainVolume.cpp \
-    SceneMain/world/generator/FunctionTerrainOverlay.cpp \
-    SceneMain/world/generator/Function2DSimplex.cpp \
-    SceneMain/world/generator/FunctionTerrainHeightmap.cpp \
-    SceneMain/world/generator/FunctionTerrainJoin.cpp
+	$$PWD/SceneMain/world/generator/FunctionTerrrainVolume.cpp \
+	$$PWD/SceneMain/world/generator/FunctionTerrainOverlay.cpp \
+	$$PWD/SceneMain/world/generator/Function2DSimplex.cpp \
+	$$PWD/SceneMain/world/generator/FunctionTerrainHeightmap.cpp \
+	$$PWD/SceneMain/world/generator/FunctionTerrainJoin.cpp
 
 HEADERS += \
     $$PWD/Scene.hpp \
@@ -83,11 +83,11 @@ HEADERS += \
 	$$PWD/SceneMain/world/generator/Function2DConst.hpp \
 	$$PWD/SceneMain/world/generator/Function3DDiv.hpp \
 	$$PWD/SceneMain/world/generator/FunctionTerrain.hpp \
-    SceneMain/world/generator/FunctionTerrrainVolume.hpp \
-    SceneMain/world/generator/FunctionTerrainOverlay.hpp \
-    SceneMain/world/generator/Function2DSimplex.hpp \
-    SceneMain/world/generator/FunctionTerrainHeightmap.hpp \
-    SceneMain/world/generator/FunctionTerrainJoin.hpp
+	$$PWD/SceneMain/world/generator/FunctionTerrrainVolume.hpp \
+	$$PWD/SceneMain/world/generator/FunctionTerrainOverlay.hpp \
+	$$PWD/SceneMain/world/generator/Function2DSimplex.hpp \
+	$$PWD/SceneMain/world/generator/FunctionTerrainHeightmap.hpp \
+	$$PWD/SceneMain/world/generator/FunctionTerrainJoin.hpp
 
 OTHER_FILES += \
 	$$PWD/shaders/terrain_fragment.glsl \

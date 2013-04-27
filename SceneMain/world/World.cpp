@@ -7,11 +7,11 @@
 World::World(SceneMain* parentScene, Player* player) :
 	playerTargetsBlock(false), targetedBlock(0,0,0),
 	last(0,0,0), parentScene(parentScene), player(player),
-	chunkGen(parentScene, rand()),
-	chunks(0,std::vector<std::vector<Chunk*> >
-		   (0,std::vector<Chunk*>
-			(0,NULL))),
-	updateStuffTimer(0.0){
+	chunkGen(parentScene, rand(), &chunks),
+	chunks(WORLDWIDTH,std::vector<std::vector<Chunk*> >
+		   (WORLDHEIGHT,std::vector<Chunk*>
+			(WORLDWIDTH,NULL))),
+	updateStuffTimer(0.0) {
 }
 
 World::~World() {
@@ -23,43 +23,14 @@ World::~World() {
 			}
 }
 
-bool World::loadDirbaio(const std::string &filePath) {
+bool World::loadInitialChunks() {
 	sf::Clock clock;
 	clock.restart();
-	std::ifstream file(filePath.c_str());
-	if(!file) {
-		outLog("#ERROR Could not load dirbaio \"" + filePath + "\"");
-		return false;
-	}
-	int sizeX = int(file.get()) << 24 | int(file.get()) << 16 | int(file.get()) << 8 | int(file.get());
-	int sizeY = int(file.get()) << 24 | int(file.get()) << 16 | int(file.get()) << 8 | int(file.get());
-	int sizeZ = int(file.get()) << 24 | int(file.get()) << 16 | int(file.get()) << 8 | int(file.get());
-	WORLDWIDTH = sizeX/CHUNKSIZE;
-	WORLDHEIGHT = sizeY/CHUNKSIZE;
-	chunks.resize(WORLDWIDTH);
-	for(int i = 0; i < WORLDWIDTH; ++i)
-		chunks[i].resize(WORLDHEIGHT);
-	for(int i = 0; i < WORLDWIDTH; ++i)
-		for(int j = 0; j < WORLDHEIGHT; ++j)
-			chunks[i][j].resize(WORLDWIDTH);
-
-	//	outLog(" - Creating chunks...");
-	//	for (int x = 0; x < WORLDWIDTH; ++x)
-	//		for (int y = 0; y < WORLDHEIGHT; ++y)
-	//			for (int z = 0; z < WORLDWIDTH; ++z)
-	//				chunks[x][y][z] = new Chunk(x,y,z,parentScene);
-	//	outLog(" - Loading chunk data...");
-	//	for(int y = 0; y < sizeY; ++y)
-	//		for(int x = 0; x < sizeX; ++x)
-	//			for(int z = 0; z < sizeZ; ++z)
-	//				chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE] = Cube(file.get(),0);
-	file.close();
-	////////////////////////LOLASO
+	outLog(" - Generating chunk terrain...");
 	for (int x = 0; x < WORLDWIDTH; ++x)
 		for (int y = 0; y < WORLDHEIGHT; ++y)
 			for (int z = 0; z < WORLDWIDTH; ++z)
 				chunks[x][y][z] = chunkGen.getChunk(x,y,z);
-	////////////////////////LOLASO
 	outLog(" - Calculating sky levels...");
 	skyValues = std::vector<std::vector<int> >(CHUNKSIZE*WORLDWIDTH,
 											   std::vector<int>(CHUNKSIZE*WORLDWIDTH,-1));

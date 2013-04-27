@@ -39,8 +39,8 @@ bool SceneMain::loadResources() {
 	if(!Skeleton::model.loadVoxelization("resources/mob.vox"))
 		return false;
 	//terrain
-	outLog("* Loading new world" );
-	if (!world.loadDirbaio("resources/out.bin"))
+	outLog("* Loading init zone chunks" );
+	if (!world.loadInitialChunks())
 		return false;
 	return true;
 }

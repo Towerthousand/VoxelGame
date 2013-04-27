@@ -19,6 +19,7 @@
 #include <list>
 #include <functional>
 #include <sys/stat.h>
+#include <thread>
 #include "BudMath.hpp"
 
 using namespace math;

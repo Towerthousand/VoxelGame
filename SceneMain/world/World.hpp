@@ -20,7 +20,7 @@ class World {
 		World(SceneMain* parentScene, Player* player);
 		~World();
 		//generators
-		bool loadDirbaio(const std::string &filePath);
+		bool loadInitialChunks();
 
 		//Getters and setters
 		bool getOutOfBounds(int x, int y, int z) const;
