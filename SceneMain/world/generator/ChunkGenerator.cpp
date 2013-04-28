@@ -1,5 +1,6 @@
 #include "ChunkGenerator.hpp"
 #include "../Chunk.hpp"
+#include "../../SceneMain.hpp"
 #include "Function3DSimplex.hpp"
 #include "Function3DSub.hpp"
 #include "Function3DYcoord.hpp"
@@ -53,64 +54,38 @@ Chunk* ChunkGenerator::getChunk(int x, int y, int z) { //chunkgrid coords
 	return chunk;
 }
 
-void ChunkGenerator::queueChunk(int x, int y, int z) { //chunkgrid coords
-	vec3f chunkIndex; //this is the position of the chunk in the chunk matrix
-	chunkIndex.x = (z < 0 ? ((x%WORLDWIDTH) + WORLDWIDTH)%WORLDWIDTH : x%WORLDWIDTH);
-	chunkIndex.y = (y < 0 ? ((y%WORLDWIDTH) + WORLDWIDTH)%WORLDWIDTH : y%WORLDWIDTH);
-	chunkIndex.z = (z < 0 ? ((z%WORLDWIDTH) + WORLDWIDTH)%WORLDWIDTH : z%WORLDWIDTH);
+bool ChunkGenerator::queueChunk(int x, int y, int z) { //chunkgrid coords
 	//1. delete the chunk that is in the place of the new chunk and assign pointer to null
+	vec3f chunkIndex = parentScene->getWorld().getCoords(x*CHUNKSIZE,y*CHUNKSIZE,z*CHUNKSIZE).first;
 	if((*chunkStorage)[chunkIndex.x][chunkIndex.y][chunkIndex.z] != NULL) {
+		if((*chunkStorage)[chunkIndex.x][chunkIndex.y][chunkIndex.z]->XPOS == x &&
+		   (*chunkStorage)[chunkIndex.x][chunkIndex.y][chunkIndex.z]->YPOS == y &&
+		   (*chunkStorage)[chunkIndex.x][chunkIndex.y][chunkIndex.z]->ZPOS == z)
+			return false; //the chunk is already in place
 		delete (*chunkStorage)[chunkIndex.x][chunkIndex.y][chunkIndex.z];
 		(*chunkStorage)[chunkIndex.x][chunkIndex.y][chunkIndex.z] = NULL;
 	}
 	//2. queue new chunk
-
+	threadedChunkManagement(x,y,z);
+	//this should not go here
+	parentScene->getWorld().calculateLight((*chunkStorage)[chunkIndex.x][chunkIndex.y][chunkIndex.z]->getPos() + vec3i(CHUNKSIZE/2),vec2i(CHUNKSIZE/2));
+	return true;
 }
 
-void ChunkGenerator::threadedChunkManagement(std::vector<std::vector<std::vector<Chunk*> > >* storage,std::queue<vec3i>* queue, bool* ended) {
-	bool work;
-	vec3i nextChunk;
-	while(true) {
-		//1. CHECK FOR END OF THREAD OR NEW CHUNKS TO PROCESS
-		//turn mutex on
-		if(*ended) {
-			//turn mutex off
-			return;
-		}
-		if(!queue->empty()) {
-			work = true;
-			nextChunk = queue->front();
-			queue->pop();
-		}
-		//turn mutex off
-		if(work) {
-			//2. CREATE NEW CHUNK
-			Chunk* newChunk;
-			vec3i chunkIndex; //this is the position of the chunk in the chunk matrix
-			chunkIndex.x = (nextChunk.x < 0 ? ((nextChunk.x%WORLDWIDTH) + WORLDWIDTH)%WORLDWIDTH : nextChunk.x%WORLDWIDTH);
-			chunkIndex.y = (nextChunk.y < 0 ? ((nextChunk.y%WORLDHEIGHT) + WORLDHEIGHT)%WORLDHEIGHT : nextChunk.y%WORLDHEIGHT);
-			chunkIndex.z = (nextChunk.z < 0 ? ((nextChunk.z%WORLDWIDTH) + WORLDWIDTH)%WORLDWIDTH : nextChunk.z%WORLDWIDTH);
-			bool onDisk = false;
-			if (onDisk) {
-				//copy contents from disc into cubes...
-			}
-			else {
-				ID3Data data = entry->getID3Data(x*CHUNKSIZE,y*CHUNKSIZE,z*CHUNKSIZE,CHUNKSIZE,CHUNKSIZE+5,CHUNKSIZE);
-				for (int i = 0; i < CHUNKSIZE; ++i)
-					for (int j = 0; j < CHUNKSIZE; ++j)
-						for (int k = 0; k < CHUNKSIZE; ++k)
-							newChunk->cubes[i][j][k] = Cube(data[i][j][k],0);
-			}
-			//3. REPLACE OLD POINTER
-			//turn mutex on
-			if(storage[chunkIndex.x][chunkIndex.y][chunkIndex.z] != NULL) {
-				outLog("#ERROR -ChunkManager- Memory has not been properly freed before asigning new chunk");
-				delete newChunk;
-			}
-			else
-				storage[chunkIndex.x][chunkIndex.y][chunkIndex.z] = newChunk;
-			//turn mutex off
-			work = false;
-		}
+void ChunkGenerator::threadedChunkManagement(int x, int y, int z) {
+	//2. CREATE NEW CHUNK
+	Chunk* newChunk = new Chunk(x,y,z,parentScene);
+	vec3f chunkIndex = parentScene->getWorld().getCoords(x*CHUNKSIZE,y*CHUNKSIZE,z*CHUNKSIZE).first;
+	ID3Data data = entry->getID3Data(x*CHUNKSIZE,y*CHUNKSIZE,z*CHUNKSIZE,CHUNKSIZE,CHUNKSIZE+5,CHUNKSIZE);
+	for (int i = 0; i < CHUNKSIZE; ++i)
+		for (int j = 0; j < CHUNKSIZE; ++j)
+			for (int k = 0; k < CHUNKSIZE; ++k)
+				newChunk->cubes[i][j][k] = Cube(data[i][j][k],0);
+	//3. REPLACE OLD POINTER
+	if((*chunkStorage)[chunkIndex.x][chunkIndex.y][chunkIndex.z] != NULL) {
+		outLog("#ERROR -ChunkManager- Memory has not been properly freed before asigning new chunk");
+		delete newChunk;
 	}
+	else
+		(*chunkStorage)[chunkIndex.x][chunkIndex.y][chunkIndex.z] = newChunk;
 }

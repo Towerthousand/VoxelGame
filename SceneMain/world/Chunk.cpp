@@ -25,6 +25,10 @@ Cube Chunk::getCube(int x, int y, int z) const {
 	return parentScene->getWorld().getCube(x+(XPOS*CHUNKSIZE),y+(YPOS*CHUNKSIZE),z+(ZPOS*CHUNKSIZE));
 }
 
+vec3i Chunk::getPos() {
+	return vec3i(XPOS*CHUNKSIZE,YPOS*CHUNKSIZE,ZPOS*CHUNKSIZE);
+}
+
 void Chunk::update(float deltaTime) {
 	//empty arrays and re-do them
 	markedForRedraw = false;

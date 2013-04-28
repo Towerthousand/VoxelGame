@@ -11,8 +11,8 @@ class ChunkGenerator {
 		~ChunkGenerator();
 
 		Chunk* getChunk(int x, int y, int z); //chunkgrid coords
-		void queueChunk(int x, int y, int z); //chunkgrid coords
-		void threadedChunkManagement(std::vector<std::vector<std::vector<Chunk*> > >* storage,std::queue<vec3i>* queue, bool* ended);
+		bool queueChunk(int x, int y, int z); //chunkgrid coords
+		void threadedChunkManagement(int x, int y, int z);
 
 	private:
 		SceneMain* parentScene;
@@ -20,7 +20,6 @@ class ChunkGenerator {
 
 		FunctionTerrain* entry; //root function for the generation tree
 		std::vector<std::vector<std::vector<Chunk*> > >* chunkStorage;
-		std::queue<vec3i> chunkQueue;
 		bool endChunkThread;
 };
 

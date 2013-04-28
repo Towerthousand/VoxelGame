@@ -12,10 +12,16 @@ class Chunk { //16*16*16
 		void draw() const;
 		void drawBoundingBox() const;
 
+		vec3i getPos();
+
 		bool outOfView;
 		bool markedForRedraw;
 		std::vector<std::vector<std::vector<Cube> > > cubes;
 		int vertexCount;
+
+		int XPOS; //x pos of chunk inside world matrix
+		int YPOS; //y pos of chunk inside world matrix
+		int ZPOS; //z pos of chunk inside world matrix
 	private:
 		//Getters & consultors
 		Cube getCube(int x, int y, int z) const;
@@ -23,9 +29,6 @@ class Chunk { //16*16*16
 		void pushCubeToArray(short x, short y, short z, unsigned char cubeID, std::vector<Vertex> &renderData);
 		void makeVbo(std::vector<Vertex> &renderData);
 
-		int XPOS; //x pos of chunk inside world matrix
-		int YPOS; //y pos of chunk inside world matrix
-		int ZPOS; //z pos of chunk inside world matrix
 		int VBOID;
 		mat4f modelMatrix; //precalculated, since chunks do not transform ever
 		SceneMain* parentScene;

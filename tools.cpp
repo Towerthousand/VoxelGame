@@ -4,8 +4,6 @@
 int SCRWIDTH = sf::VideoMode::getFullscreenModes()[0].width;
 int SCRHEIGHT = sf::VideoMode::getFullscreenModes()[0].height;
 bool WINDOWFOCUS = false;
-int WORLDHEIGHT = 16;
-int WORLDWIDTH = 2;
 sf::Clock GLOBALCLOCK;
 
 //implement random functions here

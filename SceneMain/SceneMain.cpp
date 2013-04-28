@@ -26,9 +26,9 @@ bool SceneMain::loadResources() {
 		return false;
 	shaders["MODEL"] = s;
 	//textures
-	if(!parent.textures().loadTexture("lolwtf","resources/blocks" + toString(TEXSIZE) +".png"))
+	if(!parent.textures().loadTexture("terrain","resources/blocks" + toString(TEXSIZE) +".png"))
 		return false;
-	//music
+	//musicz
 	if(!parent.audio().loadMusic("troll","resources/troll.ogg"))
 		return false;
 	//models
@@ -113,7 +113,7 @@ void SceneMain::draw() const {
 	//Move matrix to position (according to player)
 	getState().view = player->viewMatrix;
 	//Draw all the stuff
-	parent.textures().useTexture("lolwtf", GL_TEXTURE0);
+	parent.textures().useTexture("terrain", GL_TEXTURE0);
 	//world
 	world.draw();
 	if (world.playerTargetsBlock)
@@ -151,9 +151,9 @@ void SceneMain::onKeyPressed(float deltaTime, sf::Keyboard::Key key) {
 	switch(key) {
 		case sf::Keyboard::E: { //new spawnpoint
 			vec3f newPos(0,0,0);
-			newPos.x = rand()%(WORLDWIDTH*CHUNKSIZE);
-			newPos.z = rand()%(WORLDWIDTH*CHUNKSIZE);
-			newPos.y = world.getSkylightLevel(newPos.x,newPos.z) + player->hitbox.radius.y + 0.5; //0.5 extra
+			newPos.x = 0;
+			newPos.z = 0;
+			newPos.y = 100; //0.5 extra
 			player->pos = newPos + vec3f(0.5,1,0.5);
 		}
 			break;

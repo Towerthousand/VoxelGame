@@ -26,14 +26,15 @@ World::~World() {
 bool World::loadInitialChunks() {
 	sf::Clock clock;
 	clock.restart();
+	skyValues = std::vector<std::vector<int> >(CHUNKSIZE*WORLDWIDTH,
+											   std::vector<int>(CHUNKSIZE*WORLDWIDTH,-1));
 	outLog(" - Generating chunk terrain...");
 	for (int x = 0; x < WORLDWIDTH; ++x)
 		for (int y = 0; y < WORLDHEIGHT; ++y)
-			for (int z = 0; z < WORLDWIDTH; ++z)
-				chunks[x][y][z] = chunkGen.getChunk(x,y,z);
+			for (int z = 0; z < WORLDWIDTH; ++z) {
+				chunkGen.queueChunk(x,y,z);
+			}
 	outLog(" - Calculating sky levels...");
-	skyValues = std::vector<std::vector<int> >(CHUNKSIZE*WORLDWIDTH,
-											   std::vector<int>(CHUNKSIZE*WORLDWIDTH,-1));
 	for(int x = 0; x < CHUNKSIZE*WORLDWIDTH; ++x)
 		for(int z = 0; z < CHUNKSIZE*WORLDWIDTH; ++z)
 			skyValues[x][z] = getSkylightLevel(x,z);
@@ -47,12 +48,11 @@ bool World::loadInitialChunks() {
 }
 
 bool World::getOutOfBounds(int x, int y, int z) const{
-	if (x/CHUNKSIZE >= WORLDWIDTH || x/CHUNKSIZE < 0
-		|| y/CHUNKSIZE >= WORLDHEIGHT || y/CHUNKSIZE < 0
-		|| z/CHUNKSIZE >= WORLDWIDTH || z/CHUNKSIZE < 0
-		|| x%CHUNKSIZE < 0
-		|| z%CHUNKSIZE < 0
-		|| y%CHUNKSIZE < 0)
+	std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
+	Chunk* c = chunks[matrixCoords.first.x][matrixCoords.first.y][matrixCoords.first.z];
+	if(c == NULL)
+		return true;
+	if(c->XPOS != (x >> CHUNKSIZE_POW2) || c->YPOS != (y >> CHUNKSIZE_POW2) || c->ZPOS != (z >> CHUNKSIZE_POW2))
 		return true;
 	return false;
 }
@@ -63,8 +63,32 @@ Cube World::getCube(int x, int y, int z) const {
 	return getCubeRaw(x,y,z);
 }
 
+std::pair<vec3i,vec3i> World::getCoords(int x, int y, int z) const {
+	int blockIndexX = x & CHUNKSIZE_MASK;;//local coords (0 <= coord < CHUNKSIZE)
+	int realChunkX = x >> CHUNKSIZE_POW2;//real coords
+	int chunkIndexX = realChunkX & WORLDWIDTH_MASK; //chunkgrid coords (0 <= coord < WORLDWIDTH
+
+	int blockIndexY = y & CHUNKSIZE_MASK;;//local coords (0 <= coord < CHUNKSIZE)
+	int realChunkY = y >> CHUNKSIZE_POW2;//real coords
+	int chunkIndexY = realChunkY & WORLDHEIGHT_MASK; //chunkgrid coords (0 <= coord < WORLDHEIGHT
+
+	int blockIndexZ = z & CHUNKSIZE_MASK;;//local coords (0 <= coord < CHUNKSIZE)
+	int realChunkZ = z >> CHUNKSIZE_POW2;//real coords
+	int chunkIndexZ = realChunkZ & WORLDWIDTH_MASK; //chunkgrid coords (0 <= coord < WORLDWIDTH
+
+	return std::pair<vec3i,vec3i>(vec3i(chunkIndexX,chunkIndexY,chunkIndexZ),vec3i(blockIndexX,blockIndexY,blockIndexZ));
+}
+
+vec2i World::getSkyCoords(int x, int z) const {
+	int indexX = x & (WORLDWIDTH*CHUNKSIZE -1); //chunkgrid coords (0 <= coord < WORLDSIZE
+	int indexZ = z & (WORLDWIDTH*CHUNKSIZE -1); //chunkgrid coords (0 <= coord < WORLDSIZE
+	return vec2i(indexX,indexZ);
+}
+
+
 Cube World::getCubeRaw(int x, int y, int z) const {
-	return chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE];
+	std::pair<vec3i,vec3i> realCoords = getCoords(x,y,z);
+	return chunks[realCoords.first.x][realCoords.first.y][realCoords.first.z]->cubes[realCoords.second.x][realCoords.second.y][realCoords.second.z];
 }
 
 int World::getSkylightLevel(int x, int z) const { //X and Z in cube coords
@@ -75,7 +99,8 @@ int World::getSkylightLevel(int x, int z) const { //X and Z in cube coords
 }
 
 bool World::getSkyAccess(int x, int y, int z) const {
-	if (y <= skyValues[x][z])
+	vec2i skyCoords = getSkyCoords(x,z);
+	if (y <= skyValues[skyCoords.x][skyCoords.y])
 		return false;
 	return true;
 }
@@ -83,21 +108,24 @@ bool World::getSkyAccess(int x, int y, int z) const {
 void World::setCubeID(int x, int y, int z, unsigned char ID) { //set the id, calculate light (taking into account sky level)
 	if (getOutOfBounds(x,y,z))
 		return;
-	chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE].ID = ID;
-	if (y > skyValues[x][z]) { // calculate "shadow" of the new block
-		int previousSkyValue = skyValues[x][z];
-		skyValues[x][z] = getSkylightLevel(x,z);
+	std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
+	chunks[matrixCoords.first.x][matrixCoords.first.y][matrixCoords.first.z]->cubes[matrixCoords.second.x][matrixCoords.second.y][matrixCoords.second.z].ID = ID;
+	chunks[matrixCoords.first.x][matrixCoords.first.y][matrixCoords.first.z]->markedForRedraw = true;
+	vec2i skyCoords = getSkyCoords(x,z);
+	if (y > skyValues[skyCoords.x][skyCoords.y]) { // calculate "shadow" of the new block
+		int previousSkyValue = skyValues[skyCoords.x][skyCoords.y];
+		skyValues[skyCoords.x][skyCoords.y] = getSkylightLevel(x,z);
 		calculateLight(vec3i(x,
 							 ((y - previousSkyValue)/2) + previousSkyValue - UPDATERADIUS/2,
 							 z),
 					   vec2i(UPDATERADIUS,std::max(UPDATERADIUS,(y - previousSkyValue)/2 + UPDATERADIUS/2 + 4)));
 	}
-	else if (y == skyValues[x][z]) { //propagate skylight downwards
-		skyValues[x][z] = getSkylightLevel(x,z);
+	else if (y == skyValues[skyCoords.x][skyCoords.y]) { //propagate skylight downwards
+		skyValues[skyCoords.x][skyCoords.y] = getSkylightLevel(x,z);
 		calculateLight(vec3i(x,
-							 ((y - skyValues[x][z])/2) + skyValues[x][z]  - UPDATERADIUS/2,
+							 ((y - skyValues[skyCoords.x][skyCoords.y])/2) + skyValues[skyCoords.x][skyCoords.y]  - UPDATERADIUS/2,
 							 z),
-					   vec2i(UPDATERADIUS,std::max(UPDATERADIUS,(y - skyValues[x][z])/2 + UPDATERADIUS/2 + 4)));
+					   vec2i(UPDATERADIUS,std::max(UPDATERADIUS,(y - skyValues[skyCoords.x][skyCoords.y])/2 + UPDATERADIUS/2 + 4)));
 	}
 	else { //just calculate the surrounding blocks, since wer'e not changing sky level
 		calculateLight(vec3i(x,y,z),vec2i(UPDATERADIUS,UPDATERADIUS));
@@ -107,8 +135,9 @@ void World::setCubeID(int x, int y, int z, unsigned char ID) { //set the id, cal
 void World::setCubeLight(int x, int y, int z, unsigned char light) { //set the light, mark for redraw
 	if (getOutOfBounds(x,y,z))
 		return;
-	chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE].light = light;
-	chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->markedForRedraw = true;
+	std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
+	chunks[matrixCoords.first.x][matrixCoords.first.y][matrixCoords.first.z]->cubes[matrixCoords.second.x][matrixCoords.second.y][matrixCoords.second.z].light = light;
+	chunks[matrixCoords.first.x][matrixCoords.first.y][matrixCoords.first.z]->markedForRedraw = true;
 }
 
 void World::draw() const {
@@ -116,15 +145,16 @@ void World::draw() const {
 	//empty culling
 	for (int x = 0; x < WORLDWIDTH; ++x)
 		for (int y = 0; y < WORLDHEIGHT; ++y)
-			for (int z = 0; z < WORLDWIDTH; ++z) {
-				vec3f center(x*CHUNKSIZE+CHUNKSIZE/2,y*CHUNKSIZE+CHUNKSIZE/2,z*CHUNKSIZE+CHUNKSIZE/2);
-				if (chunks[x][y][z]->vertexCount == 0)
-					chunks[x][y][z]->outOfView = true;
-				else if (abs((player->pos - center).module()) < CHUNKSIZE*5)
-					chunks[x][y][z]->outOfView = false;
-				else
-					chunks[x][y][z]->outOfView = !player->insideFrustum(center,sqrt(3*((CHUNKSIZE/2)*(CHUNKSIZE/2))));
-			}
+			for (int z = 0; z < WORLDWIDTH; ++z)
+				if(chunks[x][y][z] != NULL) {
+					vec3f center = chunks[x][y][z]->getPos() + vec3i(CHUNKSIZE/2);
+					if (chunks[x][y][z]->vertexCount == 0)
+						chunks[x][y][z]->outOfView = true;
+					else if (abs((player->pos - center).module()) < CHUNKSIZE*5)
+						chunks[x][y][z]->outOfView = false;
+					else
+						chunks[x][y][z]->outOfView = !player->insideFrustum(center,sqrt(3*((CHUNKSIZE/2)*(CHUNKSIZE/2))));
+				}
 
 	//do occlusion culling here!
 	std::priority_queue<std::pair<float,Chunk*> > queryList; //chunks to be queried, ordered by distance
@@ -133,12 +163,12 @@ void World::draw() const {
 	float dist = 0;
 	for(int x = 0; x < WORLDWIDTH; ++x)
 		for(int y = 0; y < WORLDHEIGHT; ++y)
-			for(int z = 0; z < WORLDWIDTH; ++z) {
-				if(!chunks[x][y][z]->outOfView) {
-					dist = (vec3f(x*CHUNKSIZE,y*CHUNKSIZE,z*CHUNKSIZE) + vec3f(CHUNKSIZE/2,CHUNKSIZE/2,CHUNKSIZE/2) - parentScene->player->pos).module();
-					queryList.push(std::pair<float,Chunk*>(-dist,chunks[x][y][z]));
-				}
-			}
+			for(int z = 0; z < WORLDWIDTH; ++z)
+				if(chunks[x][y][z] != NULL)
+					if(!chunks[x][y][z]->outOfView) {
+						dist = (chunks[x][y][z]->getPos() + vec3f(CHUNKSIZE/2) - parentScene->player->pos).module();
+						queryList.push(std::pair<float,Chunk*>(-dist,chunks[x][y][z]));
+					}
 
 	int layers = 10;
 	int chunksPerLayer = queryList.size()/layers + int(queryList.size()%layers > 0); //chunks per pass
@@ -198,12 +228,22 @@ void World::draw() const {
 
 void World::update(float deltaTime) {
 	//updateStuff(deltaTime);
+	vec2i playerChunkPos = vec2i(std::floor(player->pos.x),std::floor(player->pos.z))/CHUNKSIZE;
+	int count = 0;
+	for (int x = -WORLDWIDTH/2; x < WORLDWIDTH/2; ++x)
+		for (int y = 0; y < WORLDHEIGHT; ++y)
+			for (int z = -WORLDWIDTH/2; z < WORLDWIDTH/2; ++z){
+				if(count < 10)
+					if(chunkGen.queueChunk(playerChunkPos.x+x,y,playerChunkPos.y+z))
+						++count;
+			}
 	traceView(player,10);
 	for (int x = 0; x < WORLDWIDTH; ++x)
 		for (int y = 0; y < WORLDHEIGHT; ++y)
 			for (int z = 0; z < WORLDWIDTH; ++z)
-				if (chunks[x][y][z]->markedForRedraw == true)
-					chunks[x][y][z]->update(deltaTime);
+				if(chunks[x][y][z] != NULL)
+					if (chunks[x][y][z]->markedForRedraw == true)
+						chunks[x][y][z]->update(deltaTime);
 }
 
 //Based on: Fast Voxel Traversal Algorithm for Ray Tracinge
@@ -292,43 +332,46 @@ void World::traceView(const Player *playerCam, float tMax) {
 void World::calculateLight(vec3i source, vec2i radius) {
 	//BFS TO THE MAX
 	std::vector<vec3i> blocksToCheck[MAXLIGHT+1];
-	unsigned char* ID = 0;
-	unsigned char* light = 0;
+	unsigned char ID = 0;
+	unsigned char light = 0;
 	for(int x = source.x-radius.x; x <= source.x+radius.x; ++x) {
 		for(int y = source.y-radius.y; y <= source.y+radius.y; ++y) {
 			for(int z = source.z-radius.x; z <= source.z+radius.x; ++z) {
 				if (!getOutOfBounds(x,y,z)){
-					ID = &chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE].ID;
-					light = &chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->cubes[x%CHUNKSIZE][y%CHUNKSIZE][z%CHUNKSIZE].light;
-					switch(*ID) {
-						case 0: //air
-							if (x == source.x-radius.x || x == source.x+radius.x
-								||y == source.y-radius.y || y == source.y+radius.y
-								||z == source.z-radius.x || z == source.z+radius.x){
-								//if it is on border, mark it as node
-								if (*light > MINLIGHT) {
-									blocksToCheck[*light].push_back(vec3i(x,y,z));
+					std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
+					if(chunks[matrixCoords.first.x][matrixCoords.first.y][matrixCoords.first.z] != NULL) {
+						ID = chunks[matrixCoords.first.x][matrixCoords.first.y][matrixCoords.first.z]->cubes[matrixCoords.second.x][matrixCoords.second.y][matrixCoords.second.z].ID;
+						light = chunks[matrixCoords.first.x][matrixCoords.first.y][matrixCoords.first.z]->cubes[matrixCoords.second.x][matrixCoords.second.y][matrixCoords.second.z].light;
+						switch(ID) {
+							case 0: //air
+								if (x == source.x-radius.x || x == source.x+radius.x
+									||y == source.y-radius.y || y == source.y+radius.y
+									||z == source.z-radius.x || z == source.z+radius.x){
+									//if it is on border, mark it as node
+									if (light > MINLIGHT) {
+										blocksToCheck[light].push_back(vec3i(x,y,z));
+									}
 								}
-							}
-							else {
-								if (getSkyAccess(x,y,z)) {
-									*light = MAXLIGHT;
-									blocksToCheck[MAXLIGHT].push_back(vec3i(x,y,z));
+								else {
+									if (getSkyAccess(x,y,z)) {
+										setCubeLight(x,y,z,MAXLIGHT);
+										blocksToCheck[MAXLIGHT].push_back(vec3i(x,y,z));
+									}
+									else
+										setCubeLight(x,y,z,MINLIGHT);
+									chunks[matrixCoords.first.x][matrixCoords.first.y][matrixCoords.first.z]->markedForRedraw = true;
 								}
-								else
-									*light = MINLIGHT;
-								chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->markedForRedraw = true;
-							}
-							break;
-						case 4: //lightblock
-							*light = MAXLIGHT;
-							chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->markedForRedraw = true;
-							blocksToCheck[MAXLIGHT].push_back(vec3i(x,y,z));
-							break;
-						default:
-							*light = 0;
-							chunks[x/CHUNKSIZE][y/CHUNKSIZE][z/CHUNKSIZE]->markedForRedraw = true;
-							break;
+								break;
+							case 4: //lightblock
+								setCubeLight(x,y,z,MAXLIGHT);
+								chunks[matrixCoords.first.x][matrixCoords.first.y][matrixCoords.first.z]->markedForRedraw = true;
+								blocksToCheck[MAXLIGHT].push_back(vec3i(x,y,z));
+								break;
+							default:
+								setCubeLight(x,y,z,0);
+								chunks[matrixCoords.first.x][matrixCoords.first.y][matrixCoords.first.z]->markedForRedraw = true;
+								break;
+						}
 					}
 				}
 			}
@@ -363,18 +406,18 @@ void World::processCubeLighting(const vec3i& source, const vec3i& offset, std::v
 }
 
 void World::updateStuff(float deltaTime) { //only to be called by world.update()
-	if (updateStuffTimer >= 0.01) { //grass thingy
-		updateStuffTimer-= 0.01;
-		for(int i = 0; i < 10; ++i) {
-			int x = rand()%(CHUNKSIZE*WORLDWIDTH);
-			int y = rand()%(CHUNKSIZE*WORLDHEIGHT);
-			int z = rand()%(CHUNKSIZE*WORLDWIDTH);
-			if (getCube(x,y+1,z).ID != 0 && getCube(x,y,z).ID == 3) {
-				setCubeID(x,y,z,1);
-			}
-		}
-	}
-	updateStuffTimer += deltaTime;
+	//	if (updateStuffTimer >= 0.01) { //grass thingy
+	//		updateStuffTimer-= 0.01;
+	//		for(int i = 0; i < 10; ++i) {
+	//			int x = rand()%(CHUNKSIZE*WORLDWIDTH);
+	//			int y = rand()%(CHUNKSIZE*WORLDHEIGHT);
+	//			int z = rand()%(CHUNKSIZE*WORLDWIDTH);
+	//			if (getCube(x,y+1,z).ID != 0 && getCube(x,y,z).ID == 3) {
+	//				setCubeID(x,y,z,1);
+	//			}
+	//		}
+	//	}
+	//	updateStuffTimer += deltaTime;
 }
 
 void World::drawWireCube(const vec3f &pos) const {

@@ -25,6 +25,8 @@ class World {
 		//Getters and setters
 		bool getOutOfBounds(int x, int y, int z) const;
 		Cube getCube(int x, int y, int z) const;
+		std::pair<vec3i,vec3i> getCoords(int x, int y, int z) const;
+		vec2i getSkyCoords(int x, int z) const;
 		Cube getCubeRaw(int x, int y, int z) const;
 		int getSkylightLevel(int x, int z) const;
 		bool getSkyAccess(int x, int y, int z) const;
@@ -39,12 +41,14 @@ class World {
 		//this should go in graphicutils or something
 		void drawWireCube(const vec3f& pos) const;
 
+		//lololol shouldn't be public, fix it broh
+		void calculateLight(vec3i source, vec2i radius);
+
 		bool playerTargetsBlock;
 		vec3f targetedBlock;
 		vec3f last;
 
 	private:
-		void calculateLight(vec3i source, vec2i radius);
 		void processCubeLighting(const vec3i& source, const vec3i& offset, std::vector<vec3i> &queue);
 		void updateStuff(float deltaTime);
 
