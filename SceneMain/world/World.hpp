@@ -44,6 +44,9 @@ class World {
 		//lololol shouldn't be public, fix it broh
 		void calculateLight(vec3i source, vec2i radius);
 
+		Chunk* &operator()(int x, int y, int z);
+		Chunk* const &operator()(int x, int y, int z) const;
+
 		bool playerTargetsBlock;
 		vec3f targetedBlock;
 		vec3f last;
