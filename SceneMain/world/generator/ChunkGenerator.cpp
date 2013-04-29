@@ -12,10 +12,9 @@
 #include "FunctionTerrainHeightmap.hpp"
 #include "FunctionTerrainJoin.hpp"
 
-ChunkGenerator::ChunkGenerator(SceneMain* scene, int seed, std::vector<std::vector<std::vector<Chunk*> > >* chunkStorage) :
+ChunkGenerator::ChunkGenerator(SceneMain* scene, int seed) :
 	parentScene(scene),
 	entry(NULL),
-	chunkStorage(chunkStorage),
 	endChunkThread(false) {
 	generator.seed(seed);
 	Function3DSimplex* simplex31 = new Function3DSimplex(&generator,100,-70,70);
@@ -57,18 +56,18 @@ Chunk* ChunkGenerator::getChunk(int x, int y, int z) { //chunkgrid coords
 bool ChunkGenerator::queueChunk(int x, int y, int z) { //chunkgrid coords
 	//1. delete the chunk that is in the place of the new chunk and assign pointer to null
 	vec3f chunkIndex = parentScene->getWorld().getCoords(x*CHUNKSIZE,y*CHUNKSIZE,z*CHUNKSIZE).first;
-	if((*chunkStorage)[chunkIndex.x][chunkIndex.y][chunkIndex.z] != NULL) {
-		if((*chunkStorage)[chunkIndex.x][chunkIndex.y][chunkIndex.z]->XPOS == x &&
-		   (*chunkStorage)[chunkIndex.x][chunkIndex.y][chunkIndex.z]->YPOS == y &&
-		   (*chunkStorage)[chunkIndex.x][chunkIndex.y][chunkIndex.z]->ZPOS == z)
+	if(parentScene->getWorld()(chunkIndex.x,chunkIndex.y,chunkIndex.z) != NULL) {
+		if(parentScene->getWorld()(chunkIndex.x,chunkIndex.y,chunkIndex.z)->XPOS == x &&
+		   parentScene->getWorld()(chunkIndex.x,chunkIndex.y,chunkIndex.z)->YPOS == y &&
+		   parentScene->getWorld()(chunkIndex.x,chunkIndex.y,chunkIndex.z)->ZPOS == z)
 			return false; //the chunk is already in place
-		delete (*chunkStorage)[chunkIndex.x][chunkIndex.y][chunkIndex.z];
-		(*chunkStorage)[chunkIndex.x][chunkIndex.y][chunkIndex.z] = NULL;
+		delete parentScene->getWorld()(chunkIndex.x,chunkIndex.y,chunkIndex.z);
+		parentScene->getWorld()(chunkIndex.x,chunkIndex.y,chunkIndex.z) = NULL;
 	}
 	//2. queue new chunk
 	threadedChunkManagement(x,y,z);
 	//this should not go here
-	parentScene->getWorld().calculateLight((*chunkStorage)[chunkIndex.x][chunkIndex.y][chunkIndex.z]->getPos() + vec3i(CHUNKSIZE/2),vec2i(CHUNKSIZE/2));
+	parentScene->getWorld().calculateLight(parentScene->getWorld()(chunkIndex.x,chunkIndex.y,chunkIndex.z)->getPos() + vec3i(CHUNKSIZE/2),vec2i(CHUNKSIZE/2));
 	return true;
 }
 
@@ -82,10 +81,10 @@ void ChunkGenerator::threadedChunkManagement(int x, int y, int z) {
 			for (int k = 0; k < CHUNKSIZE; ++k)
 				newChunk->cubes[i][j][k] = Cube(data[i][j][k],0);
 	//3. REPLACE OLD POINTER
-	if((*chunkStorage)[chunkIndex.x][chunkIndex.y][chunkIndex.z] != NULL) {
+	if(parentScene->getWorld()(chunkIndex.x,chunkIndex.y,chunkIndex.z) != NULL) {
 		outLog("#ERROR -ChunkManager- Memory has not been properly freed before asigning new chunk");
 		delete newChunk;
 	}
 	else
-		(*chunkStorage)[chunkIndex.x][chunkIndex.y][chunkIndex.z] = newChunk;
+		parentScene->getWorld()(chunkIndex.x,chunkIndex.y,chunkIndex.z) = newChunk;
 }

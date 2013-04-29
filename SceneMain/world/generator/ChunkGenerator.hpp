@@ -7,7 +7,7 @@ class SceneMain;
 class FunctionTerrain;
 class ChunkGenerator {
 	public:
-		ChunkGenerator(SceneMain* scene, int seed, std::vector<std::vector<std::vector<Chunk*> > >* chunkStorage);
+		ChunkGenerator(SceneMain* scene, int seed);
 		~ChunkGenerator();
 
 		Chunk* getChunk(int x, int y, int z); //chunkgrid coords
@@ -19,7 +19,6 @@ class ChunkGenerator {
 		std::mt19937 generator; //Mersenne twister with nice configuration
 
 		FunctionTerrain* entry; //root function for the generation tree
-		std::vector<std::vector<std::vector<Chunk*> > >* chunkStorage;
 		bool endChunkThread;
 };
 

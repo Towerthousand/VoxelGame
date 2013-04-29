@@ -58,7 +58,7 @@ class World {
 		SceneMain* parentScene;
 		Player* player;
 		ChunkGenerator chunkGen;
-		std::vector<std::vector<std::vector<Chunk*> > > chunks;
+		std::vector<Chunk*> chunks;
 		std::vector<std::vector<int> > skyValues;
 		float updateStuffTimer;
 		static const int vertexPoints[8][3];

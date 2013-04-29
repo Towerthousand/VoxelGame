@@ -7,10 +7,8 @@
 World::World(SceneMain* parentScene, Player* player) :
 	playerTargetsBlock(false), targetedBlock(0,0,0),
 	last(0,0,0), parentScene(parentScene), player(player),
-	chunkGen(parentScene, rand(), &chunks),
-	chunks(WORLDWIDTH,std::vector<std::vector<Chunk*> >
-		   (WORLDHEIGHT,std::vector<Chunk*>
-			(WORLDWIDTH,NULL))),
+	chunkGen(parentScene, rand()),
+	chunks(WORLDWIDTH,NULL),
 	updateStuffTimer(0.0) {
 }
 
@@ -24,13 +22,13 @@ World::~World() {
 }
 
 Chunk* &World::operator()(int x, int y, int z) {
-	return chunks[x][y][z];
-	//return chunks[x*WORLDWIDTH*WORLDHEIGHT+y*WORLDHEIGHT+z];
+	//return chunks[x][y][z];
+	return chunks[x*WORLDWIDTH*WORLDHEIGHT + y*WORLDHEIGHT + z];
 }
 
 Chunk* const &World::operator()(int x, int y, int z) const {
-	return chunks[x][y][z];
-	//return chunks[x*WORLDWIDTH*WORLDHEIGHT+y*WORLDHEIGHT+z];
+	//return chunks[x][y][z];
+	return chunks[x*WORLDWIDTH*WORLDHEIGHT+y*WORLDHEIGHT+z];
 }
 
 bool World::loadInitialChunks() {
