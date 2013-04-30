@@ -141,16 +141,8 @@ bool World::getSkyAccess(int x, int y, int z) const {
 }
 
 bool World::loadInitialChunks() {
-	sf::Clock clock;
-	clock.restart();
 	skyValues = std::vector<std::vector<int> >(CHUNKSIZE*WORLDWIDTH,
 											   std::vector<int>(CHUNKSIZE*WORLDWIDTH,-1));
-	outLog(" - Lighting chunks...");
-	calculateLight(vec3i(CHUNKSIZE*WORLDWIDTH/2,
-						 CHUNKSIZE*WORLDHEIGHT/2,
-						 CHUNKSIZE*WORLDWIDTH/2),
-				   vec2i(WORLDWIDTH*CHUNKSIZE/2 + 1,WORLDHEIGHT*CHUNKSIZE/2 + 1));
-	outLog(" - Finished lighting. Time: " + toString((float)clock.restart().asSeconds()) + " seconds");
 	return true;
 }
 
@@ -162,20 +154,21 @@ void World::update(float deltaTime) {
 		for (int y = 0; y < WORLDHEIGHT; ++y)
 			for (int z = -WORLDWIDTH/2; z < WORLDWIDTH/2; ++z){
 				vec3i chunkPos(playerChunkPos.x+x,y,playerChunkPos.y+z);
-				std::pair<vec3i,vec3i> matrixCoords = getCoords(chunkPos);
+				std::pair<vec3i,vec3i> matrixCoords = getCoords(chunkPos*CHUNKSIZE);
 				float dist = std::fabs((chunkPos*CHUNKSIZE - player->pos).module());
 				if((*this)(matrixCoords.first) != NULL){
 					if((*this)(matrixCoords.first)->XPOS != chunkPos.x ||
 					   (*this)(matrixCoords.first)->YPOS != chunkPos.y ||
 					   (*this)(matrixCoords.first)->ZPOS != chunkPos.z)
-						queue.push(std::pair<float,vec3i>(dist,chunkPos));
+						queue.push(std::pair<float,vec3i>(-dist,chunkPos));
 				}
 				else
-					queue.push(std::pair<float,vec3i>(dist,chunkPos));
+					queue.push(std::pair<float,vec3i>(-dist,chunkPos));
 			}
 	if(!queue.empty()) {
 		vec3i lol = queue.top().second;
-		chunkGen.queueChunk(lol.x,lol.y,lol.z);
+		if(!chunkGen.queueChunk(lol.x,lol.y,lol.z))
+			outLog(toString(queue.top().first));
 	}
 	traceView(player,10);
 	for (int x = 0; x < WORLDWIDTH; ++x)
