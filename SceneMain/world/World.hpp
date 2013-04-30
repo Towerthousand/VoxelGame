@@ -40,6 +40,7 @@ class World {
 
 		//coordinates
 		std::pair<vec3i,vec3i> getCoords(int x, int y, int z) const;
+		std::pair<vec3i,vec3i> getCoords(vec3i coord);
 		vec2i getSkyCoords(int x, int z) const;
 
 		//main

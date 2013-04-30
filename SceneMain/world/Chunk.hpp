@@ -30,7 +30,7 @@ class Chunk { //16*16*16
 		int ZPOS; //z pos of chunk inside world matrix
 	private:
 		//Getters & consultors
-		Cube getsCube(int x, int y, int z) const;
+		Cube getCube(int x, int y, int z) const;
 
 		void pushCubeToArray(short x, short y, short z, unsigned char cubeID, std::vector<Vertex> &renderData);
 		void makeVbo(std::vector<Vertex> &renderData);

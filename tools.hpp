@@ -30,8 +30,7 @@ struct Vertex {
 			   unsigned char cr = 255, unsigned char cg = 255, unsigned char cb = 255, unsigned char ca = 255) :
 			vx(vx), vy(vy), vz(vz),
 			tx(tx), ty(ty),
-			cr(cr), cg(cg), cb(cb), ca(ca)
-		{}
+			cr(cr), cg(cg), cb(cb), ca(ca) {}
 		short
 		vx,vy,vz,
 		tx,ty;
@@ -55,14 +54,14 @@ std::string toString(float num);
 #define CONTEXT_SETTINGS_OPENGL sf::ContextSettings(32,32,0,3,0)
 
 #define CHUNKSIZE_POW2 4
-#define CHUNKSIZE (1 << CHUNKSIZE_POW2)
-#define CHUNKSIZE_MASK (CHUNKSIZE - 1)
+#define CHUNKSIZE 16 //CHUNKSIZE << CHUNKSIZE_POW2
+#define CHUNKSIZE_MASK 15 //CHUNKSIZE -1
 
 #define WORLDWIDTH 8
-#define WORLDWIDTH_MASK (WORLDWIDTH - 1)
+#define WORLDWIDTH_MASK 7 //WORLDWIDTH -1
 
 #define WORLDHEIGHT 16
-#define WORLDHEIGHT_MASK (WORLDHEIGHT - 1)
+#define WORLDHEIGHT_MASK 15 //WORLDHEIGHT -1
 
 #define PLAYER_HEIGHT -1.8
 #define UPDATERADIUS 16.0f //How many potential light blocks does changing a block affect? Not taking into account skylight.
