@@ -7,6 +7,12 @@ class Chunk { //16*16*16
 	public:
 		Chunk(int x, int y, int z, SceneMain *scene);
 		~Chunk();
+
+		Cube &operator()(int x, int y, int z);
+		Cube &operator()(vec3f coord);
+		Cube const &operator()(int x, int y, int z) const;
+		Cube const &operator()(vec3f coord) const;
+
 		//main
 		void update(float deltaTime);
 		void draw() const;
@@ -16,7 +22,7 @@ class Chunk { //16*16*16
 
 		bool outOfView;
 		bool markedForRedraw;
-		std::vector<std::vector<std::vector<Cube> > > cubes;
+		std::vector<Cube> cubes;
 		int vertexCount;
 
 		int XPOS; //x pos of chunk inside world matrix
@@ -24,7 +30,7 @@ class Chunk { //16*16*16
 		int ZPOS; //z pos of chunk inside world matrix
 	private:
 		//Getters & consultors
-		Cube getCube(int x, int y, int z) const;
+		Cube getsCube(int x, int y, int z) const;
 
 		void pushCubeToArray(short x, short y, short z, unsigned char cubeID, std::vector<Vertex> &renderData);
 		void makeVbo(std::vector<Vertex> &renderData);

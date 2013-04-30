@@ -5,9 +5,7 @@
 
 Chunk::Chunk(int x, int y, int z, SceneMain* scene) :
 	outOfView(false), markedForRedraw(false),
-	cubes(CHUNKSIZE,std::vector<std::vector<Cube> >
-		  (CHUNKSIZE,std::vector<Cube>
-		   (CHUNKSIZE,Cube(0,MINLIGHT)))),
+	cubes(CHUNKSIZE*CHUNKSIZE*CHUNKSIZE,Cube(0,MINLIGHT)),
 	vertexCount(0),
 	XPOS(x), YPOS(y), ZPOS(z),
 	VBOID(1),
@@ -19,6 +17,22 @@ Chunk::Chunk(int x, int y, int z, SceneMain* scene) :
 }
 
 Chunk::~Chunk() {
+}
+
+Cube &Chunk::operator()(int x, int y, int z) {
+	return cubes[x*CHUNKSIZE*CHUNKSIZE + y*CHUNKSIZE + z];
+}
+
+Cube &Chunk::operator()(vec3f coord) {
+	return cubes[coord.x*CHUNKSIZE*CHUNKSIZE+coord.y*CHUNKSIZE+coord.z];
+}
+
+Cube const &Chunk::operator()(int x, int y, int z) const {
+	return cubes[x*CHUNKSIZE*CHUNKSIZE + y*CHUNKSIZE + z];
+}
+
+Cube const &Chunk::operator()(vec3f coord) const {
+	return cubes[coord.x*CHUNKSIZE*CHUNKSIZE+coord.y*CHUNKSIZE+coord.z];
 }
 
 Cube Chunk::getCube(int x, int y, int z) const {

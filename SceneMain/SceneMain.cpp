@@ -274,14 +274,13 @@ void SceneMain::onMouseMoved(float deltaTime, int dx, int dy) {
 }
 
 void SceneMain::onClose() {
-	parent.textures().deleteTexture("lolwtf");
+	parent.textures().deleteTexture("terrain");
 	parent.audio().deleteMusic("troll");
 
 	outLog("* Deleting GameObjects on SceneMain" );
-	for(std::list<GameObject*>::iterator it = objects.begin(); it != objects.end(); ++it) {
+	for(std::list<GameObject*>::iterator it = objects.begin(); it != objects.end(); ++it)
 		if(*it != NULL)
 			delete *it;
-	}
 }
 
 void SceneMain::addObject(GameObject* object) {

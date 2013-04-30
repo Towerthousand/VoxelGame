@@ -49,7 +49,7 @@ Chunk* ChunkGenerator::getChunk(int x, int y, int z) { //chunkgrid coords
 	for (int i = 0; i < CHUNKSIZE; ++i)
 		for (int j = 0; j < CHUNKSIZE; ++j)
 			for (int k = 0; k < CHUNKSIZE; ++k)
-				chunk->cubes[i][j][k] = Cube(data[i][j][k],0);
+				chunk->cubes[i*CHUNKSIZE*CHUNKSIZE+j*CHUNKSIZE+k] = Cube(data[i][j][k],0);
 	return chunk;
 }
 
@@ -79,7 +79,7 @@ void ChunkGenerator::threadedChunkManagement(int x, int y, int z) {
 	for (int i = 0; i < CHUNKSIZE; ++i)
 		for (int j = 0; j < CHUNKSIZE; ++j)
 			for (int k = 0; k < CHUNKSIZE; ++k)
-				newChunk->cubes[i][j][k] = Cube(data[i][j][k],0);
+				newChunk->cubes[i*CHUNKSIZE*CHUNKSIZE+j*CHUNKSIZE+k] = Cube(data[i][j][k],0);
 	//3. REPLACE OLD POINTER
 	if(parentScene->getWorld()(chunkIndex.x,chunkIndex.y,chunkIndex.z) != NULL) {
 		outLog("#ERROR -ChunkManager- Memory has not been properly freed before asigning new chunk");

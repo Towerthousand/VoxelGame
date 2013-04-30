@@ -22,37 +22,46 @@ class World {
 		//generators
 		bool loadInitialChunks();
 
+		Chunk* &operator()(int x, int y, int z);
+		Chunk* &operator()(vec3f coord);
+		Chunk* const &operator()(int x, int y, int z) const;
+		Chunk* const &operator()(vec3f coord) const;
+
 		//Getters and setters
 		bool getOutOfBounds(int x, int y, int z) const;
 		Cube getCube(int x, int y, int z) const;
-		std::pair<vec3i,vec3i> getCoords(int x, int y, int z) const;
-		vec2i getSkyCoords(int x, int z) const;
 		Cube getCubeRaw(int x, int y, int z) const;
+		void setCubeID(int x, int y, int z, unsigned char ID);
+		void setCubeIDRaw(int x, int y, int z, unsigned char ID);
+		void setCubeLight(int x, int y, int z, unsigned char light);
+		void setCubeLightRaw(int x, int y, int z, unsigned char light);
 		int getSkylightLevel(int x, int z) const;
 		bool getSkyAccess(int x, int y, int z) const;
-		void setCubeID(int x, int y, int z, unsigned char ID);
-		void setCubeLight(int x, int y, int z, unsigned char light);
+
+		//coordinates
+		std::pair<vec3i,vec3i> getCoords(int x, int y, int z) const;
+		vec2i getSkyCoords(int x, int z) const;
 
 		//main
 		void draw() const;
 		void update(float deltaTime);
 		void traceView(const Player *playerCam, float tMax);
 
-		//this should go in graphicutils or something
+		//this should go in graphic utils or something
 		void drawWireCube(const vec3f& pos) const;
 
-		//lololol shouldn't be public, fix it broh
+		//lololol shouldn't be public, fix it! It is accessed by the chunk generator
 		void calculateLight(vec3i source, vec2i radius);
-
-		Chunk* &operator()(int x, int y, int z);
-		Chunk* const &operator()(int x, int y, int z) const;
 
 		bool playerTargetsBlock;
 		vec3f targetedBlock;
 		vec3f last;
 
 	private:
+		//BFS Helper functions
 		void processCubeLighting(const vec3i& source, const vec3i& offset, std::vector<vec3i> &queue);
+
+		//Logic chunk updating (called by this->update(deltaTime))
 		void updateStuff(float deltaTime);
 
 		SceneMain* parentScene;
