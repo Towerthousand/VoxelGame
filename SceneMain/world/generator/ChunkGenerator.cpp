@@ -57,7 +57,6 @@ bool ChunkGenerator::queueChunk(int x, int y, int z) { //chunkgrid coords
 	//1. delete the chunk that is in the place of the new chunk and assign pointer to null
 	vec3f chunkIndex = parentScene->getWorld().getCoords(x*CHUNKSIZE,y*CHUNKSIZE,z*CHUNKSIZE).first;
 	if(parentScene->getWorld()(chunkIndex.x,chunkIndex.y,chunkIndex.z) != NULL) {
-		outLog("LOL");
 		if(parentScene->getWorld()(chunkIndex.x,chunkIndex.y,chunkIndex.z)->XPOS == x &&
 		   parentScene->getWorld()(chunkIndex.x,chunkIndex.y,chunkIndex.z)->YPOS == y &&
 		   parentScene->getWorld()(chunkIndex.x,chunkIndex.y,chunkIndex.z)->ZPOS == z)

@@ -149,26 +149,32 @@ bool World::loadInitialChunks() {
 void World::update(float deltaTime) {
 	//updateStuff(deltaTime);
 	vec2i playerChunkPos = vec2i(std::floor(player->pos.x),std::floor(player->pos.z))/CHUNKSIZE;
-	std::priority_queue<std::pair<float,vec3i> > queue;
+	float minDistance = 321032130210301;
+	vec3i chunkToDraw;
+	bool found;
 	for (int x = -WORLDWIDTH/2; x < WORLDWIDTH/2; ++x)
 		for (int y = 0; y < WORLDHEIGHT; ++y)
 			for (int z = -WORLDWIDTH/2; z < WORLDWIDTH/2; ++z){
 				vec3i chunkPos(playerChunkPos.x+x,y,playerChunkPos.y+z);
 				std::pair<vec3i,vec3i> matrixCoords = getCoords(chunkPos*CHUNKSIZE);
 				float dist = std::fabs((chunkPos*CHUNKSIZE - player->pos).module());
-				if((*this)(matrixCoords.first) != NULL){
+				if((*this)(matrixCoords.first) != NULL) {
 					if((*this)(matrixCoords.first)->XPOS != chunkPos.x ||
 					   (*this)(matrixCoords.first)->YPOS != chunkPos.y ||
 					   (*this)(matrixCoords.first)->ZPOS != chunkPos.z)
-						queue.push(std::pair<float,vec3i>(-dist,chunkPos));
+						if(dist < minDistance) {
+							chunkToDraw = chunkPos;
+							found = true;
+						}
 				}
-				else
-					queue.push(std::pair<float,vec3i>(-dist,chunkPos));
+				else if(dist < minDistance) {
+					chunkToDraw = chunkPos;
+					found = true;
+				}
 			}
-	if(!queue.empty()) {
-		vec3i lol = queue.top().second;
-		if(!chunkGen.queueChunk(lol.x,lol.y,lol.z))
-			outLog(toString(queue.top().first));
+	if(found) {
+		if(!chunkGen.queueChunk(chunkToDraw.x,chunkToDraw.y,chunkToDraw.z))
+			outLog("ERROR WHEN TRYING TO QUEUE NEAREST CHUNK");
 	}
 	traceView(player,10);
 	for (int x = 0; x < WORLDWIDTH; ++x)
@@ -350,40 +356,40 @@ void World::traceView(const Player *playerCam, float tMax) {
 
 void World::calculateLight(vec3i source, vec2i radius) {
 	//BFS TO THE MAX
+	sf::Clock clock;
+	clock.restart();
 	std::vector<vec3i> blocksToCheck[MAXLIGHT+1];
-	unsigned char ID = 0;
-	unsigned char light = 0;
 	for(int x = source.x-radius.x; x <= source.x+radius.x; ++x) {
 		for(int y = source.y-radius.y; y <= source.y+radius.y; ++y) {
 			for(int z = source.z-radius.x; z <= source.z+radius.x; ++z) {
 				if (!getOutOfBounds(x,y,z)){
 					std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
-					if((*this)(matrixCoords.first) != NULL) {
-						ID = (*(*this)(matrixCoords.first))(matrixCoords.second).ID;
-						light = (*(*this)(matrixCoords.first))(matrixCoords.second).light;
-						switch(ID) {
+					Chunk* chunk = (*this)(matrixCoords.first);
+					Cube* cube = &chunk->cubes[matrixCoords.second.x*CHUNKSIZE*CHUNKSIZE+matrixCoords.second.y*CHUNKSIZE+matrixCoords.second.z];
+					if(chunk != NULL) {
+						switch(cube->ID) {
 							case 0: //air
 								if (x == source.x-radius.x || x == source.x+radius.x
 									||y == source.y-radius.y || y == source.y+radius.y
 									||z == source.z-radius.x || z == source.z+radius.x)
 									//if it is on border, mark it as node
-									if (light > MINLIGHT)
-										blocksToCheck[light].push_back(vec3i(x,y,z));
+									if (cube->light > MINLIGHT)
+										blocksToCheck[cube->light].push_back(vec3i(x,y,z));
 									else {
 										if (getSkyAccess(x,y,z)) {
-											setCubeLightRaw(x,y,z,MAXLIGHT);
+											cube->light = MAXLIGHT;
 											blocksToCheck[MAXLIGHT].push_back(vec3i(x,y,z));
 										}
 										else
-											setCubeLightRaw(x,y,z,MINLIGHT);
+											cube->light = MINLIGHT;
 									}
 								break;
 							case 4: //lightblock
-								setCubeLightRaw(x,y,z,MAXLIGHT);
+								cube->light = MAXLIGHT;
 								blocksToCheck[MAXLIGHT].push_back(vec3i(x,y,z));
 								break;
 							default:
-								setCubeLightRaw(x,y,z,0);
+								cube->light = 0;
 								break;
 						}
 					}
@@ -391,6 +397,7 @@ void World::calculateLight(vec3i source, vec2i radius) {
 			}
 		}
 	}
+	outLog("PRE: " + toString(clock.getElapsedTime().asSeconds()));
 	for (int i = MAXLIGHT; i > MINLIGHT; --i)  {
 		for(uint j = 0; j < blocksToCheck[i].size(); ++j) {
 			vec3i source = blocksToCheck[i][j];
@@ -402,6 +409,7 @@ void World::calculateLight(vec3i source, vec2i radius) {
 			processCubeLighting(source,vec3i(0,0,-1),blocksToCheck[i-1]);
 		}
 	}
+	outLog("POST: " + toString(clock.getElapsedTime().asSeconds()));
 }
 
 void World::processCubeLighting(const vec3i& source, const vec3i& offset, std::vector<vec3i> &queue) { //BFS node processing
@@ -434,19 +442,19 @@ void World::updateStuff(float deltaTime) { //only to be called by world.update()
 }
 
 void World::drawWireCube(const vec3f &pos) const {
-	mat4f poppedMat = parentScene->getState().model;
-	parentScene->getState().model.translate(pos.x-0.0025,pos.y-0.0025,pos.z-0.0025);
-	parentScene->getState().model.scale(1.005,1.005,1.005);
-	parentScene->getState().updateShaderUniforms(parentScene->getShader("MODEL"));
-	parentScene->getShader("MODEL").use();
-	glLineWidth(1.5);
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glColor4f(0.0,0.0,0.0,0.5);
-	glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
-	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glColor4f(1.0,1.0,1.0,1.0);
-	parentScene->getState().model = poppedMat;
+	//	mat4f poppedMat = parentScene->getState().model;
+	//	parentScene->getState().model.translate(pos.x-0.0025,pos.y-0.0025,pos.z-0.0025);
+	//	parentScene->getState().model.scale(1.005,1.005,1.005);
+	//	parentScene->getState().updateShaderUniforms(parentScene->getShader("MODEL"));
+	//	parentScene->getShader("MODEL").use();
+	//	glLineWidth(1.5);
+	//	glEnableClientState(GL_VERTEX_ARRAY);
+	//	glColor4f(0.0,0.0,0.0,0.5);
+	//	glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
+	//	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
+	//	glDisableClientState(GL_VERTEX_ARRAY);
+	//	glColor4f(1.0,1.0,1.0,1.0);
+	//	parentScene->getState().model = poppedMat;
 }
 
 const int World::vertexPoints[8][3] = {
