@@ -163,11 +163,13 @@ void World::update(float deltaTime) {
 					   (*this)(matrixCoords.first)->YPOS != chunkPos.y ||
 					   (*this)(matrixCoords.first)->ZPOS != chunkPos.z)
 						if(dist < minDistance) {
+							minDistance = dist;
 							chunkToDraw = chunkPos;
 							found = true;
 						}
 				}
 				else if(dist < minDistance) {
+					minDistance = dist;
 					chunkToDraw = chunkPos;
 					found = true;
 				}
@@ -353,7 +355,6 @@ void World::traceView(const Player *playerCam, float tMax) {
 	playerTargetsBlock = false;
 }
 
-
 void World::calculateLight(vec3i source, vec2i radius) {
 	//BFS TO THE MAX
 	sf::Clock clock;
@@ -371,7 +372,65 @@ void World::calculateLight(vec3i source, vec2i radius) {
 							case 0: //air
 								if (x == source.x-radius.x || x == source.x+radius.x
 									||y == source.y-radius.y || y == source.y+radius.y
-									||z == source.z-radius.x || z == source.z+radius.x)
+									||z == source.z-radius.x || z == source.z+radius.x) {
+									//if it is on border, mark it as node
+									if (cube->light > MINLIGHT)
+										blocksToCheck[cube->light].push_back(vec3i(x,y,z));
+									else {
+										if (getSkyAccess(x,y,z)) {
+											cube->light = MAXLIGHT;
+											blocksToCheck[MAXLIGHT].push_back(vec3i(x,y,z));
+										}
+										else
+											cube->light = MINLIGHT;
+									}
+								}
+								break;
+							case 4: //lightblock
+								cube->light = MAXLIGHT;
+								blocksToCheck[MAXLIGHT].push_back(vec3i(x,y,z));
+								break;
+							default:
+								cube->light = 0;
+								break;
+						}
+					}
+				}
+			}
+		}
+	}
+	outLog("PRE: " + toString(clock.getElapsedTime().asSeconds()));
+	for (int i = MAXLIGHT; i > MINLIGHT; --i)  {
+		for(uint j = 0; j < blocksToCheck[i].size(); ++j) {
+			vec3i source = blocksToCheck[i][j];
+			processCubeLighting(source,vec3i(1,0,0),blocksToCheck[i-1]);
+			processCubeLighting(source,vec3i(-1,0,0),blocksToCheck[i-1]);
+			processCubeLighting(source,vec3i(0,1,0),blocksToCheck[i-1]);
+			processCubeLighting(source,vec3i(0,-1,0),blocksToCheck[i-1]);
+			processCubeLighting(source,vec3i(0,0,1),blocksToCheck[i-1]);
+			processCubeLighting(source,vec3i(0,0,-1),blocksToCheck[i-1]);
+		}
+	}
+	outLog("POST: " + toString(clock.getElapsedTime().asSeconds()));
+}
+
+void World::calculateLightManhattan(vec3i source, int radius) {
+	//BFS TO THE MAX
+	sf::Clock clock;
+	clock.restart();
+	std::vector<vec3i>  blocksToCheck[MAXLIGHT+1];
+	for(int x = source.x-radius; x <= source.x+radius; ++x) {
+		for(int y = source.y-radius; y <= source.y+radius; ++y) {
+			for(int z = source.z-radius; z <= source.z+radius; ++z) {
+				int manhattanDistance = std::abs(x-source.x)+std::abs(y-source.y)+std::abs(z-source.z);
+				if (manhattanDistance < radius && !getOutOfBounds(x,y,z)){
+					std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
+					Chunk* chunk = (*this)(matrixCoords.first);
+					Cube* cube = &chunk->cubes[matrixCoords.second.x*CHUNKSIZE*CHUNKSIZE+matrixCoords.second.y*CHUNKSIZE+matrixCoords.second.z];
+					if(chunk != NULL) {
+						switch(cube->ID) {
+							case 0: //air
+								if (manhattanDistance = radius)
 									//if it is on border, mark it as node
 									if (cube->light > MINLIGHT)
 										blocksToCheck[cube->light].push_back(vec3i(x,y,z));
@@ -442,19 +501,19 @@ void World::updateStuff(float deltaTime) { //only to be called by world.update()
 }
 
 void World::drawWireCube(const vec3f &pos) const {
-	//	mat4f poppedMat = parentScene->getState().model;
-	//	parentScene->getState().model.translate(pos.x-0.0025,pos.y-0.0025,pos.z-0.0025);
-	//	parentScene->getState().model.scale(1.005,1.005,1.005);
-	//	parentScene->getState().updateShaderUniforms(parentScene->getShader("MODEL"));
-	//	parentScene->getShader("MODEL").use();
-	//	glLineWidth(1.5);
-	//	glEnableClientState(GL_VERTEX_ARRAY);
-	//	glColor4f(0.0,0.0,0.0,0.5);
-	//	glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
-	//	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
-	//	glDisableClientState(GL_VERTEX_ARRAY);
-	//	glColor4f(1.0,1.0,1.0,1.0);
-	//	parentScene->getState().model = poppedMat;
+		mat4f poppedMat = parentScene->getState().model;
+		parentScene->getState().model.translate(pos.x-0.0025,pos.y-0.0025,pos.z-0.0025);
+		parentScene->getState().model.scale(1.005,1.005,1.005);
+		parentScene->getState().updateShaderUniforms(parentScene->getShader("MODEL"));
+		parentScene->getShader("MODEL").use();
+		glLineWidth(1.5);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glColor4f(0.0,0.0,0.0,0.5);
+		glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
+		glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glColor4f(1.0,1.0,1.0,1.0);
+		parentScene->getState().model = poppedMat;
 }
 
 const int World::vertexPoints[8][3] = {
