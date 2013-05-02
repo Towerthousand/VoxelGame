@@ -53,6 +53,7 @@ class World {
 
 		//lololol shouldn't be public, fix it! It is accessed by the chunk generator
 		void calculateLight(vec3i source, vec2i radius);
+		void calculateLightManhattan(vec3i source, int radius);
 
 		bool playerTargetsBlock;
 		vec3f targetedBlock;

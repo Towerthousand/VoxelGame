@@ -510,7 +510,7 @@ void World::drawWireCube(const vec3f &pos) const {
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glColor4f(0.0,0.0,0.0,0.5);
 		glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
-		glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
+		//glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glColor4f(1.0,1.0,1.0,1.0);
 		parentScene->getState().model = poppedMat;
