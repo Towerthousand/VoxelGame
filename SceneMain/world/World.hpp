@@ -19,8 +19,6 @@ class World {
 	public:
 		World(SceneMain* parentScene, Player* player);
 		~World();
-		//generators
-		bool loadInitialChunks();
 
 		Chunk* &operator()(int x, int y, int z);
 		Chunk* &operator()(vec3f coord);

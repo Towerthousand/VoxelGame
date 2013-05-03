@@ -9,6 +9,8 @@ World::World(SceneMain* parentScene, Player* player) :
 	last(0,0,0), parentScene(parentScene), player(player),
 	chunkGen(parentScene, rand()),
 	chunks(WORLDWIDTH*WORLDWIDTH*WORLDHEIGHT,NULL),
+	skyValues(std::vector<std::vector<int> >(CHUNKSIZE*WORLDWIDTH,
+											 std::vector<int>(CHUNKSIZE*WORLDWIDTH,-1))),
 	updateStuffTimer(0.0) {
 }
 
@@ -39,9 +41,7 @@ Chunk* const &World::operator()(vec3f coord) const {
 
 bool World::getOutOfBounds(int x, int y, int z) const{
 	Chunk* c = (*this)(getCoords(x,y,z).first);
-	if(c == NULL)
-		return true;
-	if(c->XPOS != (x >> CHUNKSIZE_POW2) || c->YPOS != (y >> CHUNKSIZE_POW2) || c->ZPOS != (z >> CHUNKSIZE_POW2))
+	if(c == NULL || c->XPOS != (x >> CHUNKSIZE_POW2) || c->YPOS != (y >> CHUNKSIZE_POW2) || c->ZPOS != (z >> CHUNKSIZE_POW2))
 		return true;
 	return false;
 }
@@ -140,16 +140,10 @@ bool World::getSkyAccess(int x, int y, int z) const {
 	return true;
 }
 
-bool World::loadInitialChunks() {
-	skyValues = std::vector<std::vector<int> >(CHUNKSIZE*WORLDWIDTH,
-											   std::vector<int>(CHUNKSIZE*WORLDWIDTH,-1));
-	return true;
-}
-
 void World::update(float deltaTime) {
 	//updateStuff(deltaTime);
 	vec2i playerChunkPos = vec2i(std::floor(player->pos.x),std::floor(player->pos.z))/CHUNKSIZE;
-	float minDistance = 321032130210301;
+	float minDistance = WORLDWIDTH*WORLDWIDTH*WORLDHEIGHT*CHUNKSIZE*CHUNKSIZE*CHUNKSIZE*4;
 	vec3i chunkToDraw;
 	bool found;
 	for (int x = -WORLDWIDTH/2; x < WORLDWIDTH/2; ++x)
@@ -501,19 +495,19 @@ void World::updateStuff(float deltaTime) { //only to be called by world.update()
 }
 
 void World::drawWireCube(const vec3f &pos) const {
-		mat4f poppedMat = parentScene->getState().model;
-		parentScene->getState().model.translate(pos.x-0.0025,pos.y-0.0025,pos.z-0.0025);
-		parentScene->getState().model.scale(1.005,1.005,1.005);
-		parentScene->getState().updateShaderUniforms(parentScene->getShader("MODEL"));
-		parentScene->getShader("MODEL").use();
-		glLineWidth(1.5);
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glColor4f(0.0,0.0,0.0,0.5);
-		glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
-		//glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glColor4f(1.0,1.0,1.0,1.0);
-		parentScene->getState().model = poppedMat;
+	mat4f poppedMat = parentScene->getState().model;
+	parentScene->getState().model.translate(pos.x-0.0025,pos.y-0.0025,pos.z-0.0025);
+	parentScene->getState().model.scale(1.005,1.005,1.005);
+	parentScene->getState().updateShaderUniforms(parentScene->getShader("MODEL"));
+	parentScene->getShader("MODEL").use();
+	glLineWidth(1.5);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glColor4f(0.0,0.0,0.0,0.5);
+	glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
+	//glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glColor4f(1.0,1.0,1.0,1.0);
+	parentScene->getState().model = poppedMat;
 }
 
 const int World::vertexPoints[8][3] = {

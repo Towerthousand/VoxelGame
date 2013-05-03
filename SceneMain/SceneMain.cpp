@@ -38,10 +38,6 @@ bool SceneMain::loadResources() {
 		return false;
 	if(!Skeleton::model.loadVoxelization("resources/mob.vox"))
 		return false;
-	//terrain
-	outLog("* Loading init zone chunks" );
-	if (!world.loadInitialChunks())
-		return false;
 	return true;
 }
 
