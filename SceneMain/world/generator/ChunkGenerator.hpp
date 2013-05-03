@@ -10,16 +10,19 @@ class ChunkGenerator {
 		ChunkGenerator(SceneMain* scene, int seed);
 		~ChunkGenerator();
 
-		Chunk* getChunk(int x, int y, int z); //chunkgrid coords
-		bool queueChunk(int x, int y, int z); //chunkgrid coords
-		void threadedChunkManagement(int x, int y, int z);
+		bool queueChunk(vec3i chunk); //chunkgrid coords
+		void threadedChunkManagement();
+
+		static std::mutex inputQueueMutex;
+		static std::mutex outputQueueMutex;
 
 	private:
 		SceneMain* parentScene;
 		std::mt19937 generator; //Mersenne twister with nice configuration
 
 		FunctionTerrain* entry; //root function for the generation tree
-		bool endChunkThread;
+		std::set<vec3i> chunksToLoad;
+		std::list<Chunk*> chunksLoaded;
 };
 
 #endif // WORLDGENERATOR_HPP

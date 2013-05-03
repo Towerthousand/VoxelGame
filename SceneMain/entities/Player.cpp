@@ -41,7 +41,7 @@ void Player::drawFrustum() const {
 	//instead of every update and call drawFrustum() every draw
 	//to see the culling from outside.
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	for (int i = 0; i < frustumPlanes.size(); ++i) {
+	for (uint i = 0; i < frustumPlanes.size(); ++i) {
 		glPushMatrix();
 		glColor4f(0.0,0.0,0.0,1);
 		glBegin(GL_LINE_STRIP);
@@ -55,7 +55,7 @@ void Player::drawFrustum() const {
 
 bool Player::insideFrustum( const vec3f &center, float radius) const {
 	float distance,D;
-	for(int i=0; i < frustumPlanes.size(); i++) {
+	for(uint i=0; i < frustumPlanes.size(); i++) {
 		//construct the plane with a normal and a point
 		vec3f v = frustumPlanes[i][1]-frustumPlanes[i][0];
 		vec3f u = frustumPlanes[i][2]-frustumPlanes[i][0];

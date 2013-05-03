@@ -8,15 +8,15 @@ Chunk::Chunk(int x, int y, int z, SceneMain* scene) :
 	cubes(CHUNKSIZE*CHUNKSIZE*CHUNKSIZE,Cube(0,MINLIGHT)),
 	vertexCount(0),
 	XPOS(x), YPOS(y), ZPOS(z),
-	VBOID(1),
+	VBOID(0),
 	modelMatrix(mat4f::fromIdentity()),
 	parentScene(scene) {
 	modelMatrix.translate(XPOS*CHUNKSIZE,YPOS*CHUNKSIZE,ZPOS*CHUNKSIZE);
 	modelMatrix.scale(0.5,0.5,0.5);
-	glGenBuffers(1, (GLuint*) &VBOID);
 }
 
 Chunk::~Chunk() {
+	glDeleteBuffers(1,(GLuint*) &VBOID);
 }
 
 Cube &Chunk::operator()(int x, int y, int z) {
@@ -41,6 +41,11 @@ Cube Chunk::getCube(int x, int y, int z) const {
 
 vec3i Chunk::getPos() {
 	return vec3i(XPOS*CHUNKSIZE,YPOS*CHUNKSIZE,ZPOS*CHUNKSIZE);
+}
+
+void Chunk::initBuffer() {
+	if(VBOID == 0)
+		glGenBuffers(1, (GLuint*) &VBOID);
 }
 
 void Chunk::update(float deltaTime) {

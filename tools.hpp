@@ -20,6 +20,7 @@
 #include <functional>
 #include <sys/stat.h>
 #include <thread>
+#include <mutex>
 #include "BudMath.hpp"
 
 using namespace math;
@@ -78,5 +79,6 @@ extern int SCRWIDTH;
 extern int SCRHEIGHT;
 extern bool WINDOWFOCUS;
 extern sf::Clock GLOBALCLOCK;
+extern std::mutex input;
 
 #endif // TOOLS_HPP

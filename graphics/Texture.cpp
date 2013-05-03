@@ -4,6 +4,7 @@ Texture::Texture(): handle(0), size(0,0){
 }
 
 Texture::~Texture(){
+	glDeleteTextures(1,(GLuint*) &handle);
 }
 
 bool Texture::load(const std::string &filePath) {

@@ -5,6 +5,7 @@ int SCRWIDTH = sf::VideoMode::getFullscreenModes()[0].width;
 int SCRHEIGHT = sf::VideoMode::getFullscreenModes()[0].height;
 bool WINDOWFOCUS = false;
 sf::Clock GLOBALCLOCK;
+std::mutex input;
 
 //implement random functions here
 std::string toString(float num) {

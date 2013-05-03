@@ -143,35 +143,24 @@ bool World::getSkyAccess(int x, int y, int z) const {
 void World::update(float deltaTime) {
 	//updateStuff(deltaTime);
 	vec2i playerChunkPos = vec2i(std::floor(player->pos.x),std::floor(player->pos.z))/CHUNKSIZE;
-	float minDistance = WORLDWIDTH*WORLDWIDTH*WORLDHEIGHT*CHUNKSIZE*CHUNKSIZE*CHUNKSIZE*4;
-	vec3i chunkToDraw;
-	bool found;
+	std::priority_queue<std::pair<float,vec3i> > queue;
 	for (int x = -WORLDWIDTH/2; x < WORLDWIDTH/2; ++x)
 		for (int y = 0; y < WORLDHEIGHT; ++y)
 			for (int z = -WORLDWIDTH/2; z < WORLDWIDTH/2; ++z){
 				vec3i chunkPos(playerChunkPos.x+x,y,playerChunkPos.y+z);
-				std::pair<vec3i,vec3i> matrixCoords = getCoords(chunkPos*CHUNKSIZE);
+				std::pair<vec3i,vec3i> matrixCoords = getCoords(chunkPos);
 				float dist = std::fabs((chunkPos*CHUNKSIZE - player->pos).module());
-				if((*this)(matrixCoords.first) != NULL) {
+				if((*this)(matrixCoords.first) != NULL){
 					if((*this)(matrixCoords.first)->XPOS != chunkPos.x ||
 					   (*this)(matrixCoords.first)->YPOS != chunkPos.y ||
 					   (*this)(matrixCoords.first)->ZPOS != chunkPos.z)
-						if(dist < minDistance) {
-							minDistance = dist;
-							chunkToDraw = chunkPos;
-							found = true;
-						}
+						queue.push(std::pair<float,vec3i>(dist,chunkPos));
 				}
-				else if(dist < minDistance) {
-					minDistance = dist;
-					chunkToDraw = chunkPos;
-					found = true;
-				}
+				else
+					queue.push(std::pair<float,vec3i>(dist,chunkPos));
 			}
-	if(found) {
-		if(!chunkGen.queueChunk(chunkToDraw.x,chunkToDraw.y,chunkToDraw.z))
-			outLog("ERROR WHEN TRYING TO QUEUE NEAREST CHUNK");
-	}
+	if(!queue.empty())
+		chunkGen.queueChunk(queue.top().second);
 	traceView(player,10);
 	for (int x = 0; x < WORLDWIDTH; ++x)
 		for (int y = 0; y < WORLDHEIGHT; ++y)
@@ -424,7 +413,7 @@ void World::calculateLightManhattan(vec3i source, int radius) {
 					if(chunk != NULL) {
 						switch(cube->ID) {
 							case 0: //air
-								if (manhattanDistance = radius)
+								if (manhattanDistance == radius) {
 									//if it is on border, mark it as node
 									if (cube->light > MINLIGHT)
 										blocksToCheck[cube->light].push_back(vec3i(x,y,z));
@@ -436,6 +425,7 @@ void World::calculateLightManhattan(vec3i source, int radius) {
 										else
 											cube->light = MINLIGHT;
 									}
+								}
 								break;
 							case 4: //lightblock
 								cube->light = MAXLIGHT;

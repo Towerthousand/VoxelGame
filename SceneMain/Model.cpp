@@ -9,6 +9,7 @@ Model::Model() : modelWidth(0), modelHeight(0), modelDepth(0),
 }
 
 Model::~Model() {
+	glDeleteBuffers(1, (GLuint*) &VBOID);
 }
 
 bool Model::loadVoxelization(const std::string &filePath) {

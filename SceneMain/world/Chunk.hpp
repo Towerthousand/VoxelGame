@@ -13,7 +13,7 @@ class Chunk { //16*16*16
 		Cube const &operator()(int x, int y, int z) const;
 		Cube const &operator()(vec3f coord) const;
 
-		//main
+		void initBuffer();
 		void update(float deltaTime);
 		void draw() const;
 		void drawBoundingBox() const;
