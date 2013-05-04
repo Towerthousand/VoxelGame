@@ -142,6 +142,17 @@ bool World::getSkyAccess(int x, int y, int z) const {
 
 void World::update(float deltaTime) {
 	//updateStuff(deltaTime);
+	chunkGen.outputQueueMutex.lock();
+	while(!chunkGen.chunksLoaded.empty()) {
+		Chunk* newChunk = chunkGen.chunksLoaded.front();
+		newChunk->initBuffer();
+		vec3i matrixCoords = getCoords(newChunk->getPos()).first;
+		(*this)(matrixCoords) = newChunk;
+		chunkGen.chunksLoaded.pop_front();
+		calculateLight((*this)(matrixCoords)->getPos() + vec3i(CHUNKSIZE/2),vec2i(CHUNKSIZE/2));
+		outLog(toString(newChunk->XPOS) + " " + toString(newChunk->YPOS) + " " + toString(newChunk->ZPOS));
+	}
+	chunkGen.outputQueueMutex.unlock();
 	vec2i playerChunkPos = vec2i(std::floor(player->pos.x),std::floor(player->pos.z))/CHUNKSIZE;
 	std::priority_queue<std::pair<float,vec3i> > queue;
 	for (int x = -WORLDWIDTH/2; x < WORLDWIDTH/2; ++x)
@@ -154,10 +165,10 @@ void World::update(float deltaTime) {
 					if((*this)(matrixCoords.first)->XPOS != chunkPos.x ||
 					   (*this)(matrixCoords.first)->YPOS != chunkPos.y ||
 					   (*this)(matrixCoords.first)->ZPOS != chunkPos.z)
-						queue.push(std::pair<float,vec3i>(dist,chunkPos));
+						queue.push(std::pair<float,vec3i>(-dist,chunkPos));
 				}
 				else
-					queue.push(std::pair<float,vec3i>(dist,chunkPos));
+					queue.push(std::pair<float,vec3i>(-dist,chunkPos));
 			}
 	if(!queue.empty())
 		chunkGen.queueChunk(queue.top().second);

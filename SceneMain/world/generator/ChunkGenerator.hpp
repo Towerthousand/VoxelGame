@@ -15,6 +15,7 @@ class ChunkGenerator {
 
 		static std::mutex inputQueueMutex;
 		static std::mutex outputQueueMutex;
+		std::list<Chunk*> chunksLoaded;
 
 	private:
 		SceneMain* parentScene;
@@ -22,7 +23,6 @@ class ChunkGenerator {
 
 		FunctionTerrain* entry; //root function for the generation tree
 		std::set<vec3i> chunksToLoad;
-		std::list<Chunk*> chunksLoaded;
 };
 
 #endif // WORLDGENERATOR_HPP

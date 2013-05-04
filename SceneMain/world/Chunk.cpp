@@ -5,7 +5,7 @@
 
 Chunk::Chunk(int x, int y, int z, SceneMain* scene) :
 	outOfView(false), markedForRedraw(false),
-	cubes(CHUNKSIZE*CHUNKSIZE*CHUNKSIZE,Cube(0,MINLIGHT)),
+	cubes(CHUNKSIZE*CHUNKSIZE*CHUNKSIZE,Cube(2,MINLIGHT)),
 	vertexCount(0),
 	XPOS(x), YPOS(y), ZPOS(z),
 	VBOID(0),
