@@ -79,6 +79,5 @@ extern int SCRWIDTH;
 extern int SCRHEIGHT;
 extern bool WINDOWFOCUS;
 extern sf::Clock GLOBALCLOCK;
-extern std::mutex input;
 
 #endif // TOOLS_HPP

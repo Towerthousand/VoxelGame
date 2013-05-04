@@ -5,7 +5,7 @@
 
 Chunk::Chunk(int x, int y, int z, SceneMain* scene) :
 	outOfView(false), markedForRedraw(false),
-	cubes(CHUNKSIZE*CHUNKSIZE*CHUNKSIZE,Cube(2,MINLIGHT)),
+	cubes(CHUNKSIZE*CHUNKSIZE*CHUNKSIZE,Cube(0,MINLIGHT)),
 	vertexCount(0),
 	XPOS(x), YPOS(y), ZPOS(z),
 	VBOID(0),
@@ -17,6 +17,11 @@ Chunk::Chunk(int x, int y, int z, SceneMain* scene) :
 
 Chunk::~Chunk() {
 	glDeleteBuffers(1,(GLuint*) &VBOID);
+}
+
+void Chunk::initBuffer() {
+	if(VBOID == 0)
+		glGenBuffers(1,(GLuint*) &VBOID);
 }
 
 Cube &Chunk::operator()(int x, int y, int z) {
@@ -41,11 +46,6 @@ Cube Chunk::getCube(int x, int y, int z) const {
 
 vec3i Chunk::getPos() {
 	return vec3i(XPOS*CHUNKSIZE,YPOS*CHUNKSIZE,ZPOS*CHUNKSIZE);
-}
-
-void Chunk::initBuffer() {
-	if(VBOID == 0)
-		glGenBuffers(1, (GLuint*) &VBOID);
 }
 
 void Chunk::update(float deltaTime) {

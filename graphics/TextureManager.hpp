@@ -12,7 +12,7 @@ class TextureManager
 		void useTexture(const std::string& textureID, GLenum texUnit);
 		void deleteTexture(const std::string& textureID);
 	private:
-		std::map<std::string,Texture> textureBank;
+		std::map<std::string,Texture*> textureBank;
 };
 
 #endif // TEXTUREMANAGER_HPP

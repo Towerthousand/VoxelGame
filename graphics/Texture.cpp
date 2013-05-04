@@ -15,12 +15,12 @@ bool Texture::load(const std::string &filePath) {
 		return false;
 	}
 	size = vec2i(image.getSize().x,image.getSize().y);
-
+	
 	//get handle
 	GLuint tex_handle;
 	glGenTextures(1, &tex_handle);
 	handle = tex_handle;
-
+	
 	//bind handle and set to image
 	bind();
 	glTexImage2D(
