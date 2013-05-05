@@ -142,24 +142,23 @@ bool World::getSkyAccess(int x, int y, int z) const {
 
 void World::update(float deltaTime) {
 	//updateStuff(deltaTime);
-	chunkGen.outputQueueMutex.lock();
+	chunkGen.chunkMutex.lock();
 	while(!chunkGen.chunksLoaded.empty()) {
 		Chunk* newChunk = chunkGen.chunksLoaded.front();
 		newChunk->initBuffer();
 		vec3i matrixCoords = getCoords(newChunk->getPos()).first;
 		(*this)(matrixCoords) = newChunk;
 		chunkGen.chunksLoaded.pop_front();
-		calculateLight((*this)(matrixCoords)->getPos() + vec3i(CHUNKSIZE/2),vec2i(CHUNKSIZE/2));
-		outLog(toString(newChunk->XPOS) + " " + toString(newChunk->YPOS) + " " + toString(newChunk->ZPOS));
+		calculateLight((*this)(matrixCoords)->getPos() + vec3i(CHUNKSIZE/2),vec2i(CHUNKSIZE/2 -1));
 	}
-	chunkGen.outputQueueMutex.unlock();
+	chunkGen.chunkMutex.unlock();
 	vec2i playerChunkPos = vec2i(std::floor(player->pos.x),std::floor(player->pos.z))/CHUNKSIZE;
 	std::priority_queue<std::pair<float,vec3i> > queue;
 	for (int x = -WORLDWIDTH/2; x < WORLDWIDTH/2; ++x)
 		for (int y = 0; y < WORLDHEIGHT; ++y)
 			for (int z = -WORLDWIDTH/2; z < WORLDWIDTH/2; ++z){
 				vec3i chunkPos(playerChunkPos.x+x,y,playerChunkPos.y+z);
-				std::pair<vec3i,vec3i> matrixCoords = getCoords(chunkPos);
+				std::pair<vec3i,vec3i> matrixCoords = getCoords(chunkPos*CHUNKSIZE);
 				float dist = std::fabs((chunkPos*CHUNKSIZE - player->pos).module());
 				if((*this)(matrixCoords.first) != NULL){
 					if((*this)(matrixCoords.first)->XPOS != chunkPos.x ||
@@ -170,8 +169,11 @@ void World::update(float deltaTime) {
 				else
 					queue.push(std::pair<float,vec3i>(-dist,chunkPos));
 			}
-	if(!queue.empty())
-		chunkGen.queueChunk(queue.top().second);
+		while(!queue.empty()) {
+			if(chunkGen.queueChunk(queue.top().second))
+				break;
+			queue.pop();
+		}
 	traceView(player,10);
 	for (int x = 0; x < WORLDWIDTH; ++x)
 		for (int y = 0; y < WORLDHEIGHT; ++y)
@@ -393,7 +395,6 @@ void World::calculateLight(vec3i source, vec2i radius) {
 			}
 		}
 	}
-	outLog("PRE: " + toString(clock.getElapsedTime().asSeconds()));
 	for (int i = MAXLIGHT; i > MINLIGHT; --i)  {
 		for(uint j = 0; j < blocksToCheck[i].size(); ++j) {
 			vec3i source = blocksToCheck[i][j];
@@ -405,7 +406,6 @@ void World::calculateLight(vec3i source, vec2i radius) {
 			processCubeLighting(source,vec3i(0,0,-1),blocksToCheck[i-1]);
 		}
 	}
-	outLog("POST: " + toString(clock.getElapsedTime().asSeconds()));
 }
 
 void World::calculateLightManhattan(vec3i source, int radius) {
@@ -451,7 +451,6 @@ void World::calculateLightManhattan(vec3i source, int radius) {
 			}
 		}
 	}
-	outLog("PRE: " + toString(clock.getElapsedTime().asSeconds()));
 	for (int i = MAXLIGHT; i > MINLIGHT; --i)  {
 		for(uint j = 0; j < blocksToCheck[i].size(); ++j) {
 			vec3i source = blocksToCheck[i][j];
@@ -463,7 +462,6 @@ void World::calculateLightManhattan(vec3i source, int radius) {
 			processCubeLighting(source,vec3i(0,0,-1),blocksToCheck[i-1]);
 		}
 	}
-	outLog("POST: " + toString(clock.getElapsedTime().asSeconds()));
 }
 
 void World::processCubeLighting(const vec3i& source, const vec3i& offset, std::vector<vec3i> &queue) { //BFS node processing

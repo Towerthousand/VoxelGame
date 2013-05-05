@@ -39,10 +39,14 @@ ChunkGenerator::ChunkGenerator(SceneMain* scene, int seed) :
 
 	std::thread thread(&ChunkGenerator::threadedChunkManagement,this);
 	thread.detach();
+	std::thread thread2(&ChunkGenerator::threadedChunkManagement,this);
+	thread2.detach();
+	std::thread thread3(&ChunkGenerator::threadedChunkManagement,this);
+	thread3.detach();
 }
 
 ChunkGenerator::~ChunkGenerator() {
-	delete entry; //will delete all child node functions recursively into the function tree
+	//delete entry; //will delete all child node functions recursively into the function tree
 }
 
 bool ChunkGenerator::queueChunk(vec3i chunk) { //chunkgrid coords
@@ -53,23 +57,20 @@ bool ChunkGenerator::queueChunk(vec3i chunk) { //chunkgrid coords
 		parentScene->getWorld()(chunkIndex) = NULL;
 	}
 	//2. queue new chunk
-	inputQueueMutex.lock();
-	outputQueueMutex.lock();
+	chunkMutex.lock();
 	if(chunksToLoad.find(chunk) == chunksToLoad.end()) {
 		for(std::list<Chunk*>::iterator it = chunksLoaded.begin();it != chunksLoaded.end(); ++it)
 			if(vec3i((*it)->XPOS,(*it)->YPOS,(*it)->ZPOS) == chunk) {
-				outputQueueMutex.unlock();
-				inputQueueMutex.unlock();
+				chunkMutex.unlock();
 				return false;//chunk has been already generated but not picked up
 			}
 		chunksToLoad.insert(chunk);
-		outputQueueMutex.unlock();
-		inputQueueMutex.unlock();
+		chunksToLoadQueue.push(chunk);
+		chunkMutex.unlock();
 		return true;
 	}
 	else {
-		outputQueueMutex.unlock();
-		inputQueueMutex.unlock();
+		chunkMutex.unlock();
 		return false; //chunk has been already queued
 	}
 }
@@ -77,29 +78,27 @@ bool ChunkGenerator::queueChunk(vec3i chunk) { //chunkgrid coords
 void ChunkGenerator::threadedChunkManagement() {
 	while(true) {
 		//Look for new chunks. If there are, generate and output to output queue. If not, sleep for a short while
-		inputQueueMutex.lock();
-		if(!chunksToLoad.empty()) {
-			vec3i chunkPos = *chunksToLoad.begin();
-			inputQueueMutex.unlock();
+		chunkMutex.lock();
+		if(!chunksToLoad.empty() && !chunksToLoadQueue.empty()) {
+			vec3i chunkPos = chunksToLoadQueue.front();
+			chunkMutex.unlock();
 			Chunk* newChunk = new Chunk(chunkPos.x,chunkPos.y,chunkPos.z,parentScene);
 			ID3Data data = entry->getID3Data(chunkPos.x*CHUNKSIZE,chunkPos.y*CHUNKSIZE,chunkPos.z*CHUNKSIZE,CHUNKSIZE,CHUNKSIZE+5,CHUNKSIZE);
 			for (int i = 0; i < CHUNKSIZE; ++i)
 				for (int j = 0; j < CHUNKSIZE; ++j)
 					for (int k = 0; k < CHUNKSIZE; ++k)
 						newChunk->cubes[i*CHUNKSIZE*CHUNKSIZE+j*CHUNKSIZE+k] = Cube(data[i][j][k],0);
-			outputQueueMutex.lock();
-			inputQueueMutex.lock();
+			chunkMutex.lock();
 			chunksLoaded.push_back(newChunk);
 			chunksToLoad.erase(chunkPos);
-			inputQueueMutex.unlock();
-			outputQueueMutex.unlock();
+			chunksToLoadQueue.pop();
+			chunkMutex.unlock();
 		}
 		else {
-			inputQueueMutex.unlock();
+			chunkMutex.unlock();
 			sf::sleep(sf::microseconds(100));
 		}
 	}
 }
 
-std::mutex ChunkGenerator::inputQueueMutex;
-std::mutex ChunkGenerator::outputQueueMutex;
+std::mutex ChunkGenerator::chunkMutex;

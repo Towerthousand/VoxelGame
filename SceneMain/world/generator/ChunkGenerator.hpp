@@ -13,8 +13,7 @@ class ChunkGenerator {
 		bool queueChunk(vec3i chunk); //chunkgrid coords
 		void threadedChunkManagement();
 
-		static std::mutex inputQueueMutex;
-		static std::mutex outputQueueMutex;
+		static std::mutex chunkMutex;
 		std::list<Chunk*> chunksLoaded;
 
 	private:
@@ -23,6 +22,7 @@ class ChunkGenerator {
 
 		FunctionTerrain* entry; //root function for the generation tree
 		std::set<vec3i> chunksToLoad;
+		std::queue<vec3i> chunksToLoadQueue;
 };
 
 #endif // WORLDGENERATOR_HPP
