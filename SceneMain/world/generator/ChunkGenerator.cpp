@@ -81,6 +81,7 @@ void ChunkGenerator::threadedChunkManagement() {
 		chunkMutex.lock();
 		if(!chunksToLoad.empty() && !chunksToLoadQueue.empty()) {
 			vec3i chunkPos = chunksToLoadQueue.front();
+			chunksToLoadQueue.pop();
 			chunkMutex.unlock();
 			Chunk* newChunk = new Chunk(chunkPos.x,chunkPos.y,chunkPos.z,parentScene);
 			ID3Data data = entry->getID3Data(chunkPos.x*CHUNKSIZE,chunkPos.y*CHUNKSIZE,chunkPos.z*CHUNKSIZE,CHUNKSIZE,CHUNKSIZE+5,CHUNKSIZE);
@@ -91,7 +92,6 @@ void ChunkGenerator::threadedChunkManagement() {
 			chunkMutex.lock();
 			chunksLoaded.push_back(newChunk);
 			chunksToLoad.erase(chunkPos);
-			chunksToLoadQueue.pop();
 			chunkMutex.unlock();
 		}
 		else {

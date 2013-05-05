@@ -145,10 +145,10 @@ void World::update(float deltaTime) {
 	chunkGen.chunkMutex.lock();
 	while(!chunkGen.chunksLoaded.empty()) {
 		Chunk* newChunk = chunkGen.chunksLoaded.front();
+		chunkGen.chunksLoaded.pop_front();
 		newChunk->initBuffer();
 		vec3i matrixCoords = getCoords(newChunk->getPos()).first;
 		(*this)(matrixCoords) = newChunk;
-		chunkGen.chunksLoaded.pop_front();
 		calculateLight((*this)(matrixCoords)->getPos() + vec3i(CHUNKSIZE/2),vec2i(CHUNKSIZE/2 -1));
 	}
 	chunkGen.chunkMutex.unlock();
@@ -169,11 +169,11 @@ void World::update(float deltaTime) {
 				else
 					queue.push(std::pair<float,vec3i>(-dist,chunkPos));
 			}
-		while(!queue.empty()) {
-			if(chunkGen.queueChunk(queue.top().second))
-				break;
-			queue.pop();
-		}
+	while(!queue.empty()) {
+		if(chunkGen.queueChunk(queue.top().second))
+			outLog(toString(GLOBALCLOCK.getElapsedTime().asSeconds()));
+		queue.pop();
+	}
 	traceView(player,10);
 	for (int x = 0; x < WORLDWIDTH; ++x)
 		for (int y = 0; y < WORLDHEIGHT; ++y)
