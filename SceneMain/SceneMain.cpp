@@ -8,7 +8,7 @@
 
 SceneMain::SceneMain(Game &parent) :
 	Scene(parent), chunksDrawn(0),
-	player(new Player(this, vec3f(0,1,0))), world(this,player),
+	player(new Player(this, vec3f(0,100,0))), world(this,player),
 	debugCounter(0.0), fpsCount(0) {
 }
 
@@ -149,7 +149,7 @@ void SceneMain::onKeyPressed(float deltaTime, sf::Keyboard::Key key) {
 			vec3f newPos(0,0,0);
 			newPos.x = 0;
 			newPos.z = 0;
-			newPos.y = 100; //0.5 extra
+			newPos.y = 100;
 			player->pos = newPos + vec3f(0.5,1,0.5);
 		}
 			break;

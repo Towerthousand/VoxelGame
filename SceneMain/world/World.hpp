@@ -33,7 +33,6 @@ class World {
 		void setCubeIDRaw(int x, int y, int z, unsigned char ID);
 		void setCubeLight(int x, int y, int z, unsigned char light);
 		void setCubeLightRaw(int x, int y, int z, unsigned char light);
-		int getSkylightLevel(int x, int z) const;
 		bool getSkyAccess(int x, int y, int z) const;
 
 		//coordinates

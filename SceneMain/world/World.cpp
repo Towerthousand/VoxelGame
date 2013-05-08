@@ -10,7 +10,7 @@ World::World(SceneMain* parentScene, Player* player) :
 	chunkGen(parentScene, rand()),
 	chunks(WORLDWIDTH*WORLDWIDTH*WORLDHEIGHT,NULL),
 	skyValues(std::vector<std::vector<int> >(CHUNKSIZE*WORLDWIDTH,
-											 std::vector<int>(CHUNKSIZE*WORLDWIDTH,-1))),
+											 std::vector<int>(CHUNKSIZE*WORLDWIDTH,0))),
 	updateStuffTimer(0.0) {
 }
 
@@ -64,20 +64,20 @@ void World::setCubeID(int x, int y, int z, unsigned char ID) { //set the id, cal
 	vec2i skyCoords = getSkyCoords(x,z);
 	if (y > skyValues[skyCoords.x][skyCoords.y]) { // calculate "shadow" of the new block
 		int previousSkyValue = skyValues[skyCoords.x][skyCoords.y];
-		skyValues[skyCoords.x][skyCoords.y] = getSkylightLevel(x,z);
+		//TODO: CALCULATE NEW VALUE HERE
 		calculateLight(vec3i(x,
 							 ((y - previousSkyValue)/2) + previousSkyValue - UPDATERADIUS/2,
 							 z),
 					   vec2i(UPDATERADIUS,std::max(UPDATERADIUS,(y - previousSkyValue)/2 + UPDATERADIUS/2 + 4)));
 	}
 	else if (y == skyValues[skyCoords.x][skyCoords.y]) { //propagate skylight downwards
-		skyValues[skyCoords.x][skyCoords.y] = getSkylightLevel(x,z);
+		//TODO:CALCULATE NEW VALUE HERE
 		calculateLight(vec3i(x,
 							 ((y - skyValues[skyCoords.x][skyCoords.y])/2) + skyValues[skyCoords.x][skyCoords.y]  - UPDATERADIUS/2,
 							 z),
 					   vec2i(UPDATERADIUS,std::max(UPDATERADIUS,(y - skyValues[skyCoords.x][skyCoords.y])/2 + UPDATERADIUS/2 + 4)));
 	}
-	else { //just calculate the surrounding blocks, since wer'e not changing sky level
+	else { //just calculate the surrounding blocks, since we're not changing sky level
 		calculateLight(vec3i(x,y,z),vec2i(UPDATERADIUS,UPDATERADIUS));
 	}
 }
@@ -126,13 +126,6 @@ vec2i World::getSkyCoords(int x, int z) const {
 	return vec2i(indexX,indexZ);
 }
 
-int World::getSkylightLevel(int x, int z) const { //X and Z in cube coords
-	for(int y = CHUNKSIZE*WORLDHEIGHT-1; y >= 0; --y)
-		if(getCube(x,y,z).ID != 0)
-			return y;
-	return -1;
-}
-
 bool World::getSkyAccess(int x, int y, int z) const {
 	vec2i skyCoords = getSkyCoords(x,z);
 	if (y <= skyValues[skyCoords.x][skyCoords.y])
@@ -149,15 +142,16 @@ void World::update(float deltaTime) {
 		newChunk->initBuffer();
 		vec3i matrixCoords = getCoords(newChunk->getPos()).first;
 		(*this)(matrixCoords) = newChunk;
-		calculateLight((*this)(matrixCoords)->getPos() + vec3i(CHUNKSIZE/2),vec2i(CHUNKSIZE/2 -1));
+		calculateLight(newChunk->getPos() + vec3i(CHUNKSIZE/2),vec2i(CHUNKSIZE/2 - 1));
+		newChunk->markedForRedraw = false;
 	}
 	chunkGen.chunkMutex.unlock();
-	vec2i playerChunkPos = vec2i(std::floor(player->pos.x),std::floor(player->pos.z))/CHUNKSIZE;
+	vec3i playerChunkPos = vec3i(std::floor(player->pos.x),std::floor(player->pos.y),std::floor(player->pos.z))/CHUNKSIZE;
 	std::priority_queue<std::pair<float,vec3i> > queue;
 	for (int x = -WORLDWIDTH/2; x < WORLDWIDTH/2; ++x)
-		for (int y = 0; y < WORLDHEIGHT; ++y)
+		for (int y = -WORLDHEIGHT/2; y < WORLDHEIGHT/2; ++y)
 			for (int z = -WORLDWIDTH/2; z < WORLDWIDTH/2; ++z){
-				vec3i chunkPos(playerChunkPos.x+x,y,playerChunkPos.y+z);
+				vec3i chunkPos(playerChunkPos.x+x,playerChunkPos.y+y,playerChunkPos.z+z);
 				std::pair<vec3i,vec3i> matrixCoords = getCoords(chunkPos*CHUNKSIZE);
 				float dist = std::fabs((chunkPos*CHUNKSIZE - player->pos).module());
 				if((*this)(matrixCoords.first) != NULL){
@@ -417,7 +411,7 @@ void World::calculateLightManhattan(vec3i source, int radius) {
 		for(int y = source.y-radius; y <= source.y+radius; ++y) {
 			for(int z = source.z-radius; z <= source.z+radius; ++z) {
 				int manhattanDistance = std::abs(x-source.x)+std::abs(y-source.y)+std::abs(z-source.z);
-				if (manhattanDistance < radius && !getOutOfBounds(x,y,z)){
+				if (manhattanDistance <= radius && !getOutOfBounds(x,y,z)){
 					std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
 					Chunk* chunk = (*this)(matrixCoords.first);
 					Cube* cube = &chunk->cubes[matrixCoords.second.x*CHUNKSIZE*CHUNKSIZE+matrixCoords.second.y*CHUNKSIZE+matrixCoords.second.z];

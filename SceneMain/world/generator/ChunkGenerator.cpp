@@ -88,7 +88,7 @@ void ChunkGenerator::threadedChunkManagement() {
 			for (int i = 0; i < CHUNKSIZE; ++i)
 				for (int j = 0; j < CHUNKSIZE; ++j)
 					for (int k = 0; k < CHUNKSIZE; ++k)
-						newChunk->cubes[i*CHUNKSIZE*CHUNKSIZE+j*CHUNKSIZE+k] = Cube(data[i][j][k],0);
+						(*newChunk)(i,j,k) = Cube(data[i][j][k],0);
 			chunkMutex.lock();
 			chunksLoaded.push_back(newChunk);
 			chunksToLoad.erase(chunkPos);
@@ -96,7 +96,7 @@ void ChunkGenerator::threadedChunkManagement() {
 		}
 		else {
 			chunkMutex.unlock();
-			sf::sleep(sf::microseconds(100));
+			sf::sleep(sf::seconds(0.1));
 		}
 	}
 }
