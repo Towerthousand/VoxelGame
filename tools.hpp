@@ -65,7 +65,7 @@ std::string toString(float num);
 #define WORLDHEIGHT_MASK 15 //WORLDHEIGHT -1
 
 #define PLAYER_HEIGHT -1.8
-#define UPDATERADIUS 16.0f //How many potential light blocks does changing a block affect? Not taking into account skylight.
+#define UPDATERADIUS 17.0f //How many potential light blocks does changing a block affect? Not taking into account skylight.
 #define MAXLIGHT 20
 #define MINLIGHT 3
 #define DEG_TO_RAD ((2*M_PI)/360.0f)
