@@ -33,12 +33,10 @@ class World {
 		void setCubeIDRaw(int x, int y, int z, unsigned char ID);
 		void setCubeLight(int x, int y, int z, unsigned char light);
 		void setCubeLightRaw(int x, int y, int z, unsigned char light);
-		bool getSkyAccess(int x, int y, int z) const;
 
 		//coordinates
 		std::pair<vec3i,vec3i> getCoords(int x, int y, int z) const;
 		std::pair<vec3i,vec3i> getCoords(vec3i coord);
-		vec2i getSkyCoords(int x, int z) const;
 
 		//main
 		void draw() const;
@@ -49,7 +47,7 @@ class World {
 		void drawWireCube(const vec3f& pos) const;
 
 		//lololol shouldn't be public, fix it! It is accessed by the chunk generator
-		void calculateLight(vec3i source, vec2i radius);
+		void calculateLight(vec3i source, int radius);
 		void calculateLightManhattan(vec3i source, int radius);
 
 		bool playerTargetsBlock;
@@ -67,7 +65,6 @@ class World {
 		Player* player;
 		ChunkGenerator chunkGen;
 		std::vector<Chunk*> chunks;
-		std::vector<std::vector<int> > skyValues;
 		float updateStuffTimer;
 		static const int vertexPoints[8][3];
 		static const int indexes[24];

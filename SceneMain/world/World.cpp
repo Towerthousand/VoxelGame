@@ -9,8 +9,6 @@ World::World(SceneMain* parentScene, Player* player) :
 	last(0,0,0), parentScene(parentScene), player(player),
 	chunkGen(parentScene, rand()),
 	chunks(WORLDWIDTH*WORLDWIDTH*WORLDHEIGHT,NULL),
-	skyValues(std::vector<std::vector<int> >(CHUNKSIZE*WORLDWIDTH,
-											 std::vector<int>(CHUNKSIZE*WORLDWIDTH,0))),
 	updateStuffTimer(0.0) {
 }
 
@@ -57,44 +55,27 @@ Cube World::getCubeRaw(int x, int y, int z) const {
 	return (*(*this)(matrixCoords.first))(matrixCoords.second);
 }
 
-void World::setCubeID(int x, int y, int z, unsigned char ID) { //set the id, calculate light (taking into account sky level)
+void World::setCubeID(int x, int y, int z, unsigned char ID) {
 	if (getOutOfBounds(x,y,z))
 		return;
 	setCubeIDRaw(x,y,z,ID);
-	vec2i skyCoords = getSkyCoords(x,z);
-	if (y > skyValues[skyCoords.x][skyCoords.y]) { // calculate "shadow" of the new block
-		int previousSkyValue = skyValues[skyCoords.x][skyCoords.y];
-		//TODO: CALCULATE NEW VALUE HERE
-		calculateLight(vec3i(x,
-							 ((y - previousSkyValue)/2) + previousSkyValue - UPDATERADIUS/2,
-							 z),
-					   vec2i(UPDATERADIUS,std::max(UPDATERADIUS,(y - previousSkyValue)/2 + UPDATERADIUS/2 + 4)));
-	}
-	else if (y == skyValues[skyCoords.x][skyCoords.y]) { //propagate skylight downwards
-		//TODO:CALCULATE NEW VALUE HERE
-		calculateLight(vec3i(x,
-							 ((y - skyValues[skyCoords.x][skyCoords.y])/2) + skyValues[skyCoords.x][skyCoords.y]  - UPDATERADIUS/2,
-							 z),
-					   vec2i(UPDATERADIUS,std::max(UPDATERADIUS,(y - skyValues[skyCoords.x][skyCoords.y])/2 + UPDATERADIUS/2 + 4)));
-	}
-	else { //just calculate the surrounding blocks, since we're not changing sky level
-		calculateLight(vec3i(x,y,z),vec2i(UPDATERADIUS,UPDATERADIUS));
-	}
+	//TODO HERE: SKY LEVEL
+	calculateLightManhattan(vec3i(x,y,z),UPDATERADIUS);
 }
 
-void World::setCubeIDRaw(int x, int y, int z, unsigned char ID) { //set the id, calculate light (taking into account sky level)
+void World::setCubeIDRaw(int x, int y, int z, unsigned char ID) {
 	std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
 	(*(*this)(matrixCoords.first))(matrixCoords.second).ID = ID;
 	(*this)(matrixCoords.first)->markedForRedraw = true;
 }
 
-void World::setCubeLight(int x, int y, int z, unsigned char light) { //set the light, mark for redraw
+void World::setCubeLight(int x, int y, int z, unsigned char light) {
 	if (getOutOfBounds(x,y,z))
 		return;
 	setCubeLightRaw(x,y,z,light);
 }
 
-void World::setCubeLightRaw(int x, int y, int z, unsigned char light) { //set the id, calculate light (taking into account sky level)
+void World::setCubeLightRaw(int x, int y, int z, unsigned char light) {
 	std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
 	(*(*this)(matrixCoords.first))(matrixCoords.second).light = light;
 	(*this)(matrixCoords.first)->markedForRedraw = true;
@@ -120,19 +101,6 @@ std::pair<vec3i,vec3i> World::getCoords(vec3i coord) {
 	return getCoords(coord.x,coord.y,coord.z);
 }
 
-vec2i World::getSkyCoords(int x, int z) const {
-	int indexX = x & (WORLDWIDTH*CHUNKSIZE -1); //chunkgrid coords (0 <= coord < WORLDSIZE
-	int indexZ = z & (WORLDWIDTH*CHUNKSIZE -1); //chunkgrid coords (0 <= coord < WORLDSIZE
-	return vec2i(indexX,indexZ);
-}
-
-bool World::getSkyAccess(int x, int y, int z) const {
-	vec2i skyCoords = getSkyCoords(x,z);
-	if (y <= skyValues[skyCoords.x][skyCoords.y])
-		return false;
-	return true;
-}
-
 void World::update(float deltaTime) {
 	//updateStuff(deltaTime);
 	chunkGen.chunkMutex.lock();
@@ -142,8 +110,7 @@ void World::update(float deltaTime) {
 		newChunk->initBuffer();
 		vec3i matrixCoords = getCoords(newChunk->getPos()).first;
 		(*this)(matrixCoords) = newChunk;
-		calculateLight(newChunk->getPos() + vec3i(CHUNKSIZE/2),vec2i(CHUNKSIZE/2 - 1));
-		newChunk->markedForRedraw = false;
+		calculateLight(newChunk->getPos() + vec3i(CHUNKSIZE/2),CHUNKSIZE/2);
 	}
 	chunkGen.chunkMutex.unlock();
 	vec3i playerChunkPos = vec3i(std::floor(player->pos.x),std::floor(player->pos.y),std::floor(player->pos.z))/CHUNKSIZE;
@@ -163,10 +130,9 @@ void World::update(float deltaTime) {
 				else
 					queue.push(std::pair<float,vec3i>(-dist,chunkPos));
 			}
-	while(!queue.empty()) {
-		if(chunkGen.queueChunk(queue.top().second))
-			outLog(toString(GLOBALCLOCK.getElapsedTime().asSeconds()));
-		queue.pop();
+	if(!queue.empty()) {
+		while(!queue.empty() && !chunkGen.queueChunk(queue.top().second))
+			queue.pop();
 	}
 	traceView(player,10);
 	for (int x = 0; x < WORLDWIDTH; ++x)
@@ -345,14 +311,14 @@ void World::traceView(const Player *playerCam, float tMax) {
 	playerTargetsBlock = false;
 }
 
-void World::calculateLight(vec3i source, vec2i radius) {
+void World::calculateLight(vec3i source, int radius) {
 	//BFS TO THE MAX
 	sf::Clock clock;
 	clock.restart();
 	std::vector<vec3i> blocksToCheck[MAXLIGHT+1];
-	for(int x = source.x-radius.x; x <= source.x+radius.x; ++x) {
-		for(int y = source.y-radius.y; y <= source.y+radius.y; ++y) {
-			for(int z = source.z-radius.x; z <= source.z+radius.x; ++z) {
+	for(int x = source.x-radius; x <= source.x+radius; ++x) {
+		for(int y = source.y-radius; y <= source.y+radius; ++y) {
+			for(int z = source.z-radius; z <= source.z+radius; ++z) {
 				if (!getOutOfBounds(x,y,z)){
 					std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
 					Chunk* chunk = (*this)(matrixCoords.first);
@@ -360,28 +326,22 @@ void World::calculateLight(vec3i source, vec2i radius) {
 					if(chunk != NULL) {
 						switch(cube->ID) {
 							case 0: //air
-								if (x == source.x-radius.x || x == source.x+radius.x
-									||y == source.y-radius.y || y == source.y+radius.y
-									||z == source.z-radius.x || z == source.z+radius.x) {
+								if (x == source.x-radius || x == source.x+radius
+									||y == source.y-radius || y == source.y+radius
+									||z == source.z-radius || z == source.z+radius) {
 									//if it is on border, mark it as node
 									if (cube->light > MINLIGHT)
 										blocksToCheck[cube->light].push_back(vec3i(x,y,z));
-									else {
-										if (getSkyAccess(x,y,z)) {
-											cube->light = MAXLIGHT;
-											blocksToCheck[MAXLIGHT].push_back(vec3i(x,y,z));
-										}
-										else
-											cube->light = MINLIGHT;
-									}
 								}
+								else
+									setCubeLightRaw(x,y,z,MINLIGHT);
 								break;
 							case 4: //lightblock
-								cube->light = MAXLIGHT;
+								setCubeLightRaw(x,y,z,MAXLIGHT);
 								blocksToCheck[MAXLIGHT].push_back(vec3i(x,y,z));
 								break;
 							default:
-								cube->light = 0;
+								setCubeLightRaw(x,y,z,0);
 								break;
 						}
 					}
@@ -411,33 +371,27 @@ void World::calculateLightManhattan(vec3i source, int radius) {
 		for(int y = source.y-radius; y <= source.y+radius; ++y) {
 			for(int z = source.z-radius; z <= source.z+radius; ++z) {
 				int manhattanDistance = std::abs(x-source.x)+std::abs(y-source.y)+std::abs(z-source.z);
-				if (manhattanDistance <= radius && !getOutOfBounds(x,y,z)){
+				if (manhattanDistance <= radius+1 && !getOutOfBounds(x,y,z)){
 					std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
 					Chunk* chunk = (*this)(matrixCoords.first);
 					Cube* cube = &chunk->cubes[matrixCoords.second.x*CHUNKSIZE*CHUNKSIZE+matrixCoords.second.y*CHUNKSIZE+matrixCoords.second.z];
 					if(chunk != NULL) {
 						switch(cube->ID) {
 							case 0: //air
-								if (manhattanDistance == radius) {
+								if (manhattanDistance == radius+1) {
 									//if it is on border, mark it as node
 									if (cube->light > MINLIGHT)
 										blocksToCheck[cube->light].push_back(vec3i(x,y,z));
-									else {
-										if (getSkyAccess(x,y,z)) {
-											cube->light = MAXLIGHT;
-											blocksToCheck[MAXLIGHT].push_back(vec3i(x,y,z));
-										}
-										else
-											cube->light = MINLIGHT;
-									}
 								}
+								else
+									setCubeLightRaw(x,y,z,MINLIGHT);
 								break;
 							case 4: //lightblock
-								cube->light = MAXLIGHT;
+								setCubeLightRaw(x,y,z,MAXLIGHT);
 								blocksToCheck[MAXLIGHT].push_back(vec3i(x,y,z));
 								break;
 							default:
-								cube->light = 0;
+								setCubeLightRaw(x,y,z,0);
 								break;
 						}
 					}

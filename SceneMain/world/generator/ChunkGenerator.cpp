@@ -69,10 +69,8 @@ bool ChunkGenerator::queueChunk(vec3i chunk) { //chunkgrid coords
 		chunkMutex.unlock();
 		return true;
 	}
-	else {
-		chunkMutex.unlock();
-		return false; //chunk has been already queued
-	}
+	chunkMutex.unlock();
+	return false; //chunk has been already queued
 }
 
 void ChunkGenerator::threadedChunkManagement() {
@@ -88,7 +86,7 @@ void ChunkGenerator::threadedChunkManagement() {
 			for (int i = 0; i < CHUNKSIZE; ++i)
 				for (int j = 0; j < CHUNKSIZE; ++j)
 					for (int k = 0; k < CHUNKSIZE; ++k)
-						(*newChunk)(i,j,k) = Cube(data[i][j][k],0);
+						(*newChunk)(i,j,k) = Cube(data[i][j][k],MINLIGHT);
 			chunkMutex.lock();
 			chunksLoaded.push_back(newChunk);
 			chunksToLoad.erase(chunkPos);
