@@ -87,8 +87,8 @@ HEADERS += \
 	$$PWD/SceneMain/world/generator/FunctionTerrainOverlay.hpp \
 	$$PWD/SceneMain/world/generator/Function2DSimplex.hpp \
 	$$PWD/SceneMain/world/generator/FunctionTerrainHeightmap.hpp \
-	$$PWD/SceneMain/world/generator/FunctionTerrainJoin.hpp
-
+	$$PWD/SceneMain/world/generator/FunctionTerrainJoin.hpp \
+	$$PWD/glm/glm.hpp
 OTHER_FILES += \
 	$$PWD/shaders/terrain_fragment.glsl \
 	$$PWD/shaders/terrain_vertex.glsl \

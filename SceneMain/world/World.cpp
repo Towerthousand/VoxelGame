@@ -59,7 +59,6 @@ void World::setCubeID(int x, int y, int z, unsigned char ID) {
 	if (getOutOfBounds(x,y,z))
 		return;
 	setCubeIDRaw(x,y,z,ID);
-	//TODO HERE: SKY LEVEL
 	calculateLightManhattan(vec3i(x,y,z),UPDATERADIUS);
 }
 

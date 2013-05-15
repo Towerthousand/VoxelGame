@@ -41,7 +41,7 @@ class Chunk { //16*16*16
 		mat4f modelMatrix; //precalculated, since chunks do not transform ever
 		SceneMain* parentScene;
 		static const int textureIndexes[9][6];
-		static const float vertices[24][3];
+		static const float vertices[24][3]; //to draw the bounding box
 };
 
 #endif // CHUNK_HPP

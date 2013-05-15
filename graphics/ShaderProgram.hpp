@@ -61,11 +61,11 @@ class ShaderProgram {
 
 		//MATRIX
 		void sendUniformMat2f(const std::string& uniformID
-							  , const float * value) const;
+							  , const mat2f &mat) const;
 		void sendUniformMat3f(const std::string& uniformID
-							  , const float * value) const;
+							  , const mat3f &mat) const;
 		void sendUniformMat4f(const std::string& uniformID
-							  , const float * value) const;
+							  , const mat4f &mat) const;
 
 	private:
 		GLuint programHandle;

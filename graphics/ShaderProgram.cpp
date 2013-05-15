@@ -200,31 +200,31 @@ void ShaderProgram::sendUniform4ui(const std::string& uniformID, const vec4ui& v
 /////////////////////////////////////////////MATRIX
 
 void ShaderProgram::sendUniformMat2f(const std::string& uniformID
-							  , const float * value) const {
+							  , const mat2f &mat) const {
 	GLint location = getUniLoc(uniformID);
 	if (location == -1) {
 		outLog("#ERROR When trying to get uniform: no uniform named " + uniformID);
 		return;
 	}
-	glUniformMatrix2fv(location, 1, GL_FALSE, value);
+	glUniformMatrix2fv(location, 1, GL_FALSE, value_ptr(mat));
 }
 
 void ShaderProgram::sendUniformMat3f(const std::string& uniformID
-							  , const float * value) const {
+							  , const mat3f &mat) const {
 	GLint location = getUniLoc(uniformID);
 	if (location == -1) {
 		outLog("#ERROR When trying to get uniform: no uniform named " + uniformID);
 		return;
 	}
-	glUniformMatrix3fv(location, 1, GL_FALSE, value);
+	glUniformMatrix3fv(location, 1, GL_FALSE, value_ptr(mat));
 }
 
 void ShaderProgram::sendUniformMat4f(const std::string& uniformID
-							  , const float * value) const {
+							  , const mat4f &mat) const {
 	GLint location = getUniLoc(uniformID);
 	if (location == -1) {
 		outLog("#ERROR When trying to get uniform: no uniform named " + uniformID);
 		return;
 	}
-	glUniformMatrix4fv(location, 1, GL_FALSE, value);
+	glUniformMatrix4fv(location, 1, GL_FALSE, value_ptr(mat));
 }
