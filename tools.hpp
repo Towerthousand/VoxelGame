@@ -21,7 +21,6 @@
 #include <sys/stat.h>
 #include <thread>
 #include <mutex>
-#include "BudMath.hpp"
 // vec3, vec4, ivec4, mat4
 #include <glm/glm.hpp>
 // translate, rotate, scale, perspective
@@ -29,19 +28,18 @@
 // value_ptr
 #include <glm/gtc/type_ptr.hpp>
 
-using namespace glm;
-typedef detail::tvec4<int> vec4i;
-typedef detail::tvec4<float> vec4f;
-typedef detail::tvec4<uint> vec4ui;
-typedef detail::tvec3<int> vec3i;
-typedef detail::tvec3<float> vec3f;
-typedef detail::tvec3<uint> vec3ui;
-typedef detail::tvec2<int> vec2i;
-typedef detail::tvec2<float> vec2f;
-typedef detail::tvec2<uint> vec2ui;
-typedef detail::tmat2x2<float> mat2f;
-typedef detail::tmat3x3<float> mat3f;
-typedef detail::tmat4x4<float> mat4f;
+typedef glm::detail::tvec4<int> vec4i;
+typedef glm::detail::tvec4<float> vec4f;
+typedef glm::detail::tvec4<uint> vec4ui;
+typedef glm::detail::tvec3<int> vec3i;
+typedef glm::detail::tvec3<float> vec3f;
+typedef glm::detail::tvec3<uint> vec3ui;
+typedef glm::detail::tvec2<int> vec2i;
+typedef glm::detail::tvec2<float> vec2f;
+typedef glm::detail::tvec2<uint> vec2ui;
+typedef glm::detail::tmat2x2<float> mat2f;
+typedef glm::detail::tmat3x3<float> mat3f;
+typedef glm::detail::tmat4x4<float> mat4f;
 
 struct Vertex {
 		Vertex(short vx = 0, short vy = 0, short  vz = 0,

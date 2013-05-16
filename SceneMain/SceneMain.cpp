@@ -60,7 +60,7 @@ bool SceneMain::init() {
 	parent.font().makeText("FPS","",20,vec2f(10,150),sf::Color::White,sf::Text::Bold,false);
 	//Set up textures
 	glActiveTexture(GL_TEXTURE0);
-	getState().texture[0] = mat4f::fromScale(1.0/512.0f,1.0/512.0f,1); //now texture0 is in pixel coords
+	getState().texture[0] = glm::scale(mat4f(1.0f),vec3f(1.0/512.0f,1.0/512.0f,1)); //now texture0 is in pixel coords
 	//Center mouse
 	sf::Mouse::setPosition(sf::Vector2i(SCRWIDTH/2,SCRHEIGHT/2),parent.getWindow());
 	// Add player
@@ -88,7 +88,7 @@ void SceneMain::update(float deltaTime) {
 	}
 	//Kill game objects far away from player
 	for(std::list<GameObject*>::iterator it = objects.begin(); it != objects.end(); ++it)
-		if (std::abs(((*it)->pos-player->pos).module()) > 200)
+		if (std::abs(glm::length((*it)->pos-player->pos)) > 200)
 			(*it)->isAlive = false;
 	//Erase dead game objects
 	for(std::list<GameObject*>::iterator it = objects.begin(); it != objects.end();)
@@ -105,7 +105,8 @@ void SceneMain::update(float deltaTime) {
 
 void SceneMain::draw() const {
 	//calculate perspective matrix
-	getState().projection = mat4f::fromPerspective(FOV,ZNEAR,ZFAR,float(SCRWIDTH)/float(SCRHEIGHT));
+	getState().projection = glm::perspectiveFov(FOV,float(SCRWIDTH),
+												float(SCRHEIGHT),ZNEAR,ZFAR);
 	//Move matrix to position (according to player)
 	getState().view = player->viewMatrix;
 	//Draw all the stuff
@@ -235,7 +236,7 @@ void SceneMain::onMouseButtonPressed(float deltaTime, sf::Mouse::Button button) 
 			}
 			break;
 		case sf::Mouse::Middle: { //Arrow!
-			vec3f dir(getState().view(0,2), getState().view(1,2), getState().view(2,2));//same as the player's pov
+			vec3f dir(getState().view[0][2], getState().view[1][2], getState().view[2][2]);//same as the player's pov
 			Polla * np = new Polla(this,player->camPos,player);
 			np->vel -= vec3f(dir.x*50.0,dir.y*50.0,dir.z*50.0);
 			addObject(np);

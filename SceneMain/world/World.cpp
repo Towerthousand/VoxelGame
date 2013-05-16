@@ -25,7 +25,7 @@ Chunk* &World::operator()(int x, int y, int z) {
 	return chunks[x*WORLDWIDTH*WORLDHEIGHT + y*WORLDWIDTH + z];
 }
 
-Chunk* &World::operator()(vec3f coord) {
+Chunk* &World::operator()(vec3i coord) {
 	return chunks[coord.x*WORLDWIDTH*WORLDHEIGHT + coord.y*WORLDWIDTH + coord.z];
 }
 
@@ -33,7 +33,7 @@ Chunk* const &World::operator()(int x, int y, int z) const {
 	return chunks[x*WORLDWIDTH*WORLDHEIGHT+y*WORLDWIDTH+z];
 }
 
-Chunk* const &World::operator()(vec3f coord) const {
+Chunk* const &World::operator()(vec3i coord) const {
 	return chunks[coord.x*WORLDWIDTH*WORLDHEIGHT+coord.y*WORLDWIDTH+coord.z];
 }
 
@@ -119,7 +119,7 @@ void World::update(float deltaTime) {
 			for (int z = -WORLDWIDTH/2; z < WORLDWIDTH/2; ++z){
 				vec3i chunkPos(playerChunkPos.x+x,playerChunkPos.y+y,playerChunkPos.z+z);
 				std::pair<vec3i,vec3i> matrixCoords = getCoords(chunkPos*CHUNKSIZE);
-				float dist = std::fabs((chunkPos*CHUNKSIZE - player->pos).module());
+				float dist = std::fabs(glm::length(vec3f(CHUNKSIZE*chunkPos) - player->pos));
 				if((*this)(matrixCoords.first) != NULL){
 					if((*this)(matrixCoords.first)->XPOS != chunkPos.x ||
 					   (*this)(matrixCoords.first)->YPOS != chunkPos.y ||
@@ -149,10 +149,10 @@ void World::draw() const {
 		for (int y = 0; y < WORLDHEIGHT; ++y)
 			for (int z = 0; z < WORLDWIDTH; ++z)
 				if((*this)(x,y,z) != NULL) {
-					vec3f center = (*this)(x,y,z)->getPos() + vec3i(CHUNKSIZE/2);
+					vec3f center((*this)(x,y,z)->getPos() + vec3i(CHUNKSIZE/2));
 					if ((*this)(x,y,z)->vertexCount == 0)
 						(*this)(x,y,z)->outOfView = true;
-					else if (abs((player->pos - center).module()) < CHUNKSIZE*5)
+					else if (glm::length(player->pos - center) < CHUNKSIZE*5)
 						(*this)(x,y,z)->outOfView = false;
 					else
 						(*this)(x,y,z)->outOfView = !player->insideFrustum(center,sqrt(3*((CHUNKSIZE/2)*(CHUNKSIZE/2))));
@@ -168,7 +168,7 @@ void World::draw() const {
 			for(int z = 0; z < WORLDWIDTH; ++z)
 				if((*this)(x,y,z) != NULL)
 					if(!(*this)(x,y,z)->outOfView) {
-						dist = ((*this)(x,y,z)->getPos() + vec3f(CHUNKSIZE/2) - parentScene->player->pos).module();
+						dist = glm::length(vec3f((*this)(x,y,z)->getPos()) + vec3f(CHUNKSIZE/2) - parentScene->player->pos);
 						queryList.push(std::pair<float,Chunk*>(-dist,(*this)(x,y,z)));
 					}
 
@@ -442,8 +442,11 @@ void World::updateStuff(float deltaTime) { //only to be called by world.update()
 
 void World::drawWireCube(const vec3f &pos) const {
 	mat4f poppedMat = parentScene->getState().model;
-	parentScene->getState().model.translate(pos.x-0.0025,pos.y-0.0025,pos.z-0.0025);
-	parentScene->getState().model.scale(1.005,1.005,1.005);
+	parentScene->getState().model =
+			glm::translate(parentScene->getState().model,
+						   vec3f(pos.x-0.0025,pos.y-0.0025,pos.z-0.0025));
+	parentScene->getState().model =
+			glm::scale(parentScene->getState().model,vec3f(1.005,1.005,1.005));
 	parentScene->getState().updateShaderUniforms(parentScene->getShader("MODEL"));
 	parentScene->getShader("MODEL").use();
 	glLineWidth(1.5);

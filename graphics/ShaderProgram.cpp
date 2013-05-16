@@ -206,7 +206,7 @@ void ShaderProgram::sendUniformMat2f(const std::string& uniformID
 		outLog("#ERROR When trying to get uniform: no uniform named " + uniformID);
 		return;
 	}
-	glUniformMatrix2fv(location, 1, GL_FALSE, value_ptr(mat));
+	glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 void ShaderProgram::sendUniformMat3f(const std::string& uniformID
@@ -216,7 +216,7 @@ void ShaderProgram::sendUniformMat3f(const std::string& uniformID
 		outLog("#ERROR When trying to get uniform: no uniform named " + uniformID);
 		return;
 	}
-	glUniformMatrix3fv(location, 1, GL_FALSE, value_ptr(mat));
+	glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 void ShaderProgram::sendUniformMat4f(const std::string& uniformID
@@ -226,5 +226,5 @@ void ShaderProgram::sendUniformMat4f(const std::string& uniformID
 		outLog("#ERROR When trying to get uniform: no uniform named " + uniformID);
 		return;
 	}
-	glUniformMatrix4fv(location, 1, GL_FALSE, value_ptr(mat));
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(mat));
 }

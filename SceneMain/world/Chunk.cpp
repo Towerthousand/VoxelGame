@@ -9,10 +9,10 @@ Chunk::Chunk(int x, int y, int z, SceneMain* scene) :
 	vertexCount(0),
 	XPOS(x), YPOS(y), ZPOS(z),
 	VBOID(0),
-	modelMatrix(mat4f::fromIdentity()),
+	modelMatrix(mat4f(1.0)),
 	parentScene(scene) {
-	modelMatrix.translate(XPOS*CHUNKSIZE,YPOS*CHUNKSIZE,ZPOS*CHUNKSIZE);
-	modelMatrix.scale(0.5,0.5,0.5);
+	modelMatrix = glm::translate(modelMatrix,vec3f(XPOS*CHUNKSIZE,YPOS*CHUNKSIZE,ZPOS*CHUNKSIZE));
+	modelMatrix = glm::scale(modelMatrix,vec3f(0.5,0.5,0.5));
 }
 
 Chunk::~Chunk() {
@@ -28,7 +28,7 @@ Cube &Chunk::operator()(int x, int y, int z) {
 	return cubes[x*CHUNKSIZE*CHUNKSIZE + y*CHUNKSIZE + z];
 }
 
-Cube &Chunk::operator()(vec3f coord) {
+Cube &Chunk::operator()(vec3i coord) {
 	return cubes[coord.x*CHUNKSIZE*CHUNKSIZE+coord.y*CHUNKSIZE+coord.z];
 }
 
@@ -36,7 +36,7 @@ Cube const &Chunk::operator()(int x, int y, int z) const {
 	return cubes[x*CHUNKSIZE*CHUNKSIZE + y*CHUNKSIZE + z];
 }
 
-Cube const &Chunk::operator()(vec3f coord) const {
+Cube const &Chunk::operator()(vec3i coord) const {
 	return cubes[coord.x*CHUNKSIZE*CHUNKSIZE+coord.y*CHUNKSIZE+coord.z];
 }
 

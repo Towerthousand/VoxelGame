@@ -9,9 +9,9 @@ class Chunk { //16*16*16
 		~Chunk();
 
 		Cube &operator()(int x, int y, int z);
-		Cube &operator()(vec3f coord);
+		Cube &operator()(vec3i coord);
 		Cube const &operator()(int x, int y, int z) const;
-		Cube const &operator()(vec3f coord) const;
+		Cube const &operator()(vec3i coord) const;
 
 		void initBuffer();
 

@@ -21,9 +21,9 @@ class World {
 		~World();
 
 		Chunk* &operator()(int x, int y, int z);
-		Chunk* &operator()(vec3f coord);
+		Chunk* &operator()(vec3i coord);
 		Chunk* const &operator()(int x, int y, int z) const;
-		Chunk* const &operator()(vec3f coord) const;
+		Chunk* const &operator()(vec3i coord) const;
 
 		//Getters and setters
 		bool getOutOfBounds(int x, int y, int z) const;
