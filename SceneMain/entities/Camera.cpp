@@ -6,7 +6,7 @@
 // and is thougt of as a no-fly, fps kind of view. Tweak it!
 //
 
-Camera::Camera() : camRot(0,0), camPos(0,0,0), viewMatrix(mat4f::fromIdentity()) {
+Camera::Camera() : camRot(0,0), camPos(0,0,0), viewMatrix(mat4f(1.0)) {
 }
 
 Camera::~Camera() {

@@ -100,6 +100,12 @@ std::pair<vec3i,vec3i> World::getCoords(vec3i coord) {
 	return getCoords(coord.x,coord.y,coord.z);
 }
 
+struct Compare {
+		bool operator()(const std::pair<float,vec3i> &a, const std::pair<float,vec3i> &b) {
+			return (a.second.x < b.second.x);
+		}
+};
+
 void World::update(float deltaTime) {
 	//updateStuff(deltaTime);
 	chunkGen.chunkMutex.lock();
@@ -113,7 +119,7 @@ void World::update(float deltaTime) {
 	}
 	chunkGen.chunkMutex.unlock();
 	vec3i playerChunkPos = vec3i(std::floor(player->pos.x),std::floor(player->pos.y),std::floor(player->pos.z))/CHUNKSIZE;
-	std::priority_queue<std::pair<float,vec3i> > queue;
+	std::priority_queue<std::pair<float,vec3i>, std::vector<std::pair<float,vec3i> >, Compare > queue;
 	for (int x = -WORLDWIDTH/2; x < WORLDWIDTH/2; ++x)
 		for (int y = -WORLDHEIGHT/2; y < WORLDHEIGHT/2; ++y)
 			for (int z = -WORLDWIDTH/2; z < WORLDWIDTH/2; ++z){

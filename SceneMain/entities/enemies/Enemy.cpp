@@ -33,12 +33,12 @@ void Enemy::lookAtPlayer() { //rotates current model matrix to look at player
 	vec3f front = targetPlayer->pos-pos;
 	front.y = 0;
 	vec3f dummyUp(0,1,0);
-	if((dummyUp^front).module() != 0) {
+	if(glm::cross(dummyUp,front).module() != 0) {
 		vec3f back = -front;
 		back.normalize();
-		vec3f right = dummyUp^back;
+		vec3f right = glm::cross(dummyUp,back);
 		right.normalize();
-		vec3f up = back^right;
+		vec3f up = glm::cross(back,right);
 		up.normalize();
 		modelMatrix *= mat4f(right.x, up.x, back.x, 0,
 							 right.y, up.y, back.y, 0,

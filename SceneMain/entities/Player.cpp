@@ -59,12 +59,12 @@ bool Player::insideFrustum( const vec3f &center, float radius) const {
 		//construct the plane with a normal and a point
 		vec3f v = frustumPlanes[i][1]-frustumPlanes[i][0];
 		vec3f u = frustumPlanes[i][2]-frustumPlanes[i][0];
-		u.normalize();
-		v.normalize();
-		vec3f n = v^u; //normal n = (Ax,By,Cz), point [0] = (p1,p2,p3)
-		n.normalize();
-		D = -n*frustumPlanes[i][0]; //A*p1*x + B*p2*y + C*p3*z + D = 0 => D = -dot(n,P)
-		distance = n*center + D;//Solve the equation using the player's pos instead
+		u = glm::normalize(u);
+		u = glm::normalize(v);
+		vec3f n = glm::cross(v,u); //normal n = (Ax,By,Cz), point [0] = (p1,p2,p3)
+		n = glm::normalize(n);
+		D = glm::dot(-n,frustumPlanes[i][0]); //A*p1*x + B*p2*y + C*p3*z + D = 0 => D = -dot(n,P)
+		distance = glm::dot(n,center) + D;//Solve the equation using the player's pos instead
 		//of a point in the plane.
 		if (distance < -radius)
 			return false; //not inside this player's view
@@ -74,10 +74,10 @@ bool Player::insideFrustum( const vec3f &center, float radius) const {
 
 void Player::updateCamera() {
 	camPos = pos + vec3f(0,1.5,0);
-	viewMatrix = mat4f::fromIdentity();
-	viewMatrix.rotate(camRot.x, 1, 0, 0);
-	viewMatrix.rotate(camRot.y, 0, 1, 0);
-	viewMatrix.translate(-camPos.x, -camPos.y, -camPos.z);
+	viewMatrix = mat4f(1.0);
+	viewMatrix = glm::rotate(viewMatrix,camRot.x, vec3f(1, 0, 0));
+	viewMatrix = glm::rotate(viewMatrix,camRot.y, vec3f(0, 1, 0));
+	viewMatrix = glm::translate(viewMatrix,vec3f(-camPos.x, -camPos.y, -camPos.z));
 }
 
 
@@ -85,9 +85,9 @@ void Player::makeFrustum() {
 	//calculate frustum with dir, pos , znear, zfar, fov, screen ratio
 	mat4f view = parentScene->getState().view;
 	vec3f
-			dir(view(0,2), view(1,2), view(2,2)),//same as the player's pov
-			side(view(0,0), view(1,0), view(2,0)), //x of the camera in world coords
-			up(view(0,1), view(1,1), view(2,1)); //up vector of the camera in world coords
+			dir(view[0][2], view[1][2], view[2][2]),//same as the player's pov
+			side(view[0][0], view[1][0], view[2][0]), //x of the camera in world coords
+			up(view[0][1], view[1][1], view[2][1]); //up vector of the camera in world coords
 
 	float tfov = (float)tan(DEG_TO_RAD * FOV * 0.5) ; //half FOV in rads
 	float ratio = float(SCRWIDTH)/float(SCRHEIGHT);
