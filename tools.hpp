@@ -61,6 +61,15 @@ struct Cube {
 		unsigned char light;
 };
 
+struct FunctorCompare{
+		bool operator()(const std::pair<float,vec3i> &a, const std::pair<float,vec3i> &b) {
+			return (a.first < b.first);
+		}
+		bool operator()(const vec3i &a, const vec3i &b) {
+			return (a.x < b.x);
+		}
+};
+
 //prototype random functions here (define in tools.cpp). Inlines go here too
 inline void outLog(const std::string& msg) {
 	std::cout << msg << std::endl;

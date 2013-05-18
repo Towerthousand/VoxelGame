@@ -10,7 +10,7 @@ Enemy::~Enemy() {
 
 void Enemy::update(float deltaTime) {
 	Entity::update(deltaTime);
-	if ((targetPlayer->pos-pos).module() < 50) {
+	if (glm::length(targetPlayer->pos-pos) < 50) {
 		lookAtPlayer();
 	}
 	movePos(deltaTime);
@@ -33,16 +33,16 @@ void Enemy::lookAtPlayer() { //rotates current model matrix to look at player
 	vec3f front = targetPlayer->pos-pos;
 	front.y = 0;
 	vec3f dummyUp(0,1,0);
-	if(glm::cross(dummyUp,front).module() != 0) {
+	if(glm::length(glm::cross(dummyUp,front)) != 0) {
 		vec3f back = -front;
-		back.normalize();
+		back = glm::normalize(back);
 		vec3f right = glm::cross(dummyUp,back);
-		right.normalize();
+		right = glm::normalize(right);
 		vec3f up = glm::cross(back,right);
-		up.normalize();
-		modelMatrix *= mat4f(right.x, up.x, back.x, 0,
-							 right.y, up.y, back.y, 0,
-							 right.z, up.z, back.z, 0,
-							 0      , 0   , 0     , 1);
+		up = glm::normalize(up);
+		modelMatrix *= mat4f(right.x, right.y, right.z, 0,
+							 up.x   , up.y   , up.z   , 0,
+							 back.x , back.y , back.z , 0,
+							 0      , 0      , 0      , 1);
 	}
 }

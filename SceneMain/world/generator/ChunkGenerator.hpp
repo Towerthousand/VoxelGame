@@ -21,7 +21,7 @@ class ChunkGenerator {
 		std::mt19937 generator; //Mersenne twister with nice configuration
 
 		FunctionTerrain* entry; //root function for the generation tree
-		std::set<vec3i> chunksToLoad;
+		std::set<vec3i,FunctorCompare> chunksToLoad;
 		std::queue<vec3i> chunksToLoadQueue;
 };
 

@@ -27,7 +27,7 @@ void Skeleton::update(float deltaTime) {
 		cooldown = 1;
 		Arrow* na = new Arrow(parentScene,(pos+shootPosOffset));
 		na->vel = targetPlayer->camPos-(pos+shootPosOffset);
-		na->vel.normalize();
+		na->vel = glm::normalize(na->vel);
 		na->vel *= 70.0f;
 		parentScene->addObject(na);
 	}
@@ -47,14 +47,13 @@ void Skeleton::draw() const{
 }
 
 void Skeleton::updateMatrix() {
-	modelMatrix = mat4f::fromIdentity();
-	modelMatrix.translate(pos.x,pos.y,pos.z);
+	modelMatrix = glm::translate(mat4f(1.0),vec3f(pos.x,pos.y,pos.z));
 	lookAtPlayer(); //rotates matrix so that it looks at the player in x and z coords
 	vec3f radius = vec3f(model.modelWidth*scale.x,
 						 model.modelHeight*scale.y,
 						 model.modelDepth*scale.z)*0.5f;
-	modelMatrix.translate(-radius.x,-radius.y,-radius.z); //translate to center, after rotation
-	modelMatrix.scale(scale.x,scale.y,scale.z);
+	modelMatrix = glm::translate(modelMatrix,vec3f(-radius.x,-radius.y,-radius.z)); //translate to center, after rotation
+	modelMatrix = glm::scale(modelMatrix,vec3f(scale.x,scale.y,scale.z));
 }
 
 Model Skeleton::model;

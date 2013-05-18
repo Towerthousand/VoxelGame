@@ -39,10 +39,10 @@ ChunkGenerator::ChunkGenerator(SceneMain* scene, int seed) :
 
 	std::thread thread(&ChunkGenerator::threadedChunkManagement,this);
 	thread.detach();
-	std::thread thread2(&ChunkGenerator::threadedChunkManagement,this);
-	thread2.detach();
-	std::thread thread3(&ChunkGenerator::threadedChunkManagement,this);
-	thread3.detach();
+//	std::thread thread2(&ChunkGenerator::threadedChunkManagement,this);
+//	thread2.detach();
+//	std::thread thread3(&ChunkGenerator::threadedChunkManagement,this);
+//	thread3.detach();
 }
 
 ChunkGenerator::~ChunkGenerator() {
@@ -51,7 +51,7 @@ ChunkGenerator::~ChunkGenerator() {
 
 bool ChunkGenerator::queueChunk(vec3i chunk) { //chunkgrid coords
 	//1. delete the chunk that is in the place of the new chunk and assign pointer to null
-	vec3f chunkIndex = parentScene->getWorld().getCoords(chunk*CHUNKSIZE).first;
+	vec3i chunkIndex = parentScene->getWorld().getCoords(chunk*CHUNKSIZE).first;
 	if(parentScene->getWorld()(chunkIndex) != NULL) {
 		delete parentScene->getWorld()(chunkIndex);
 		parentScene->getWorld()(chunkIndex) = NULL;

@@ -60,7 +60,7 @@ bool Player::insideFrustum( const vec3f &center, float radius) const {
 		vec3f v = frustumPlanes[i][1]-frustumPlanes[i][0];
 		vec3f u = frustumPlanes[i][2]-frustumPlanes[i][0];
 		u = glm::normalize(u);
-		u = glm::normalize(v);
+		v = glm::normalize(v);
 		vec3f n = glm::cross(v,u); //normal n = (Ax,By,Cz), point [0] = (p1,p2,p3)
 		n = glm::normalize(n);
 		D = glm::dot(-n,frustumPlanes[i][0]); //A*p1*x + B*p2*y + C*p3*z + D = 0 => D = -dot(n,P)
@@ -106,16 +106,16 @@ void Player::makeFrustum() {
 	fc = camPos - dir * ZFAR;
 
 	// compute the 4 corners of the frustum on the near plane
-	ntl = nc + up * nh - side * nw;
-	ntr = nc + up * nh + side * nw;
-	nbl = nc - up * nh - side * nw;
-	nbr = nc - up * nh + side * nw;
+	ntl = nc + (up * nh) - (side * nw);
+	ntr = nc + (up * nh) + (side * nw);
+	nbl = nc - (up * nh) - (side * nw);
+	nbr = nc - (up * nh) + (side * nw);
 
 	// compute the 4 corners of the frustum on the far plane
-	ftl = fc + up * fh - side * fw;
-	ftr = fc + up * fh + side * fw;
-	fbl = fc - up * fh - side * fw;
-	fbr = fc - up * fh + side * fw;
+	ftl = fc + (up * fh) - (side * fw);
+	ftr = fc + (up * fh) + (side * fw);
+	fbl = fc - (up * fh) - (side * fw);
+	fbr = fc - (up * fh) + (side * fw);
 
 	// compute the six planes
 	frustumPlanes[TOP][0] = ntl;

@@ -100,12 +100,6 @@ std::pair<vec3i,vec3i> World::getCoords(vec3i coord) {
 	return getCoords(coord.x,coord.y,coord.z);
 }
 
-struct Compare {
-		bool operator()(const std::pair<float,vec3i> &a, const std::pair<float,vec3i> &b) {
-			return (a.second.x < b.second.x);
-		}
-};
-
 void World::update(float deltaTime) {
 	//updateStuff(deltaTime);
 	chunkGen.chunkMutex.lock();
@@ -115,17 +109,17 @@ void World::update(float deltaTime) {
 		newChunk->initBuffer();
 		vec3i matrixCoords = getCoords(newChunk->getPos()).first;
 		(*this)(matrixCoords) = newChunk;
-		calculateLight(newChunk->getPos() + vec3i(CHUNKSIZE/2),CHUNKSIZE/2);
+		calculateLight(newChunk->getPos() + vec3i(CHUNKSIZE*0.5),CHUNKSIZE*0.5 -1);
 	}
 	chunkGen.chunkMutex.unlock();
 	vec3i playerChunkPos = vec3i(std::floor(player->pos.x),std::floor(player->pos.y),std::floor(player->pos.z))/CHUNKSIZE;
-	std::priority_queue<std::pair<float,vec3i>, std::vector<std::pair<float,vec3i> >, Compare > queue;
+	std::priority_queue<std::pair<float,vec3i>, std::vector<std::pair<float,vec3i> >, FunctorCompare > queue;
 	for (int x = -WORLDWIDTH/2; x < WORLDWIDTH/2; ++x)
 		for (int y = -WORLDHEIGHT/2; y < WORLDHEIGHT/2; ++y)
 			for (int z = -WORLDWIDTH/2; z < WORLDWIDTH/2; ++z){
 				vec3i chunkPos(playerChunkPos.x+x,playerChunkPos.y+y,playerChunkPos.z+z);
 				std::pair<vec3i,vec3i> matrixCoords = getCoords(chunkPos*CHUNKSIZE);
-				float dist = std::fabs(glm::length(vec3f(CHUNKSIZE*chunkPos) - player->pos));
+				float dist = glm::length(vec3f(CHUNKSIZE*chunkPos) - player->pos);
 				if((*this)(matrixCoords.first) != NULL){
 					if((*this)(matrixCoords.first)->XPOS != chunkPos.x ||
 					   (*this)(matrixCoords.first)->YPOS != chunkPos.y ||

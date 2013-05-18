@@ -29,27 +29,26 @@ void Polla::draw() const{
 
 void Polla::updateMatrix() {
 	if(!hitbox.collidesWithWorld()) {
-		modelMatrix = mat4f::fromIdentity();
-		modelMatrix.translate(pos.x,pos.y,pos.z);
+		modelMatrix = glm::translate(mat4f(1.0),vec3f(pos.x,pos.y,pos.z));
 		//rotation
 		vec3f dummyUp(0,1,0);
-		if((dummyUp^vel).module() != 0) {
+		if(glm::length(glm::cross(dummyUp,vel)) != 0) {
 			vec3f back = -vel;
-			back.normalize();
-			vec3f right = dummyUp^back;
-			right.normalize();
-			vec3f up = back^right;
-			up.normalize();
-			modelMatrix *= mat4f(right.x, up.x, back.x, 0,
-								 right.y, up.y, back.y, 0,
-								 right.z, up.z, back.z, 0,
-								 0      , 0   , 0     , 1);
+			back = glm::normalize(back);
+			vec3f right = glm::cross(dummyUp,back);
+			back = glm::normalize(back);
+			vec3f up = glm::cross(back,right);
+			up = glm::normalize(up);
+			modelMatrix *= mat4f(right.x, right.y, right.z, 0,
+								 up.x   , up.y   , up.z   , 0,
+								 back.x , back.y , back.z , 0,
+								 0      , 0      , 0      , 1);
 		}
 		vec3f radius = vec3f(model.modelWidth*scale.x,
 							 model.modelHeight*scale.y,
 							 model.modelDepth*scale.z)*0.5f;
-		modelMatrix.translate(-radius.x,-radius.y,-radius.z); //translate to center, after rotation
-		modelMatrix.scale(scale.x,scale.y,scale.z);
+		modelMatrix = glm::translate(modelMatrix,vec3f(-radius.x,-radius.y,-radius.z)); //translate to center, after rotation
+		modelMatrix = glm::scale(modelMatrix,vec3f(scale.x,scale.y,scale.z));
 	}
 }
 
