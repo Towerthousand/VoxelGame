@@ -108,9 +108,9 @@ std::string toString(float num);
 #define WORLDHEIGHT_MASK 15 //WORLDHEIGHT -1
 
 //light settings
-#define MAXLIGHT 20
+#define MAXLIGHT 16
 #define MINLIGHT 3
-#define UPDATERADIUS 17.0f //How many potential light blocks does changing a block affect? Not taking into account skylight.
+#define UPDATERADIUS 13.0f //How many potential light blocks does changing a block affect? Not taking into account skylight.
 
 //frustum settings
 #define FOV 60.0f //degrees

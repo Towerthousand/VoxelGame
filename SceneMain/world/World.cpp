@@ -142,17 +142,17 @@ void World::update(float deltaTime) {
 
 void World::draw() const {
 	parentScene->chunksDrawn = 0;
-	//empty culling
+	//empty and frustum culling
 	for (int x = 0; x < WORLDWIDTH; ++x)
 		for (int y = 0; y < WORLDHEIGHT; ++y)
 			for (int z = 0; z < WORLDWIDTH; ++z)
 				if((*this)(x,y,z) != NULL) {
 					vec3f center((*this)(x,y,z)->getPos() + vec3i(CHUNKSIZE/2));
-					if ((*this)(x,y,z)->vertexCount == 0)
+					if ((*this)(x,y,z)->vertexCount == 0) //nothing to draw
 						(*this)(x,y,z)->outOfView = true;
-					else if (glm::length(player->pos - center) < CHUNKSIZE*5)
-						(*this)(x,y,z)->outOfView = false;
-					else
+//					else if (glm::length(player->pos - center) < CHUNKSIZE*5)
+//						(*this)(x,y,z)->outOfView = false; //this is because of a glitch with near chunks
+					else //check if it's actually inside of view
 						(*this)(x,y,z)->outOfView = !player->insideFrustum(center,sqrt(3*((CHUNKSIZE/2)*(CHUNKSIZE/2))));
 				}
 
@@ -311,20 +311,23 @@ void World::traceView(const Player *playerCam, float tMax) {
 void World::calculateLight(vec3i source, int radius) { //BFS
 	sf::Clock clock;
 	clock.restart();
+	int updateRad = radius + 1; //if any component distance >= updateRad, lighting is OK
 	std::vector<vec3i> blocksToCheck[MAXLIGHT+1];
-	for(int x = source.x-radius; x <= source.x+radius; ++x) {
-		for(int y = source.y-radius; y <= source.y+radius; ++y) {
-			for(int z = source.z-radius; z <= source.z+radius; ++z) {
+	for(int x = source.x-updateRad; x <= source.x+updateRad; ++x) {
+		for(int y = source.y-updateRad; y <= source.y+updateRad; ++y) {
+			for(int z = source.z-updateRad; z <= source.z+updateRad; ++z) {
 				if (!getOutOfBounds(x,y,z)){
 					std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
 					Chunk* chunk = (*this)(matrixCoords.first);
-					Cube* cube = &chunk->cubes[matrixCoords.second.x*CHUNKSIZE*CHUNKSIZE+matrixCoords.second.y*CHUNKSIZE+matrixCoords.second.z];
+					Cube* cube = &chunk->cubes[matrixCoords.second.x*CHUNKSIZE*CHUNKSIZE
+								 +matrixCoords.second.y*CHUNKSIZE
+								 +matrixCoords.second.z];
 					if(chunk != NULL) {
 						switch(cube->ID) {
 							case 0: //air
-								if (x == source.x-radius || x == source.x+radius
-									||y == source.y-radius || y == source.y+radius
-									||z == source.z-radius || z == source.z+radius) { //if it is on border, mark it as node
+								if (x == source.x-updateRad || x == source.x+updateRad
+									||y == source.y-updateRad || y == source.y+updateRad
+									||z == source.z-updateRad || z == source.z+updateRad) { //if it is on border, mark it as node
 									if (cube->light > MINLIGHT)
 										blocksToCheck[cube->light].push_back(vec3i(x,y,z));
 								}
@@ -360,7 +363,7 @@ void World::calculateLight(vec3i source, int radius) { //BFS
 void World::calculateLightManhattan(vec3i source, int radius) { //BFS
 	sf::Clock clock;
 	clock.restart();
-	int updateRad = radius + 1; //if manhattan dist == updateRad, lighting is OK
+	int updateRad = radius + 1; //if manhattan dist >= updateRad, lighting is OK
 	std::vector<vec3i>  blocksToCheck[MAXLIGHT+1];
 	for(int x = source.x-updateRad; x < source.x+updateRad; ++x) {
 		for(int y = source.y-updateRad; y < source.y+updateRad; ++y) {
@@ -369,7 +372,9 @@ void World::calculateLightManhattan(vec3i source, int radius) { //BFS
 				if (manhattanDistance <= updateRad && !getOutOfBounds(x,y,z)){
 					std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
 					Chunk* chunk = (*this)(matrixCoords.first);
-					Cube* cube = &chunk->cubes[matrixCoords.second.x*CHUNKSIZE*CHUNKSIZE+matrixCoords.second.y*CHUNKSIZE+matrixCoords.second.z];
+					Cube* cube = &chunk->cubes[matrixCoords.second.x*CHUNKSIZE*CHUNKSIZE
+								 +matrixCoords.second.y*CHUNKSIZE
+								 +matrixCoords.second.z];
 					if(chunk != NULL) {
 						switch(cube->ID) {
 							case 0: //air
