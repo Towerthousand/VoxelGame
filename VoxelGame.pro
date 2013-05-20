@@ -25,6 +25,7 @@ SOURCES += \
     $$PWD/SceneMain/Hitbox.cpp \
     $$PWD/SceneMain/world/Chunk.cpp \
     $$PWD/SceneMain/world/World.cpp \
+    $$PWD/SceneMain/world/SkyMap.cpp \
     $$PWD/SceneMain/entities/Entity.cpp \
     $$PWD/SceneMain/entities/Camera.cpp \
     $$PWD/SceneMain/entities/Player.cpp \
@@ -65,6 +66,7 @@ HEADERS += \
     $$PWD/SceneMain/Hitbox.hpp \
     $$PWD/SceneMain/world/Chunk.hpp \
     $$PWD/SceneMain/world/World.hpp \
+    $$PWD/SceneMain/world/SkyMap.hpp \
     $$PWD/SceneMain/entities/Entity.hpp \
     $$PWD/SceneMain/entities/Camera.hpp \
     $$PWD/SceneMain/entities/Player.hpp \
@@ -87,7 +89,7 @@ HEADERS += \
     $$PWD/SceneMain/world/generator/Function2DSimplex.hpp \
     $$PWD/SceneMain/world/generator/FunctionTerrainHeightmap.hpp \
     $$PWD/SceneMain/world/generator/FunctionTerrainJoin.hpp \
-    $$PWD/glm/*
+    $$PWD/glm/*.hpp
 
 OTHER_FILES += \
     $$PWD/shaders/terrain_fragment.glsl \

@@ -70,8 +70,6 @@ void Game::update(float deltaTime) {
 		currentScene = nextScene;
 		nextScene = NULL;
 		if (!currentScene->init()) {
-			delete currentScene;
-			currentScene = NULL;
 			close();
 		}
 	}
@@ -193,8 +191,7 @@ void Game::onMouseMoved(float deltaTime, int dx, int dy) {
 // Whenever you wnat to end the game, you must call this function, not the Scene's onClose(); method
 // End game-wide stuff here
 void Game::close() {
-	if (currentScene != NULL)
-	{
+	if (currentScene != NULL) {
 		currentScene->onClose();
 		delete currentScene;
 		currentScene = NULL;
