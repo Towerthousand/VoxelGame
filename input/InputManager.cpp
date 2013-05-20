@@ -53,11 +53,9 @@ void InputManager::setMousePos(int x, int y) {
 	mouseDisplacement = vec2i(0,0);
 }
 
-void InputManager::resizeWindow(int newHeight, int newWidth) {
+void InputManager::resizeWindow(int newHeight, int newWidth, mat4f& mat) {
 	SCRWIDTH = newWidth;
 	SCRHEIGHT = newHeight;
 	glViewport(0, 0, SCRWIDTH, SCRHEIGHT);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(FOV, float(SCRWIDTH)/float(SCRHEIGHT), ZNEAR, ZFAR);
+	mat = glm::perspective(FOV,float(SCRWIDTH)/float(SCRHEIGHT), ZNEAR, ZFAR);
 }

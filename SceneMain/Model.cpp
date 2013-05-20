@@ -67,6 +67,7 @@ void Model::draw() const {
 	glEnable(GL_TEXTURE_2D);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 

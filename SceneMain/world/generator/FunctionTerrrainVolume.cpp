@@ -14,7 +14,7 @@ ID3Data FunctionTerrrainVolume::getID3Data(int x, int y, int z, int sx, int sy, 
 	for(int i = 0; i < sx; ++i)
 		for(int j = 0; j < sy; ++j)
 			for(int k = 0; k < sz; ++k) {
-				if (sourceData[i][j][k] < 0)
+				if (sourceData[i][j][k] <= 0)
 					result[i][j][k] = 0;
 				else
 					result[i][j][k] = blockID;

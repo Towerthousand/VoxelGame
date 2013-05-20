@@ -88,7 +88,8 @@ void Game::update(float deltaTime) {
 				close();
 				break;
 			case sf::Event::Resized:
-				inputManager.resizeWindow(event.size.height,event.size.width);
+				inputManager.resizeWindow(event.size.height,event.size.width,
+										  renderState.projection);
 				break;
 			case sf::Event::GainedFocus:
 				inputManager.gainFocus();

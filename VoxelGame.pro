@@ -24,7 +24,7 @@ SOURCES += \
     $$PWD/SceneMain/Model.cpp \
     $$PWD/SceneMain/Hitbox.cpp \
     $$PWD/SceneMain/world/Chunk.cpp \
-	$$PWD/SceneMain/world/World.cpp \
+    $$PWD/SceneMain/world/World.cpp \
     $$PWD/SceneMain/entities/Entity.cpp \
     $$PWD/SceneMain/entities/Camera.cpp \
     $$PWD/SceneMain/entities/Player.cpp \
@@ -32,24 +32,23 @@ SOURCES += \
     $$PWD/SceneMain/entities/items/Polla.cpp \
     $$PWD/SceneMain/entities/enemies/Enemy.cpp \
     $$PWD/SceneMain/entities/enemies/Skeleton.cpp \
-	$$PWD/SceneMain/world/generator/ChunkGenerator.cpp \
-	$$PWD/SceneMain/world/generator/Function3DSimplex.cpp \
-	$$PWD/SceneMain/world/generator/Function3DYcoord.cpp \
-	$$PWD/SceneMain/world/generator/Function3DAdd.cpp \
-	$$PWD/SceneMain/world/generator/Function3DSub.cpp \
-	$$PWD/SceneMain/world/generator/Function2DConst.cpp \
-	$$PWD/SceneMain/world/generator/Function3DDiv.cpp \
-	$$PWD/SceneMain/world/generator/FunctionTerrrainVolume.cpp \
-	$$PWD/SceneMain/world/generator/FunctionTerrainOverlay.cpp \
-	$$PWD/SceneMain/world/generator/Function2DSimplex.cpp \
-	$$PWD/SceneMain/world/generator/FunctionTerrainHeightmap.cpp \
-	$$PWD/SceneMain/world/generator/FunctionTerrainJoin.cpp
+    $$PWD/SceneMain/world/generator/ChunkGenerator.cpp \
+    $$PWD/SceneMain/world/generator/Function3DSimplex.cpp \
+    $$PWD/SceneMain/world/generator/Function3DYcoord.cpp \
+    $$PWD/SceneMain/world/generator/Function3DAdd.cpp \
+    $$PWD/SceneMain/world/generator/Function3DSub.cpp \
+    $$PWD/SceneMain/world/generator/Function2DConst.cpp \
+    $$PWD/SceneMain/world/generator/Function3DDiv.cpp \
+    $$PWD/SceneMain/world/generator/FunctionTerrrainVolume.cpp \
+    $$PWD/SceneMain/world/generator/FunctionTerrainOverlay.cpp \
+    $$PWD/SceneMain/world/generator/Function2DSimplex.cpp \
+    $$PWD/SceneMain/world/generator/FunctionTerrainHeightmap.cpp \
+    $$PWD/SceneMain/world/generator/FunctionTerrainJoin.cpp
 
 HEADERS += \
     $$PWD/Scene.hpp \
     $$PWD/Game.hpp \
     $$PWD/tools.hpp \
-    $$PWD/BudMath.hpp \
     $$PWD/RenderState.hpp \
     $$PWD/graphics/FontManager.hpp \
     $$PWD/graphics/Texture.hpp \
@@ -65,7 +64,7 @@ HEADERS += \
     $$PWD/SceneMain/Model.hpp \
     $$PWD/SceneMain/Hitbox.hpp \
     $$PWD/SceneMain/world/Chunk.hpp \
-	$$PWD/SceneMain/world/World.hpp \
+    $$PWD/SceneMain/world/World.hpp \
     $$PWD/SceneMain/entities/Entity.hpp \
     $$PWD/SceneMain/entities/Camera.hpp \
     $$PWD/SceneMain/entities/Player.hpp \
@@ -73,24 +72,25 @@ HEADERS += \
     $$PWD/SceneMain/entities/items/Polla.hpp \
     $$PWD/SceneMain/entities/enemies/Enemy.hpp \
     $$PWD/SceneMain/entities/enemies/Skeleton.hpp \
-	$$PWD/SceneMain/world/generator/ChunkGenerator.hpp \
-	$$PWD/SceneMain/world/generator/Function3D.hpp \
-	$$PWD/SceneMain/world/generator/Function2D.hpp \
-	$$PWD/SceneMain/world/generator/Function3DSimplex.hpp \
-	$$PWD/SceneMain/world/generator/Function3DYcoord.hpp \
-	$$PWD/SceneMain/world/generator/Function3DAdd.hpp \
-	$$PWD/SceneMain/world/generator/Function3DSub.hpp \
-	$$PWD/SceneMain/world/generator/Function2DConst.hpp \
-	$$PWD/SceneMain/world/generator/Function3DDiv.hpp \
-	$$PWD/SceneMain/world/generator/FunctionTerrain.hpp \
-	$$PWD/SceneMain/world/generator/FunctionTerrrainVolume.hpp \
-	$$PWD/SceneMain/world/generator/FunctionTerrainOverlay.hpp \
-	$$PWD/SceneMain/world/generator/Function2DSimplex.hpp \
-	$$PWD/SceneMain/world/generator/FunctionTerrainHeightmap.hpp \
-	$$PWD/SceneMain/world/generator/FunctionTerrainJoin.hpp \
-	$$PWD/glm/glm.hpp
+    $$PWD/SceneMain/world/generator/ChunkGenerator.hpp \
+    $$PWD/SceneMain/world/generator/Function3D.hpp \
+    $$PWD/SceneMain/world/generator/Function2D.hpp \
+    $$PWD/SceneMain/world/generator/Function3DSimplex.hpp \
+    $$PWD/SceneMain/world/generator/Function3DYcoord.hpp \
+    $$PWD/SceneMain/world/generator/Function3DAdd.hpp \
+    $$PWD/SceneMain/world/generator/Function3DSub.hpp \
+    $$PWD/SceneMain/world/generator/Function2DConst.hpp \
+    $$PWD/SceneMain/world/generator/Function3DDiv.hpp \
+    $$PWD/SceneMain/world/generator/FunctionTerrain.hpp \
+    $$PWD/SceneMain/world/generator/FunctionTerrrainVolume.hpp \
+    $$PWD/SceneMain/world/generator/FunctionTerrainOverlay.hpp \
+    $$PWD/SceneMain/world/generator/Function2DSimplex.hpp \
+    $$PWD/SceneMain/world/generator/FunctionTerrainHeightmap.hpp \
+    $$PWD/SceneMain/world/generator/FunctionTerrainJoin.hpp \
+    $$PWD/glm/*
+
 OTHER_FILES += \
-	$$PWD/shaders/terrain_fragment.glsl \
-	$$PWD/shaders/terrain_vertex.glsl \
-	$$PWD/shaders/model_vertex.glsl \
-	$$PWD/shaders/model_fragment.glsl
+    $$PWD/shaders/terrain_fragment.glsl \
+    $$PWD/shaders/terrain_vertex.glsl \
+    $$PWD/shaders/model_vertex.glsl \
+    $$PWD/shaders/model_fragment.glsl

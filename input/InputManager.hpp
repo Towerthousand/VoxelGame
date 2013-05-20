@@ -16,7 +16,7 @@ class InputManager {
 		void gainFocus();
 		void loseFocus();
 
-		void resizeWindow(int newHeight, int newWidth);
+		void resizeWindow(int newHeight, int newWidth, mat4f &mat);
 
 		void update();
 

@@ -8,8 +8,7 @@ World::World(SceneMain* parentScene, Player* player) :
 	playerTargetsBlock(false), targetedBlock(0,0,0),
 	last(0,0,0), parentScene(parentScene), player(player),
 	chunkGen(parentScene, rand()),
-	chunks(WORLDWIDTH*WORLDWIDTH*WORLDHEIGHT,NULL),
-	updateStuffTimer(0.0) {
+	chunks(WORLDWIDTH*WORLDWIDTH*WORLDHEIGHT,NULL) {
 }
 
 World::~World() {
@@ -101,7 +100,6 @@ std::pair<vec3i,vec3i> World::getCoords(vec3i coord) {
 }
 
 void World::update(float deltaTime) {
-	//updateStuff(deltaTime);
 	chunkGen.chunkMutex.lock();
 	while(!chunkGen.chunksLoaded.empty()) {
 		Chunk* newChunk = chunkGen.chunksLoaded.front();
@@ -310,8 +308,7 @@ void World::traceView(const Player *playerCam, float tMax) {
 	playerTargetsBlock = false;
 }
 
-void World::calculateLight(vec3i source, int radius) {
-	//BFS TO THE MAX
+void World::calculateLight(vec3i source, int radius) { //BFS
 	sf::Clock clock;
 	clock.restart();
 	std::vector<vec3i> blocksToCheck[MAXLIGHT+1];
@@ -327,8 +324,7 @@ void World::calculateLight(vec3i source, int radius) {
 							case 0: //air
 								if (x == source.x-radius || x == source.x+radius
 									||y == source.y-radius || y == source.y+radius
-									||z == source.z-radius || z == source.z+radius) {
-									//if it is on border, mark it as node
+									||z == source.z-radius || z == source.z+radius) { //if it is on border, mark it as node
 									if (cube->light > MINLIGHT)
 										blocksToCheck[cube->light].push_back(vec3i(x,y,z));
 								}
@@ -361,24 +357,23 @@ void World::calculateLight(vec3i source, int radius) {
 	}
 }
 
-void World::calculateLightManhattan(vec3i source, int radius) {
-	//BFS TO THE MAX
+void World::calculateLightManhattan(vec3i source, int radius) { //BFS
 	sf::Clock clock;
 	clock.restart();
+	int updateRad = radius + 1; //if manhattan dist == updateRad, lighting is OK
 	std::vector<vec3i>  blocksToCheck[MAXLIGHT+1];
-	for(int x = source.x-radius; x <= source.x+radius; ++x) {
-		for(int y = source.y-radius; y <= source.y+radius; ++y) {
-			for(int z = source.z-radius; z <= source.z+radius; ++z) {
+	for(int x = source.x-updateRad; x < source.x+updateRad; ++x) {
+		for(int y = source.y-updateRad; y < source.y+updateRad; ++y) {
+			for(int z = source.z-updateRad; z < source.z+updateRad; ++z) {
 				int manhattanDistance = std::abs(x-source.x)+std::abs(y-source.y)+std::abs(z-source.z);
-				if (manhattanDistance <= radius+1 && !getOutOfBounds(x,y,z)){
+				if (manhattanDistance <= updateRad && !getOutOfBounds(x,y,z)){
 					std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
 					Chunk* chunk = (*this)(matrixCoords.first);
 					Cube* cube = &chunk->cubes[matrixCoords.second.x*CHUNKSIZE*CHUNKSIZE+matrixCoords.second.y*CHUNKSIZE+matrixCoords.second.z];
 					if(chunk != NULL) {
 						switch(cube->ID) {
 							case 0: //air
-								if (manhattanDistance == radius+1) {
-									//if it is on border, mark it as node
+								if (manhattanDistance == updateRad) { //if it is on border, mark it as node
 									if (cube->light > MINLIGHT)
 										blocksToCheck[cube->light].push_back(vec3i(x,y,z));
 								}
@@ -425,21 +420,6 @@ void World::processCubeLighting(const vec3i& source, const vec3i& offset, std::v
 	}
 }
 
-void World::updateStuff(float deltaTime) { //only to be called by world.update()
-	//	if (updateStuffTimer >= 0.01) { //grass thingy
-	//		updateStuffTimer-= 0.01;
-	//		for(int i = 0; i < 10; ++i) {
-	//			int x = rand()%(CHU NKSIZE*WORLDWIDTH);
-	//			int y = rand()%(CHUNKSIZE*WORLDHEIGHT);
-	//			int z = rand()%(CHUNKSIZE*WORLDWIDTH);
-	//			if (getCube(x,y+1,z).ID != 0 && getCube(x,y,z).ID == 3) {
-	//				setCubeID(x,y,z,1);
-	//			}
-	//		}
-	//	}
-	//	updateStuffTimer += deltaTime;
-}
-
 void World::drawWireCube(const vec3f &pos) const {
 	mat4f poppedMat = parentScene->getState().model;
 	parentScene->getState().model =
@@ -453,7 +433,7 @@ void World::drawWireCube(const vec3f &pos) const {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glColor4f(0.0,0.0,0.0,0.5);
 	glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
-	//glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
+	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glColor4f(1.0,1.0,1.0,1.0);
 	parentScene->getState().model = poppedMat;

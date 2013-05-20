@@ -46,26 +46,22 @@ class World {
 		//this should go in graphic utils or something
 		void drawWireCube(const vec3f& pos) const;
 
-		//lololol shouldn't be public, fix it! It is accessed by the chunk generator
-		void calculateLight(vec3i source, int radius);
-		void calculateLightManhattan(vec3i source, int radius);
-
 		bool playerTargetsBlock;
 		vec3f targetedBlock;
 		vec3f last;
 
 	private:
+		//Lighting
+		void calculateLight(vec3i source, int radius);
+		void calculateLightManhattan(vec3i source, int radius);
+
 		//BFS Helper functions
 		void processCubeLighting(const vec3i& source, const vec3i& offset, std::vector<vec3i> &queue);
-
-		//Logic chunk updating (called by this->update(deltaTime))
-		void updateStuff(float deltaTime);
 
 		SceneMain* parentScene;
 		Player* player;
 		ChunkGenerator chunkGen;
 		std::vector<Chunk*> chunks;
-		float updateStuffTimer;
 		static const int vertexPoints[8][3];
 		static const int indexes[24];
 };

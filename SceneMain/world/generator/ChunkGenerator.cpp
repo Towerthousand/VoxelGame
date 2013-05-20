@@ -39,14 +39,14 @@ ChunkGenerator::ChunkGenerator(SceneMain* scene, int seed) :
 
 	std::thread thread(&ChunkGenerator::threadedChunkManagement,this);
 	thread.detach();
-//	std::thread thread2(&ChunkGenerator::threadedChunkManagement,this);
-//	thread2.detach();
-//	std::thread thread3(&ChunkGenerator::threadedChunkManagement,this);
-//	thread3.detach();
+	std::thread thread2(&ChunkGenerator::threadedChunkManagement,this);
+	thread2.detach();
+	std::thread thread3(&ChunkGenerator::threadedChunkManagement,this);
+	thread3.detach();
 }
 
 ChunkGenerator::~ChunkGenerator() {
-	//delete entry; //will delete all child node functions recursively into the function tree
+	delete entry; //will delete all child node functions recursively into the function tree
 }
 
 bool ChunkGenerator::queueChunk(vec3i chunk) { //chunkgrid coords
@@ -62,15 +62,15 @@ bool ChunkGenerator::queueChunk(vec3i chunk) { //chunkgrid coords
 		for(std::list<Chunk*>::iterator it = chunksLoaded.begin();it != chunksLoaded.end(); ++it)
 			if(vec3i((*it)->XPOS,(*it)->YPOS,(*it)->ZPOS) == chunk) {
 				chunkMutex.unlock();
-				return false;//chunk has been already generated but not picked up
+				return false;//chunk was already generated but not picked up yet
 			}
 		chunksToLoad.insert(chunk);
 		chunksToLoadQueue.push(chunk);
 		chunkMutex.unlock();
-		return true;
+		return true; //chunk is now queued
 	}
 	chunkMutex.unlock();
-	return false; //chunk has been already queued
+	return false; //chunk was already queued
 }
 
 void ChunkGenerator::threadedChunkManagement() {

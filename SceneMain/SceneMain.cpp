@@ -105,8 +105,7 @@ void SceneMain::update(float deltaTime) {
 
 void SceneMain::draw() const {
 	//calculate perspective matrix
-	getState().projection = glm::perspectiveFov(FOV,float(SCRWIDTH),
-												float(SCRHEIGHT),ZNEAR,ZFAR);
+	getState().projection = glm::perspective(FOV,float(SCRWIDTH)/float(SCRHEIGHT),ZNEAR,ZFAR);
 	//Move matrix to position (according to player)
 	getState().view = player->viewMatrix;
 	//Draw all the stuff

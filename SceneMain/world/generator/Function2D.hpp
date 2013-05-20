@@ -11,7 +11,7 @@ class Function2D : public Function3D{ //abstract
 		//data returned must be sx by sy
 		virtual float3Data getFloat3Data(int x, int y, int z, int sx, int sy, int sz) {
 			float2Data layer = getFloat2Data(x,z,sx,sz);
-			float3Data result(sx,float2Data(sy,std::vector<float>(sz,0.0)));
+			float3Data result(sx,float2Data(sy,float1Data(sz,0.0)));
 			for(int i = 0; i < sx; ++i)
 				for(int j = 0; j < sy; ++j)
 					for(int k = 0; k < sz; ++k)

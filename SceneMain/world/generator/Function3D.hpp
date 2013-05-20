@@ -2,8 +2,10 @@
 #define FUNCTION3D_HPP
 #include "tools.hpp"
 
-typedef std::vector<std::vector<std::vector<float> > > float3Data;
-typedef std::vector<std::vector<float> > float2Data;
+typedef double floatType; //put double here for more precision in world gen.
+typedef std::vector<std::vector<std::vector<floatType> > > float3Data;
+typedef std::vector<std::vector<floatType> > float2Data;
+typedef std::vector<floatType> float1Data;
 
 class Function3D { //abstract
 	public:
