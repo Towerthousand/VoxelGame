@@ -1,13 +1,14 @@
 #include "ShaderProgram.hpp"
 
 ShaderProgram::ShaderProgram() {
+	programHandle = 0;
 }
 
 ShaderProgram::~ShaderProgram() {
 }
 
 bool ShaderProgram::makeProgram(const std::string& filePathVertex, const std::string& filePathFragment) {
-	glDeleteProgram(programHandle);
+	if (programHandle != 0) glDeleteProgram(programHandle);
 	programHandle = 0;
 	outLog("* Loading new vertex shader from " + filePathVertex);
 	if (!vertex.loadFromFile(GL_VERTEX_SHADER,filePathVertex))
@@ -24,6 +25,10 @@ bool ShaderProgram::makeProgram(const std::string& filePathVertex, const std::st
 	glGetProgramiv(programHandle, GL_LINK_STATUS, &linked);
 	if (!linked) {
 		outLog("#ERROR Failed to link shader program");
+		int size;
+		char buffer[1000];
+		glGetProgramInfoLog(programHandle, 1000, &size, buffer);
+		outLog(buffer);
 		glDeleteProgram(programHandle);
 		return false;
 	}
