@@ -1,6 +1,7 @@
 #include "Shader.hpp"
 
 Shader::Shader() {
+	shaderHandle = 0;
 }
 
 Shader::~Shader() {
@@ -11,7 +12,7 @@ GLuint& Shader::getHandle() {
 }
 
 bool Shader::loadFromFile(GLenum type, const std::string& filePath) {
-	glDeleteShader(shaderHandle);
+	if (shaderHandle) glDeleteShader(shaderHandle);
 	shaderHandle = 0;
 	//Load
 	std::vector<char> fileContents;
@@ -25,13 +26,19 @@ bool Shader::loadFromFile(GLenum type, const std::string& filePath) {
 //	for (int i = 0; i < fileContents.size(); ++i) //output shader
 //		std::cout << fileContents[i];
 //	std::cout << std::endl;
-	glShaderSource(shaderHandle, 1, (const GLchar**)&fileContents, &length);
+	GLchar* a[1];
+	a[0] = &(fileContents[0]);
+	glShaderSource(shaderHandle, 1, (const GLchar**)a, &length);
 	//Compile
 	glCompileShader(shaderHandle);
 	int compiled;
 	glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &compiled);
 	if (!compiled) {
 		outLog( "#ERROR Failed to compile: " + filePath);
+		int size;
+		char buffer[1000];
+		glGetShaderInfoLog(shaderHandle, 1000, &size, buffer);
+		outLog(buffer);
 		glDeleteShader(shaderHandle);
 		return false;
 	}
