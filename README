@@ -1,1 +1,8 @@
-Towerthousand's public repo for minecraft copycat, VoxelGame.
+THIS IS A TEST REPO AND PROBABLY WON'T WORK. I'm about to make a "production" 
+repo for this project since I've gotten a decent amount of people asking how
+to compile it. 
+When I have the next stable release (probably tomorrow) I will make a test 
+branch and leave the master one only for stable releases (stable as in "it 
+compiles, runs, has no major bugs, no features taken out, and code is 
+moderately clean")
+
