@@ -26,17 +26,24 @@ int const &skyMap::operator()(vec2i coord) const {
 }
 
 bool skyMap::updateValues(Chunk *c) {
-	bool result = true;
-	for(int x = 0; x < CHUNKSIZE; ++x)
+	bool result = false;
+	for(int x = 0; x < CHUNKSIZE; ++x) {
 		for(int z = 0; z < CHUNKSIZE; ++z) {
 			int lowPos = c->YPOS*CHUNKSIZE;
 			if((*this)(x,z) < (lowPos+CHUNKSIZE)) {
-				for(int y = CHUNKSIZE-1; y >= 0 && lowPos+y >= values[x*CHUNKSIZE+z]; --y) {
-					if((*c)(x,y,z).ID != 0) {
-						values[x*CHUNKSIZE+z] = lowPos + y;
+				int ind = x*CHUNKSIZE+z;
+				for(int y = CHUNKSIZE-1; y >= 0 && lowPos+y >= values[ind]; --y) {
+					if (lowPos+y == values[ind]) {
+						if((*c)(x,y,z).ID == 0)
+							outLog("#ERROR CHUNK WAS MODIFIED OUT OF APPLICATION");
+					}
+					else if((*c)(x,y,z).ID != 0) {
+						values[ind] = lowPos + y;
 						result = true;
 					}
 				}
 			}
 		}
+	}
+	return result;
 }

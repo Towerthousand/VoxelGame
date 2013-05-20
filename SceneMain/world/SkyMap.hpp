@@ -14,7 +14,7 @@ class skyMap {
 		int const &operator()(int x, int z) const;
 		int const &operator()(vec2i coord) const;
 
-		bool updateValues(Chunk* c);
+		bool updateValues(Chunk* c); //returns wether there was a change
 
 	private:
 		std::vector<int> values;

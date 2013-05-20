@@ -10,8 +10,6 @@ Game::Game() : currentScene(NULL), nextScene(NULL) {
 }
 
 Game::~Game() {
-	//GAME DESTRUCTOR is actually a really cool name for the ultimate boss of a geeky
-	//game about metagame. Nais. GAME CONSTRUCTOR is not a good hero name, though.
 }
 
 // Init non-resource, general game frame stuff here.
@@ -47,7 +45,7 @@ bool Game::loadResources () {
 	return true;
 }
 
-// CAN'T TOUCH THIS NANANANA NANA NANA (main game loop)
+// Main game loop
 void Game::run() {
 	sf::Clock clock;
 	while (isRunning) {
@@ -188,7 +186,7 @@ void Game::onMouseMoved(float deltaTime, int dx, int dy) {
 		currentScene->onMouseMoved(deltaTime,dx,dy);
 }
 
-// Whenever you wnat to end the game, you must call this function, not the Scene's onClose(); method
+// Whenever you want to end the game, you must call this function, not the Scene's onClose(); method
 // End game-wide stuff here
 void Game::close() {
 	if (currentScene != NULL) {
