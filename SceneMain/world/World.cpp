@@ -45,7 +45,7 @@ bool World::getOutOfBounds(int x, int y, int z) const{
 
 Cube World::getCube(int x, int y, int z) const {
 	if (getOutOfBounds(x,y,z))
-		return Cube(0,MAXLIGHT);
+        return Cube(0,MINLIGHT);
 	return getCubeRaw(x,y,z);
 }
 
@@ -121,8 +121,11 @@ void World::update(float deltaTime) {
 				if((*this)(matrixCoords.first) != NULL){
 					if((*this)(matrixCoords.first)->XPOS != chunkPos.x ||
 					   (*this)(matrixCoords.first)->YPOS != chunkPos.y ||
-					   (*this)(matrixCoords.first)->ZPOS != chunkPos.z)
+                       (*this)(matrixCoords.first)->ZPOS != chunkPos.z) {
+                        delete (*this)(matrixCoords.first);
+                        (*this)(matrixCoords.first) = NULL;
 						queue.push(std::pair<float,vec3i>(-dist,chunkPos));
+                    }
 				}
 				else
 					queue.push(std::pair<float,vec3i>(-dist,chunkPos));
@@ -184,10 +187,10 @@ void World::draw() const {
 		std::vector<GLuint> queries(chunksPerLayer,0);
 		std::vector<Chunk*> chunkPointers(chunksPerLayer,NULL);
 
-		//disable rendering state
-		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-		glDepthMask(GL_FALSE);
-		glDisable(GL_LIGHTING);
+        //disable rendering state
+        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+        glDepthMask(GL_FALSE);
+        glDisable(GL_LIGHTING);
 
 		//generate and send the queries
 		int queriesSent = 0;
@@ -203,10 +206,10 @@ void World::draw() const {
 			++queriesSent;
 		}
 
-		//enable rendering state
-		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-		glDepthMask(GL_TRUE);
-		glDisable(GL_LIGHTING);
+        //enable rendering state
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        glDepthMask(GL_TRUE);
+        glDisable(GL_LIGHTING);
 
 		//collect query results
 		for (int i = 0; i < queriesSent; ++i) {

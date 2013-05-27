@@ -236,7 +236,7 @@ void SceneMain::onMouseButtonPressed(float deltaTime, sf::Mouse::Button button) 
 			break;
 		case sf::Mouse::Middle: { //Arrow!
 			vec3f dir(getState().view[0][2], getState().view[1][2], getState().view[2][2]);//same as the player's pov
-			Polla * np = new Polla(this,player->camPos,player);
+            Arrow * np = new Arrow(this,player->camPos);
 			np->vel -= vec3f(dir.x*50.0,dir.y*50.0,dir.z*50.0);
 			addObject(np);
 			break;

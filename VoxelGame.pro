@@ -1,6 +1,6 @@
 TEMPLATE = app
 CONFIG -= qt
-LIBS += -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lGLU
+LIBS += -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lGL
 INCLUDEPATH += $$PWD/
 QMAKE_CXXFLAGS += -std=c++11 -O3
 CXX_FLAGS += -O3

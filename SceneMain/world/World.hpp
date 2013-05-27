@@ -15,6 +15,7 @@
 class Chunk;
 class SceneMain;
 class Player;
+class skyValue;
 class World {
 	public:
 		World(SceneMain* parentScene, Player* player);

@@ -36,26 +36,26 @@ void Polla::updateMatrix() {
 			vec3f back = -vel;
 			back = glm::normalize(back);
 			vec3f right = glm::cross(dummyUp,back);
-			back = glm::normalize(back);
+            right = glm::normalize(right);
 			vec3f up = glm::cross(back,right);
 			up = glm::normalize(up);
-			modelMatrix *= mat4f(right.x, right.y, right.z, 0,
+            modelMatrix *= mat4f(right.x, right.y, right.z, 0,
 								 up.x   , up.y   , up.z   , 0,
 								 back.x , back.y , back.z , 0,
-								 0      , 0      , 0      , 1);
+                                 0      , 0      , 0      , 1);
 		}
 		vec3f radius = vec3f(model.modelWidth*scale.x,
 							 model.modelHeight*scale.y,
 							 model.modelDepth*scale.z)*0.5f;
 		modelMatrix = glm::translate(modelMatrix,vec3f(-radius.x,-radius.y,-radius.z)); //translate to center, after rotation
-		modelMatrix = glm::scale(modelMatrix,vec3f(scale.x,scale.y,scale.z));
-	}
+        modelMatrix = glm::scale(modelMatrix,vec3f(scale.x,scale.y,scale.z));
+    }
 }
 
 void Polla::movePos(float deltaTime) {
 	vel += vec3f((followedPlayer->pos.x-pos.x+0.6),
 				 (followedPlayer->pos.y-pos.y+0.6),
-				 (followedPlayer->pos.z-pos.z+0.6)) * deltaTime;
+                 (followedPlayer->pos.z-pos.z+0.6)) * deltaTime;
 	vec3f disp = vel*deltaTime; //deltaX = x0 + vt (intended displacement)
 	if (hitbox.collidesWithWorld(vec3f(disp.x,0,0)) ||
 		hitbox.collidesWithWorld(vec3f(0,disp.y,0)) ||
