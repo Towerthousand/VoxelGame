@@ -2,6 +2,7 @@
 #define WORLD_HPP
 #include "tools.hpp"
 #include "generator/ChunkGenerator.hpp"
+#include "Octree.h"
 
 //chunk grid coords:
 //0 <= x < WORLDWIDTH*CHUNKSIZE
@@ -21,28 +22,11 @@ class World {
 		World(SceneMain* parentScene, Player* player);
 		~World();
 
-        Chunk* getChunk(int x, int y, int z);
-        Chunk* getChunk(vec3i coord);
-        Chunk* getChunk(int x, int y, int z) const;
-        Chunk* getChunk(vec3i coord) const;
-
-        bool deleteChunk(int x, int y, int z);
-        bool deleteChunk(vec3i coord);
-        bool addChunk(int x, int y, int z, Chunk *ptr);
-        bool addChunk(vec3i coord, Chunk* ptr);
-
 		//Getters and setters
 		bool getOutOfBounds(int x, int y, int z) const;
 		Cube getCube(int x, int y, int z) const;
-		Cube getCubeRaw(int x, int y, int z) const;
 		void setCubeID(int x, int y, int z, unsigned char ID);
-		void setCubeIDRaw(int x, int y, int z, unsigned char ID);
 		void setCubeLight(int x, int y, int z, unsigned char light);
-		void setCubeLightRaw(int x, int y, int z, unsigned char light);
-
-		//coordinates
-		std::pair<vec3i,vec3i> getCoords(int x, int y, int z) const;
-		std::pair<vec3i,vec3i> getCoords(vec3i coord);
 
 		//main
 		void draw() const;
@@ -57,6 +41,8 @@ class World {
 		vec3f last;
 
 	private:
+        Octree octree;
+
 		//Lighting
 		void calculateLight(vec3i source, int radius);
 		void calculateLightManhattan(vec3i source, int radius);
@@ -67,7 +53,6 @@ class World {
 		SceneMain* parentScene;
 		Player* player;
 		ChunkGenerator chunkGen;
-        std::map<vec3i,Chunk*,FunctorCompare> chunks;
 		static const int vertexPoints[8][3];
 		static const int indexes[24];
 };

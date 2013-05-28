@@ -80,15 +80,6 @@ struct Vertex {
 		cr,cg,cb,ca;
 };
 
-//world voxel
-//light = 0 for solid blocks
-//MINLIGHT <= light <= MAXLIGHT for non-solid blocks
-struct Cube {
-		Cube (unsigned char ID, unsigned char light) : ID(ID), light(light) {}
-		unsigned char ID;
-		unsigned char light;
-};
-
 //prototype misc functions here (define in tools.cpp) and inlines.
 inline void outLog(const std::string& msg) {std::cout << msg << std::endl;}
 std::string toString(float num);
@@ -99,11 +90,15 @@ std::string toString(float num);
 #define DEG_TO_RAD ((2*M_PI)/360.0f)
 
 //world size
-#define CHUNKSIZE_POW2 4 //CHUNKSIZE must be 1 << CHUNKSIZE_POW2
+
+//Not used?
 #define CHUNKSIZE 16 //in voxels
 #define CHUNKSIZE_MASK 15 //CHUNKSIZE -1
 #define WORLDWIDTH 32 //in chunks
 #define WORLDHEIGHT 32 //in chunks
+
+#define CHUNKSIZE_POW2 4 //Minimum chunksize power. CHUNKSIZE must be 1 << CHUNKSIZE_POW2
+#define OCTREE_SIZE 32 //in bits
 
 //light settings
 #define MAXLIGHT 16

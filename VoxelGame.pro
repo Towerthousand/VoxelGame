@@ -44,7 +44,9 @@ SOURCES += \
     $$PWD/SceneMain/world/generator/FunctionTerrainOverlay.cpp \
     $$PWD/SceneMain/world/generator/Function2DSimplex.cpp \
     $$PWD/SceneMain/world/generator/FunctionTerrainHeightmap.cpp \
-    $$PWD/SceneMain/world/generator/FunctionTerrainJoin.cpp
+    $$PWD/SceneMain/world/generator/FunctionTerrainJoin.cpp \
+    SceneMain/world/Octree.cpp \
+    SceneMain/world/Cube.cpp
 
 HEADERS += \
     $$PWD/Scene.hpp \
@@ -89,7 +91,9 @@ HEADERS += \
     $$PWD/SceneMain/world/generator/Function2DSimplex.hpp \
     $$PWD/SceneMain/world/generator/FunctionTerrainHeightmap.hpp \
     $$PWD/SceneMain/world/generator/FunctionTerrainJoin.hpp \
-    $$PWD/glm/*.hpp
+    $$PWD/glm/*.hpp \
+    SceneMain/world/Octree.h \
+    SceneMain/world/Cube.h
 
 OTHER_FILES += \
     $$PWD/shaders/terrain_fragment.glsl \

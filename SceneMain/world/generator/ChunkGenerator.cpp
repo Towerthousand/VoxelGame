@@ -50,6 +50,9 @@ ChunkGenerator::~ChunkGenerator() {
 }
 
 bool ChunkGenerator::queueChunk(vec3i chunk) { //chunkgrid coords
+
+    /*
+
     //1. delete the chunk that is in the place of the new chunk and assign pointer to null
     parentScene->getWorld().deleteChunk(chunk);
 	//2. queue new chunk
@@ -67,9 +70,13 @@ bool ChunkGenerator::queueChunk(vec3i chunk) { //chunkgrid coords
 	}
 	chunkMutex.unlock();
 	return false; //chunk was already queued
+    */
+
+    return false;
 }
 
 void ChunkGenerator::threadedChunkManagement() {
+    /*
 	while(true) {
 		//Look for new chunks. If there are, generate and output to output queue. If not, sleep for a short while
 		chunkMutex.lock();
@@ -92,7 +99,7 @@ void ChunkGenerator::threadedChunkManagement() {
 			chunkMutex.unlock();
 			sf::sleep(sf::seconds(0.1));
 		}
-	}
+    }*/
 }
 
 std::mutex ChunkGenerator::chunkMutex;

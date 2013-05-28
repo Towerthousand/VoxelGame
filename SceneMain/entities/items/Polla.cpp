@@ -14,7 +14,7 @@ Polla::~Polla() {
 void Polla::update(float deltaTime) {
 	movePos(deltaTime);
 	updateMatrix();
-	if(parentScene->getWorld().getCube(pos.x,pos.y,pos.z).ID == 0)
+    if(parentScene->getWorld().getCube(pos.x,pos.y,pos.z).id == 0)
 		ambientLight = float(parentScene->getWorld().getCube(pos.x,pos.y,pos.z).light)/MAXLIGHT;
 }
 

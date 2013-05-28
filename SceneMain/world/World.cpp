@@ -8,118 +8,43 @@ World::World(SceneMain* parentScene, Player* player) :
     playerTargetsBlock(false), targetedBlock(0,0,0),
     last(0,0,0), parentScene(parentScene), player(player),
     chunkGen(parentScene,2) {
+
+    int num = 50;
+
+    for(int x = -num; x <= num; x++)
+        for(int y = -num; y < num; y++)
+            for(int z = -num; z < num; z++)
+                setCubeID(x, y, z, (x+y+z)&3+1);
 }
 
 World::~World() {
-    for (int x = 0; x < WORLDWIDTH; ++x)
-        for (int y = 0; y < WORLDHEIGHT; ++y)
-            for (int z = 0; z < WORLDWIDTH; ++z) {
-                //unload all chunks here
-            }
-}
-
-Chunk* World::getChunk(int x, int y, int z) {
-    return getChunk(vec3i(x,y,z));
-}
-
-Chunk* World::getChunk(vec3i coord) {
-    std::map<vec3i,Chunk*,FunctorCompare>::iterator it = chunks.find(coord);
-    if(it != chunks.end())
-        return chunks.at(coord);
-    return NULL;
-}
-
-Chunk* World::getChunk(int x, int y, int z) const {
-    return getChunk(vec3i(x,y,z));
-}
-
-Chunk* World::getChunk(vec3i coord) const {
-    std::map<vec3i,Chunk*,FunctorCompare>::const_iterator it = chunks.find(coord);
-    if(it != chunks.end())
-        return it->second;
-    return NULL;
-}
-
-bool World::deleteChunk(int x, int y, int z) { return deleteChunk(vec3i(x,y,z)); }
-
-bool World::deleteChunk(vec3i coord) { //true if deleted and saved, false otherwise
-    std::map<vec3i,Chunk*,FunctorCompare>::const_iterator it = chunks.find(coord);
-    if(it == chunks.end()) return false;
-    delete it->second;
-    chunks.erase(it);
-    return true;
-}
-
-bool World::addChunk(int x, int y, int z, Chunk* ptr) { return addChunk(vec3i(x,y,z),ptr); }
-
-bool World::addChunk(vec3i coord, Chunk* ptr) { //true if added, false otherwise
-    if (ptr == NULL || chunks.count(coord) == 1) return false; //already loaded
-    ptr->initBuffer();
-    chunks[coord] = ptr;
-    return true;
 }
 
 bool World::getOutOfBounds(int x, int y, int z) const{
-    Chunk* c = getChunk(getCoords(x,y,z).first);
-    if(c == NULL || c->XPOS != (x >> CHUNKSIZE_POW2) || c->YPOS != (y >> CHUNKSIZE_POW2) || c->ZPOS != (z >> CHUNKSIZE_POW2))
-        return true;
+    //Con los octrees NUNCA hay nada out of bounds!
+    //Ademas creo que esta funcion no se usa...
     return false;
 }
 
 Cube World::getCube(int x, int y, int z) const {
-    if (getOutOfBounds(x,y,z))
-        return Cube(0,MINLIGHT);
-    return getCubeRaw(x,y,z);
+    return octree.get(x, y, z, OCTREE_SIZE);
 }
 
-Cube World::getCubeRaw(int x, int y, int z) const {
-    std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
-    return (*getChunk(matrixCoords.first))(matrixCoords.second);
-}
-
-void World::setCubeID(int x, int y, int z, unsigned char ID) {
-    if (getOutOfBounds(x,y,z))
-        return;
-    setCubeIDRaw(x,y,z,ID);
-    calculateLightManhattan(vec3i(x,y,z),UPDATERADIUS);
-}
-
-void World::setCubeIDRaw(int x, int y, int z, unsigned char ID) {
-    std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
-    (*getChunk(matrixCoords.first))(matrixCoords.second).ID = ID;
-    getChunk(matrixCoords.first)->markedForRedraw = true;
+void World::setCubeID(int x, int y, int z, unsigned char id) {
+    octree.set(x, y, z, OCTREE_SIZE, id);
 }
 
 void World::setCubeLight(int x, int y, int z, unsigned char light) {
-    if (getOutOfBounds(x,y,z))
-        return;
-    setCubeLightRaw(x,y,z,light);
 }
 
-void World::setCubeLightRaw(int x, int y, int z, unsigned char light) {
-    std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
-    (*getChunk(matrixCoords.first))(matrixCoords.second).light = light;
-    getChunk(matrixCoords.first)->markedForRedraw = true;
-}
-
-std::pair<vec3i,vec3i> World::getCoords(int x, int y, int z) const {
-    int blockIndexX = x & CHUNKSIZE_MASK;//local coords (0 <= coord < CHUNKSIZE)
-    int realChunkX = x >> CHUNKSIZE_POW2;//real coords
-
-    int blockIndexY = y & CHUNKSIZE_MASK;//local coords (0 <= coord < CHUNKSIZE)
-    int realChunkY = y >> CHUNKSIZE_POW2;//real coords
-
-    int blockIndexZ = z & CHUNKSIZE_MASK;//local coords (0 <= coord < CHUNKSIZE)
-    int realChunkZ = z >> CHUNKSIZE_POW2;//real coords
-
-    return std::pair<vec3i,vec3i>(vec3i(realChunkX,realChunkY,realChunkZ),vec3i(blockIndexX,blockIndexY,blockIndexZ));
-}
-
-std::pair<vec3i,vec3i> World::getCoords(vec3i coord) {
-    return getCoords(coord.x,coord.y,coord.z);
-}
 
 void World::update(float deltaTime) {
+
+    //todo fix
+    octree.update(0, 0, 0, OCTREE_SIZE, this->parentScene);
+    traceView(player,10);
+
+    /*
     chunkGen.chunkMutex.lock();
     while(!chunkGen.chunksLoaded.empty()) {
         Chunk* newChunk = chunkGen.chunksLoaded.front();
@@ -145,13 +70,19 @@ void World::update(float deltaTime) {
             queue.pop();
         }
     }
-    traceView(player,10);
+
     for(std::map<vec3i,Chunk*,FunctorCompare>::iterator it = chunks.begin(); it != chunks.end(); ++it)
         if (it->second->markedForRedraw == true)
             it->second->update(deltaTime);
+            */
 }
 
 void World::draw() const {
+
+    //TODO Put occlusion and frustum culling again.
+    octree.draw(0, 0, 0, OCTREE_SIZE);
+
+    /*
     parentScene->chunksDrawn = 0;
     //empty and frustum culling
 
@@ -229,15 +160,20 @@ void World::draw() const {
         }
         //delete the queries
         glDeleteQueries(queries.size(),&queries[0]);
-    }
+    }*/
 }
 
 //Based on: Fast Voxel Traversal Algorithm for Ray Tracinge
 //By: John Amanatides et al.
 //Implemented by Jordi "BuD" Santiago Provencio
 void World::traceView(const Player *playerCam, float tMax) {
+
+    //TODO: Esto se puede optimizar a saquisimo !!
+    //TODO: Quiza se cuelga si haces un clic al infinito porque getOutOfBounds ahora devuelve siempre FALSE.
+    //TODO: Seguramente deberia parar al chocar con un nodo que no este cargado hasta nivel de bloques individuales.
+
     if (!getOutOfBounds(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z)) &&
-            getCube(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z)).ID != 0) {
+            getCube(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z)).id != 0) {
         playerTargetsBlock = true;
         targetedBlock = vec3f(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z));
         return;
@@ -305,7 +241,7 @@ void World::traceView(const Player *playerCam, float tMax) {
                 tMaxc.z= tMaxc.z + tDelta.z;
             }
         }
-        if(!getOutOfBounds(vox.x,vox.y,vox.z) && getCube(vox.x,vox.y,vox.z).ID != 0) {
+        if(!getOutOfBounds(vox.x,vox.y,vox.z) && getCube(vox.x,vox.y,vox.z).id != 0) {
             playerTargetsBlock = true;
             targetedBlock = vox;
             return;
@@ -315,6 +251,9 @@ void World::traceView(const Player *playerCam, float tMax) {
 }
 
 void World::calculateLight(vec3i source, int radius) { //BFS
+    //TODO Fix
+
+    /*
     sf::Clock clock;
     clock.restart();
     int updateRad = radius + 1; //if any component distance >= updateRad, lighting is OK
@@ -363,10 +302,14 @@ void World::calculateLight(vec3i source, int radius) { //BFS
             processCubeLighting(source,vec3i(0,0,1),blocksToCheck[i-1]);
             processCubeLighting(source,vec3i(0,0,-1),blocksToCheck[i-1]);
         }
-    }
+    }*/
 }
 
 void World::calculateLightManhattan(vec3i source, int radius) { //BFS
+
+    //TODO Fix
+
+    /*
     sf::Clock clock;
     clock.restart();
     int updateRad = radius + 1; //if manhattan dist >= updateRad, lighting is OK
@@ -414,21 +357,25 @@ void World::calculateLightManhattan(vec3i source, int radius) { //BFS
             processCubeLighting(source,vec3i(0,0,1),blocksToCheck[i-1]);
             processCubeLighting(source,vec3i(0,0,-1),blocksToCheck[i-1]);
         }
-    }
+    }*/
 }
 
 void World::processCubeLighting(const vec3i& source, const vec3i& offset, std::vector<vec3i> &queue) { //BFS node processing
+
+    //TODO Fix
+
+    /*
     vec3i subject = source+offset;
     if(!getOutOfBounds(subject.x,subject.y,subject.z)) {
         Cube sub = getCubeRaw(subject.x,subject.y,subject.z);
-        if(sub.ID == 0) {
+        if(sub.id == 0) {
             Cube src = getCubeRaw(source.x,source.y,source.z);
             if(sub.light < src.light-1) {
                 setCubeLightRaw(subject.x,subject.y,subject.z,src.light-1);
                 queue.push_back(subject);
             }
         }
-    }
+    }*/
 }
 
 void World::drawWireCube(const vec3f &pos) const {

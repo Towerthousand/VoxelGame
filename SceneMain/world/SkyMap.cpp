@@ -26,6 +26,10 @@ int const &skyMap::operator()(vec2i coord) const {
 }
 
 bool skyMap::updateValues(Chunk *c) {
+
+    //TODO Fix. Probablemente habra que reemplazar esta clase por un quadtree?
+
+    /*
 	bool result = false;
 	for(int x = 0; x < CHUNKSIZE; ++x) {
 		for(int z = 0; z < CHUNKSIZE; ++z) {
@@ -45,5 +49,7 @@ bool skyMap::updateValues(Chunk *c) {
 			}
 		}
 	}
-	return result;
+    return result;*/
+
+    return false;
 }

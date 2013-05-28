@@ -1,43 +1,44 @@
 #ifndef CHUNK_HPP
 #define CHUNK_HPP
 #include "tools.hpp"
+#include "Octree.h"
+
+class Octree;
 
 class SceneMain;
 class Chunk { //16*16*16
 	public:
-		Chunk(int x, int y, int z, SceneMain *scene);
+        Chunk(int x, int y, int z, int size, Octree* octree, SceneMain *scene);
 		~Chunk();
-
-		Cube &operator()(int x, int y, int z);
-		Cube &operator()(vec3i coord);
-		Cube const &operator()(int x, int y, int z) const;
-		Cube const &operator()(vec3i coord) const;
 
 		void initBuffer();
 
+        Cube getCube(int x, int y, int z) const;
+
 		//main
 		void update(float deltaTime);
-		void draw() const;
+        void redraw();
+        void draw() const;
 		void drawBoundingBox() const;
 
 		vec3i getPos();
 
 		bool outOfView;
-		bool markedForRedraw;
-		std::vector<Cube> cubes;
+
+        Octree* octree;
 		int vertexCount;
 
-		int XPOS; //x pos of chunk inside world matrix
-		int YPOS; //y pos of chunk inside world matrix
-		int ZPOS; //z pos of chunk inside world matrix
+        int xPos; //x pos of chunk in blocks
+        int yPos; //y pos of chunk in blocks
+        int zPos; //z pos of chunk in blocks
+        int size; //Size of chunk is 1<<size.
+
 	private:
-		//Getters & consultors
-		Cube getCube(int x, int y, int z) const;
 
 		void pushCubeToArray(short x, short y, short z, unsigned char cubeID, std::vector<Vertex> &renderData);
 		void makeVbo(std::vector<Vertex> &renderData);
 
-		int VBOID;
+        int vboId;
 		mat4f modelMatrix; //precalculated, since chunks do not transform ever
 		SceneMain* parentScene;
 		static const int textureIndexes[9][6];
