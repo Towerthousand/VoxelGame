@@ -21,10 +21,15 @@ class World {
 		World(SceneMain* parentScene, Player* player);
 		~World();
 
-		Chunk* &operator()(int x, int y, int z);
-		Chunk* &operator()(vec3i coord);
-		Chunk* const &operator()(int x, int y, int z) const;
-		Chunk* const &operator()(vec3i coord) const;
+        Chunk* getChunk(int x, int y, int z);
+        Chunk* getChunk(vec3i coord);
+        Chunk* getChunk(int x, int y, int z) const;
+        Chunk* getChunk(vec3i coord) const;
+
+        bool deleteChunk(int x, int y, int z);
+        bool deleteChunk(vec3i coord);
+        bool addChunk(int x, int y, int z, Chunk *ptr);
+        bool addChunk(vec3i coord, Chunk* ptr);
 
 		//Getters and setters
 		bool getOutOfBounds(int x, int y, int z) const;
@@ -62,7 +67,7 @@ class World {
 		SceneMain* parentScene;
 		Player* player;
 		ChunkGenerator chunkGen;
-		std::vector<Chunk*> chunks;
+        std::map<vec3i,Chunk*,FunctorCompare> chunks;
 		static const int vertexPoints[8][3];
 		static const int indexes[24];
 };

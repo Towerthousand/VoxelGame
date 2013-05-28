@@ -8,7 +8,7 @@
 
 SceneMain::SceneMain(Game &parent) :
 	Scene(parent), chunksDrawn(0),
-	player(new Player(this, vec3f(0,100,0))), world(this,player),
+    player(new Player(this, vec3f(0,50,0))), world(this,player),
 	debugCounter(0.0), fpsCount(0) {
 }
 
@@ -149,7 +149,7 @@ void SceneMain::onKeyPressed(float deltaTime, sf::Keyboard::Key key) {
 			vec3f newPos(0,0,0);
 			newPos.x = 0;
 			newPos.z = 0;
-			newPos.y = 100;
+            newPos.y = 170;
 			player->pos = newPos + vec3f(0.5,1,0.5);
 		}
 			break;
@@ -225,14 +225,12 @@ void SceneMain::onKeyReleased(float deltaTime, sf::Keyboard::Key key) {
 void SceneMain::onMouseButtonPressed(float deltaTime, sf::Mouse::Button button) {
 	switch(button) {
 		case sf::Mouse::Left: //delete block
-			if(world.playerTargetsBlock) {
-				world.setCubeID(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z,0);
-			}
+            if(world.playerTargetsBlock)
+                world.setCubeID(world.targetedBlock.x,world.targetedBlock.y,world.targetedBlock.z,0);
 			break;
 		case sf::Mouse::Right: //place block
-			if(world.playerTargetsBlock) {
-				world.setCubeID(world.last.x,world.last.y,world.last.z,player->selectedID);
-			}
+            if(world.playerTargetsBlock)
+                world.setCubeID(world.last.x,world.last.y,world.last.z,player->selectedID);
 			break;
 		case sf::Mouse::Middle: { //Arrow!
 			vec3f dir(getState().view[0][2], getState().view[1][2], getState().view[2][2]);//same as the player's pov

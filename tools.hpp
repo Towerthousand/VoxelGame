@@ -57,10 +57,10 @@ typedef glm::detail::tmat4x4<double> mat4d;
 //This is the Funtor to use when making a templated container for
 //such classes (i.e. std::priority_queue, std::set)
 struct FunctorCompare{
-		bool operator()(const std::pair<float,vec3i> &a, const std::pair<float,vec3i> &b) {
+        bool operator()(const std::pair<float,vec3i> &a, const std::pair<float,vec3i> &b) const {
 			return (a.first < b.first);
 		}
-		bool operator()(const vec3i &a, const vec3i &b) {
+        bool operator()(const vec3i &a, const vec3i &b) const {
 			return (a.x < b.x);
 		}
 };
@@ -103,9 +103,7 @@ std::string toString(float num);
 #define CHUNKSIZE 16 //in voxels
 #define CHUNKSIZE_MASK 15 //CHUNKSIZE -1
 #define WORLDWIDTH 32 //in chunks
-#define WORLDWIDTH_MASK 31 //WORLDWIDTH -1
 #define WORLDHEIGHT 32 //in chunks
-#define WORLDHEIGHT_MASK 31 //WORLDHEIGHT -1
 
 //light settings
 #define MAXLIGHT 16
