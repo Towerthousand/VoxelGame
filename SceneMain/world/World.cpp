@@ -14,7 +14,7 @@ World::World(SceneMain* parentScene, Player* player) :
     for(int x = -num; x <= num; x++)
         for(int y = -num; y < num; y++)
             for(int z = -num; z < num; z++)
-                setCubeID(x, y, z, (x+y+z)&3+1);
+                setCubeID(x, y, z, ((x+y+z)==0)*4);
 }
 
 World::~World() {
