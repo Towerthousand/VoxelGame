@@ -31,7 +31,8 @@ public:
     Cube get(int x, int y, int z, int size) const;
     void set(int x, int y, int z, int size, Cube b2);
     void draw(int x, int y, int z, int size) const;
-    void update(int x, int y, int z, int size, SceneMain* scene);
+    void update(int x, int y, int z, int size, SceneMain* scene, int px, int py, int pz);
+    void renderToPrecision(int x, int y, int z, int size, int precision, SceneMain* scene);
 
     inline bool isFilled() const
     {

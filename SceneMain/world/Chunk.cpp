@@ -11,7 +11,8 @@ Chunk::Chunk(int x, int y, int z, int size, Octree *octree, SceneMain* scene) :
 	modelMatrix(mat4f(1.0)),
 	parentScene(scene) {
     modelMatrix = glm::translate(modelMatrix,vec3f(xPos, yPos, zPos));
-	modelMatrix = glm::scale(modelMatrix,vec3f(0.5,0.5,0.5));
+    float scale = 0.5*(1<<size-(CHUNKSIZE_POW2));
+    modelMatrix = glm::scale(modelMatrix,vec3f(scale, scale, scale));
     initBuffer();
     redraw();
 }
@@ -70,9 +71,9 @@ void Chunk::draw() const {
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		glEnableClientState(GL_COLOR_ARRAY);
 
-		glVertexPointer(3, GL_SHORT, sizeof(Vertex), 0);
-        glTexCoordPointer(2, GL_SHORT, sizeof(Vertex), (GLvoid*)(3*sizeof(short)));
-        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(Vertex), (GLvoid*)(2*sizeof(short)+3*sizeof(short)));
+        glVertexPointer(3, GL_BYTE, sizeof(Vertex), 0);
+        glTexCoordPointer(2, GL_SHORT, sizeof(Vertex), (GLvoid*)(4*sizeof(char)));
+        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(Vertex), (GLvoid*)(2*sizeof(short)+4*sizeof(char)));
 
 		glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 

@@ -32,6 +32,7 @@ class Chunk { //16*16*16
         int yPos; //y pos of chunk in blocks
         int zPos; //z pos of chunk in blocks
         int size; //Size of chunk is 1<<size.
+        SceneMain* parentScene;
 
 	private:
 
@@ -40,7 +41,6 @@ class Chunk { //16*16*16
 
         int vboId;
 		mat4f modelMatrix; //precalculated, since chunks do not transform ever
-		SceneMain* parentScene;
 		static const int textureIndexes[9][6];
 		static const float vertices[24][3]; //to draw the bounding box
 };

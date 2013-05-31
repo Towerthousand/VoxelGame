@@ -16,7 +16,6 @@ int &skyMap::operator()(int x, int z) {
 int &skyMap::operator()(vec2i coord) {
 	return values[coord.x*CHUNKSIZE+coord.y];
 }
-
 int const &skyMap::operator()(int x, int z) const {
 	return values[x*CHUNKSIZE*CHUNKSIZE + z];
 }

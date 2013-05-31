@@ -4,17 +4,23 @@
 #include "../SceneMain.hpp"
 #include "../../Game.hpp"
 
+int asdf(int x)
+{
+    x = (x%6 + 6)%6;
+    if(x > 2) x = 5-x;
+    return x;
+}
+
 World::World(SceneMain* parentScene, Player* player) :
     playerTargetsBlock(false), targetedBlock(0,0,0),
     last(0,0,0), parentScene(parentScene), player(player),
     chunkGen(parentScene,2) {
 
-    int num = 50;
+    int num = 500;
 
     for(int x = -num; x <= num; x++)
-        for(int y = -num; y < num; y++)
             for(int z = -num; z < num; z++)
-                setCubeID(x, y, z, ((x+y+z)==0)*4);
+                setCubeID(x, asdf(x)+asdf(z), z, 4);
 }
 
 World::~World() {
@@ -41,7 +47,7 @@ void World::setCubeLight(int x, int y, int z, unsigned char light) {
 void World::update(float deltaTime) {
 
     //todo fix
-    octree.update(0, 0, 0, OCTREE_SIZE, this->parentScene);
+    octree.update(0, 0, 0, OCTREE_SIZE, this->parentScene, (int)player->pos.x, (int)player->pos.y, (int)player->pos.z);
     traceView(player,10);
 
     /*

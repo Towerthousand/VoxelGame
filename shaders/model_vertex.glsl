@@ -3,5 +3,5 @@ uniform float ambientLight;
 
 void main () {
 	gl_Position = modelViewProjectionMatrix * gl_Vertex;
-	gl_FrontColor = gl_Color * vec4(ambientLight,ambientLight,ambientLight,1);
+        gl_FrontColor = gl_Color;// * vec4(ambientLight,ambientLight,ambientLight,1);
 }
