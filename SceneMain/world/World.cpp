@@ -8,32 +8,32 @@ World::World(SceneMain* parentScene, Player* player) :
 	playerTargetsBlock(false), targetedBlock(0,0,0),
 	last(0,0,0), parentScene(parentScene), player(player),
 	chunkGen(parentScene, rand()),
-	chunks(WORLDWIDTH*WORLDWIDTH*WORLDHEIGHT,NULL) {
+	chunks(WORLDSIZE*WORLDSIZE*WORLDSIZE,NULL) {
 }
 
 World::~World() {
-	for (int x = 0; x < WORLDWIDTH; ++x)
-		for (int y = 0; y < WORLDHEIGHT; ++y)
-			for (int z = 0; z < WORLDWIDTH; ++z) {
+	for (int x = 0; x < WORLDSIZE; ++x)
+		for (int y = 0; y < WORLDSIZE; ++y)
+			for (int z = 0; z < WORLDSIZE; ++z) {
 				delete (*this)(x,y,z);
 				(*this)(x,y,z) = NULL;
 			}
 }
 
 Chunk* &World::operator()(int x, int y, int z) {
-	return chunks[x*WORLDWIDTH*WORLDHEIGHT + y*WORLDWIDTH + z];
+	return chunks[x*WORLDSIZE*WORLDSIZE + y*WORLDSIZE + z];
 }
 
 Chunk* &World::operator()(vec3i coord) {
-	return chunks[coord.x*WORLDWIDTH*WORLDHEIGHT + coord.y*WORLDWIDTH + coord.z];
+	return chunks[coord.x*WORLDSIZE*WORLDSIZE + coord.y*WORLDSIZE + coord.z];
 }
 
 Chunk* const &World::operator()(int x, int y, int z) const {
-	return chunks[x*WORLDWIDTH*WORLDHEIGHT+y*WORLDWIDTH+z];
+	return chunks[x*WORLDSIZE*WORLDSIZE+y*WORLDSIZE+z];
 }
 
 Chunk* const &World::operator()(vec3i coord) const {
-	return chunks[coord.x*WORLDWIDTH*WORLDHEIGHT+coord.y*WORLDWIDTH+coord.z];
+	return chunks[coord.x*WORLDSIZE*WORLDSIZE+coord.y*WORLDSIZE+coord.z];
 }
 
 bool World::getOutOfBounds(int x, int y, int z) const{
@@ -45,7 +45,7 @@ bool World::getOutOfBounds(int x, int y, int z) const{
 
 Cube World::getCube(int x, int y, int z) const {
 	if (getOutOfBounds(x,y,z))
-        return Cube(0,MINLIGHT);
+		return Cube(0,MINLIGHT);
 	return getCubeRaw(x,y,z);
 }
 
@@ -80,19 +80,10 @@ void World::setCubeLightRaw(int x, int y, int z, unsigned char light) {
 }
 
 std::pair<vec3i,vec3i> World::getCoords(int x, int y, int z) const {
-	int blockIndexX = x & CHUNKSIZE_MASK;;//local coords (0 <= coord < CHUNKSIZE)
-	int realChunkX = x >> CHUNKSIZE_POW2;//real coords
-	int chunkIndexX = realChunkX & WORLDWIDTH_MASK; //chunkgrid coords (0 <= coord < WORLDWIDTH
-
-	int blockIndexY = y & CHUNKSIZE_MASK;;//local coords (0 <= coord < CHUNKSIZE)
-	int realChunkY = y >> CHUNKSIZE_POW2;//real coords
-	int chunkIndexY = realChunkY & WORLDHEIGHT_MASK; //chunkgrid coords (0 <= coord < WORLDHEIGHT
-
-	int blockIndexZ = z & CHUNKSIZE_MASK;;//local coords (0 <= coord < CHUNKSIZE)
-	int realChunkZ = z >> CHUNKSIZE_POW2;//real coords
-	int chunkIndexZ = realChunkZ & WORLDWIDTH_MASK; //chunkgrid coords (0 <= coord < WORLDWIDTH
-
-	return std::pair<vec3i,vec3i>(vec3i(chunkIndexX,chunkIndexY,chunkIndexZ),vec3i(blockIndexX,blockIndexY,blockIndexZ));
+	return std::pair<vec3i,vec3i>(vec3i((x >> CHUNKSIZE_POW2) & WORLDSIZE_MASK,
+										(y >> CHUNKSIZE_POW2) & WORLDSIZE_MASK,
+										(z >> CHUNKSIZE_POW2) & WORLDSIZE_MASK),
+								  vec3i(x & CHUNKSIZE_MASK, y & CHUNKSIZE_MASK,z & CHUNKSIZE_MASK));
 }
 
 std::pair<vec3i,vec3i> World::getCoords(vec3i coord) {
@@ -112,20 +103,21 @@ void World::update(float deltaTime) {
 	chunkGen.chunkMutex.unlock();
 	vec3i playerChunkPos = vec3i(std::floor(player->pos.x),std::floor(player->pos.y),std::floor(player->pos.z))/CHUNKSIZE;
 	std::priority_queue<std::pair<float,vec3i>, std::vector<std::pair<float,vec3i> >, FunctorCompare > queue;
-	for (int x = -WORLDWIDTH/2; x < WORLDWIDTH/2; ++x)
-		for (int y = -WORLDHEIGHT/2; y < WORLDHEIGHT/2; ++y)
-			for (int z = -WORLDWIDTH/2; z < WORLDWIDTH/2; ++z){
+	for (int x = -WORLDSIZE/2; x < WORLDSIZE/2; ++x)
+		for (int y = -WORLDSIZE/2; y < WORLDSIZE/2; ++y)
+			for (int z = -WORLDSIZE/2; z < WORLDSIZE/2; ++z){
 				vec3i chunkPos(playerChunkPos.x+x,playerChunkPos.y+y,playerChunkPos.z+z);
 				std::pair<vec3i,vec3i> matrixCoords = getCoords(chunkPos*CHUNKSIZE);
 				float dist = glm::length(vec3f(CHUNKSIZE*chunkPos) - player->pos);
-				if((*this)(matrixCoords.first) != NULL){
-					if((*this)(matrixCoords.first)->XPOS != chunkPos.x ||
-					   (*this)(matrixCoords.first)->YPOS != chunkPos.y ||
-                       (*this)(matrixCoords.first)->ZPOS != chunkPos.z) {
-                        delete (*this)(matrixCoords.first);
-                        (*this)(matrixCoords.first) = NULL;
+				Chunk* current = (*this)(matrixCoords.first);
+				if(current != NULL){
+					if(current->XPOS != chunkPos.x ||
+							current->YPOS != chunkPos.y ||
+							current->ZPOS != chunkPos.z) {
+						delete current;
+						(*this)(matrixCoords.first) = NULL;
 						queue.push(std::pair<float,vec3i>(-dist,chunkPos));
-                    }
+					}
 				}
 				else
 					queue.push(std::pair<float,vec3i>(-dist,chunkPos));
@@ -135,43 +127,35 @@ void World::update(float deltaTime) {
 			queue.pop();
 	}
 	traceView(player,10);
-	for (int x = 0; x < WORLDWIDTH; ++x)
-		for (int y = 0; y < WORLDHEIGHT; ++y)
-			for (int z = 0; z < WORLDWIDTH; ++z)
-				if((*this)(x,y,z) != NULL)
-					if ((*this)(x,y,z)->markedForRedraw == true)
-						(*this)(x,y,z)->update(deltaTime);
+	for(std::vector<Chunk*>::iterator it = chunks.begin(); it != chunks.end(); ++it)
+		if(*it != NULL)
+			if ((*it)->markedForRedraw == true)
+				(*it)->update(deltaTime);
 }
 
 void World::draw() const {
 	parentScene->chunksDrawn = 0;
 	//empty and frustum culling
-	for (int x = 0; x < WORLDWIDTH; ++x)
-		for (int y = 0; y < WORLDHEIGHT; ++y)
-			for (int z = 0; z < WORLDWIDTH; ++z)
-				if((*this)(x,y,z) != NULL) {
-					vec3f center((*this)(x,y,z)->getPos() + vec3i(CHUNKSIZE/2));
-					if ((*this)(x,y,z)->vertexCount == 0) //nothing to draw
-						(*this)(x,y,z)->outOfView = true;
-//					else if (glm::length(player->pos - center) < CHUNKSIZE*5)
-//						(*this)(x,y,z)->outOfView = false; //this is because of a glitch with near chunks
-					else //check if it's actually inside of view
-						(*this)(x,y,z)->outOfView = !player->insideFrustum(center,sqrt(3*((CHUNKSIZE/2)*(CHUNKSIZE/2))));
-				}
+	for(std::vector<Chunk*>::const_iterator it = chunks.begin(); it != chunks.end(); ++it)
+		if(*it != NULL) {
+			vec3f center((*it)->getPos() + vec3i(CHUNKSIZE/2));
+			if ((*it)->vertexCount == 0) //nothing to draw
+				(*it)->outOfView = true;
+			else //check if it's actually inside of view
+				(*it)->outOfView = !player->insideFrustum(center,sqrt(3*((CHUNKSIZE/2)*(CHUNKSIZE/2))));
+		}
 
 	//do occlusion culling here!
 	std::priority_queue<std::pair<float,Chunk*> > queryList; //chunks to be queried, ordered by distance
 
 	//sort by distance
 	float dist = 0;
-	for(int x = 0; x < WORLDWIDTH; ++x)
-		for(int y = 0; y < WORLDHEIGHT; ++y)
-			for(int z = 0; z < WORLDWIDTH; ++z)
-				if((*this)(x,y,z) != NULL)
-					if(!(*this)(x,y,z)->outOfView) {
-						dist = glm::length(vec3f((*this)(x,y,z)->getPos()) + vec3f(CHUNKSIZE/2) - parentScene->player->pos);
-						queryList.push(std::pair<float,Chunk*>(-dist,(*this)(x,y,z)));
-					}
+	for(std::vector<Chunk*>::const_iterator it = chunks.begin(); it != chunks.end(); ++it)
+		if(*it != NULL)
+			if(!(*it)->outOfView) {
+				dist = glm::length(vec3f((*it)->getPos()) + vec3f(CHUNKSIZE/2) - parentScene->player->pos);
+				queryList.push(std::pair<float,Chunk*>(-dist,(*it)));
+			}
 
 	int layers = 10;
 	int chunksPerLayer = queryList.size()/layers + int(queryList.size()%layers > 0); //chunks per pass
@@ -187,10 +171,10 @@ void World::draw() const {
 		std::vector<GLuint> queries(chunksPerLayer,0);
 		std::vector<Chunk*> chunkPointers(chunksPerLayer,NULL);
 
-        //disable rendering state
-        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-        glDepthMask(GL_FALSE);
-        glDisable(GL_LIGHTING);
+		//disable rendering state
+		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+		glDepthMask(GL_FALSE);
+		glDisable(GL_LIGHTING);
 
 		//generate and send the queries
 		int queriesSent = 0;
@@ -206,10 +190,10 @@ void World::draw() const {
 			++queriesSent;
 		}
 
-        //enable rendering state
-        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-        glDepthMask(GL_TRUE);
-        glDisable(GL_LIGHTING);
+		//enable rendering state
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+		glDepthMask(GL_TRUE);
+		glDisable(GL_LIGHTING);
 
 		//collect query results
 		for (int i = 0; i < queriesSent; ++i) {
@@ -234,7 +218,7 @@ void World::draw() const {
 //Implemented by Jordi "BuD" Santiago Provencio
 void World::traceView(const Player *playerCam, float tMax) {
 	if (!getOutOfBounds(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z)) &&
-		getCube(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z)).ID != 0) {
+			getCube(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z)).ID != 0) {
 		playerTargetsBlock = true;
 		targetedBlock = vec3f(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z));
 		return;
@@ -329,8 +313,8 @@ void World::calculateLight(vec3i source, int radius) { //BFS
 						switch(cube->ID) {
 							case 0: //air
 								if (x == source.x-updateRad || x == source.x+updateRad
-									||y == source.y-updateRad || y == source.y+updateRad
-									||z == source.z-updateRad || z == source.z+updateRad) { //if it is on border, mark it as node
+										||y == source.y-updateRad || y == source.y+updateRad
+										||z == source.z-updateRad || z == source.z+updateRad) { //if it is on border, mark it as node
 									if (cube->light > MINLIGHT)
 										blocksToCheck[cube->light].push_back(vec3i(x,y,z));
 								}

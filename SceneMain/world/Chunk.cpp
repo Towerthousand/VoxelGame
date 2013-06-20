@@ -41,6 +41,8 @@ Cube const &Chunk::operator()(vec3i coord) const {
 }
 
 Cube Chunk::getCube(int x, int y, int z) const {
+	if(x >= 0 && x < CHUNKSIZE && y >= 0 && y < CHUNKSIZE && z >= 0 && z < CHUNKSIZE)
+		return (*this)(x,y,z);
 	return parentScene->getWorld().getCube(x+(XPOS*CHUNKSIZE),y+(YPOS*CHUNKSIZE),z+(ZPOS*CHUNKSIZE));
 }
 
@@ -56,7 +58,7 @@ void Chunk::update(float deltaTime) {
 	for(int z = 0; z < CHUNKSIZE; ++z) {
 		for(int y = 0; y < CHUNKSIZE; ++y) {
 			for(int x = 0; x < CHUNKSIZE; ++x) {
-				cubeID = getCube(x,y,z).ID;
+				cubeID = (*this)(x,y,z).ID;
 				if (cubeID != 0) { // only draw if it's not air
 					pushCubeToArray(x,y,z,cubeID,renderData);
 				}

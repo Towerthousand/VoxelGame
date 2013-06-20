@@ -54,13 +54,18 @@ typedef glm::detail::tmat3x3<double> mat3d;
 typedef glm::detail::tmat4x4<double> mat4d;
 
 //GLM provides no overload for operator< in vectors and matrices.
-//This is the Funtor to use when making a templated container for
+//This is the Functor to use when making a templated container for
 //such classes (i.e. std::priority_queue, std::set)
 struct FunctorCompare{
 		bool operator()(const std::pair<float,vec3i> &a, const std::pair<float,vec3i> &b) {
 			return (a.first < b.first);
 		}
 		bool operator()(const vec3i &a, const vec3i &b) {
+			if(a.x == b.x) {
+				if (a.y == b.y)
+					return (a.z < b.z);
+				return (a.y < b.y);
+			}
 			return (a.x < b.x);
 		}
 };
@@ -102,10 +107,8 @@ std::string toString(float num);
 #define CHUNKSIZE_POW2 4 //CHUNKSIZE must be 1 << CHUNKSIZE_POW2
 #define CHUNKSIZE 16 //in voxels
 #define CHUNKSIZE_MASK 15 //CHUNKSIZE -1
-#define WORLDWIDTH 32 //in chunks
-#define WORLDWIDTH_MASK 31 //WORLDWIDTH -1
-#define WORLDHEIGHT 32 //in chunks
-#define WORLDHEIGHT_MASK 31 //WORLDHEIGHT -1
+#define WORLDSIZE 2 //in chunks
+#define WORLDSIZE_MASK 1 //WORLDWIDTH -1
 
 //light settings
 #define MAXLIGHT 16
