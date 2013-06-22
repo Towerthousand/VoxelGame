@@ -21,10 +21,10 @@ class World {
 		World(SceneMain* parentScene, Player* player);
 		~World();
 
-		Chunk* &operator()(int x, int y, int z);
-		Chunk* &operator()(vec3i coord);
-		Chunk* const &operator()(int x, int y, int z) const;
-		Chunk* const &operator()(vec3i coord) const;
+		Chunk* &getChunk(int x, int y, int z);
+		Chunk* &getChunk(vec3i coord);
+		Chunk* const &getChunk(int x, int y, int z) const;
+		Chunk* const &getChunk(vec3i coord) const;
 
 		//Getters and setters
 		bool getOutOfBounds(int x, int y, int z) const;

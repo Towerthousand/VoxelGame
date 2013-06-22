@@ -23,7 +23,7 @@ class SceneMain : public Scene {
 		void onClose(); //close scene-wide stuff
 
 		void addObject(GameObject* object);
-		World& getWorld();
+		World* getWorld();
 		const ShaderProgram& getShader(const std::string& ID) const;
 
 		int chunksDrawn;

@@ -34,10 +34,10 @@ bool skyMap::updateValues(Chunk *c) {
 				int ind = x*CHUNKSIZE+z;
 				for(int y = CHUNKSIZE-1; y >= 0 && lowPos+y >= values[ind]; --y) {
 					if (lowPos+y == values[ind]) {
-						if((*c)(x,y,z).ID == 0)
+						if(c->getLocal(x,y,z).ID == 0)
 							outLog("#ERROR CHUNK WAS MODIFIED OUT OF APPLICATION");
 					}
-					else if((*c)(x,y,z).ID != 0) {
+					else if(c->getLocal(x,y,z).ID != 0) {
 						values[ind] = lowPos + y;
 						result = true;
 					}

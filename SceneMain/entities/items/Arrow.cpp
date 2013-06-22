@@ -17,8 +17,8 @@ Arrow::~Arrow() {
 void Arrow::update(float deltaTime) {
 	movePos(deltaTime);
 	updateMatrix();
-	if(parentScene->getWorld().getCube(pos.x,pos.y,pos.z).ID == 0)
-		ambientLight = float(parentScene->getWorld().getCube(pos.x,pos.y,pos.z).light)/MAXLIGHT;
+	if(parentScene->getWorld()->getCube(pos.x,pos.y,pos.z).ID == 0)
+		ambientLight = float(parentScene->getWorld()->getCube(pos.x,pos.y,pos.z).light)/MAXLIGHT;
 }
 
 void Arrow::draw() const {

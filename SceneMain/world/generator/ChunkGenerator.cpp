@@ -51,10 +51,10 @@ ChunkGenerator::~ChunkGenerator() {
 
 bool ChunkGenerator::queueChunk(vec3i chunk) { //chunkgrid coords
 	//1. delete the chunk that is in the place of the new chunk and assign pointer to null
-	vec3i chunkIndex = parentScene->getWorld().getCoords(chunk*CHUNKSIZE).first;
-	if(parentScene->getWorld()(chunkIndex) != NULL) {
-		delete parentScene->getWorld()(chunkIndex);
-		parentScene->getWorld()(chunkIndex) = NULL;
+	vec3i chunkIndex = parentScene->getWorld()->getCoords(chunk*CHUNKSIZE).first;
+	if(parentScene->getWorld()->getChunk(chunkIndex) != NULL) {
+		delete parentScene->getWorld()->getChunk(chunkIndex);
+		parentScene->getWorld()->getChunk(chunkIndex) = NULL;
 	}
 	//2. queue new chunk
 	chunkMutex.lock();
@@ -86,7 +86,7 @@ void ChunkGenerator::threadedChunkManagement() {
 			for (int i = 0; i < CHUNKSIZE; ++i)
 				for (int j = 0; j < CHUNKSIZE; ++j)
 					for (int k = 0; k < CHUNKSIZE; ++k)
-						(*newChunk)(i,j,k) = Cube(data[i][j][k],MINLIGHT);
+						newChunk->getLocal(i,j,k) = Cube(data[i][j][k],MINLIGHT);
 			chunkMutex.lock();
 			chunksLoaded.push_back(newChunk);
 			chunksToLoad.erase(chunkPos);

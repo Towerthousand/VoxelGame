@@ -283,8 +283,8 @@ void SceneMain::addObject(GameObject* object) {
 	objects.push_back(object);
 }
 
-World& SceneMain::getWorld() {
-	return world;
+World *SceneMain::getWorld() {
+	return &world;
 }
 
 const ShaderProgram &SceneMain::getShader(const std::string& ID) const {

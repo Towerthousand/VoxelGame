@@ -8,10 +8,10 @@ class Chunk { //16*16*16
 		Chunk(int x, int y, int z, SceneMain *scene);
 		~Chunk();
 
-		Cube &operator()(int x, int y, int z);
-		Cube &operator()(vec3i coord);
-		Cube const &operator()(int x, int y, int z) const;
-		Cube const &operator()(vec3i coord) const;
+		Cube &getLocal(int x, int y, int z);
+		Cube &getLocal(vec3i coord);
+		Cube const &getLocal(int x, int y, int z) const;
+		Cube const &getLocal(vec3i coord) const;
 
 		void initBuffer();
 

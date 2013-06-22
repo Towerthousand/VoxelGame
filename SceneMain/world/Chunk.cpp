@@ -24,26 +24,26 @@ void Chunk::initBuffer() {
 		glGenBuffers(1,(GLuint*) &VBOID);
 }
 
-Cube &Chunk::operator()(int x, int y, int z) {
+Cube &Chunk::getLocal(int x, int y, int z) {
 	return cubes[x*CHUNKSIZE*CHUNKSIZE + y*CHUNKSIZE + z];
 }
 
-Cube &Chunk::operator()(vec3i coord) {
+Cube &Chunk::getLocal(vec3i coord) {
 	return cubes[coord.x*CHUNKSIZE*CHUNKSIZE+coord.y*CHUNKSIZE+coord.z];
 }
 
-Cube const &Chunk::operator()(int x, int y, int z) const {
+Cube const &Chunk::getLocal(int x, int y, int z) const {
 	return cubes[x*CHUNKSIZE*CHUNKSIZE + y*CHUNKSIZE + z];
 }
 
-Cube const &Chunk::operator()(vec3i coord) const {
+Cube const &Chunk::getLocal(vec3i coord) const {
 	return cubes[coord.x*CHUNKSIZE*CHUNKSIZE+coord.y*CHUNKSIZE+coord.z];
 }
 
 Cube Chunk::getCube(int x, int y, int z) const {
 	if(x >= 0 && x < CHUNKSIZE && y >= 0 && y < CHUNKSIZE && z >= 0 && z < CHUNKSIZE)
-		return (*this)(x,y,z);
-	return parentScene->getWorld().getCube(x+(XPOS*CHUNKSIZE),y+(YPOS*CHUNKSIZE),z+(ZPOS*CHUNKSIZE));
+		return getLocal(x,y,z);
+	return parentScene->getWorld()->getCube(x+(XPOS*CHUNKSIZE),y+(YPOS*CHUNKSIZE),z+(ZPOS*CHUNKSIZE));
 }
 
 vec3i Chunk::getPos() {
@@ -58,7 +58,7 @@ void Chunk::update(float deltaTime) {
 	for(int z = 0; z < CHUNKSIZE; ++z) {
 		for(int y = 0; y < CHUNKSIZE; ++y) {
 			for(int x = 0; x < CHUNKSIZE; ++x) {
-				cubeID = (*this)(x,y,z).ID;
+				cubeID = getLocal(x,y,z).ID;
 				if (cubeID != 0) { // only draw if it's not air
 					pushCubeToArray(x,y,z,cubeID,renderData);
 				}

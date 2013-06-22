@@ -15,29 +15,29 @@ World::~World() {
 	for (int x = 0; x < WORLDSIZE; ++x)
 		for (int y = 0; y < WORLDSIZE; ++y)
 			for (int z = 0; z < WORLDSIZE; ++z) {
-				delete (*this)(x,y,z);
-				(*this)(x,y,z) = NULL;
+				delete getChunk(x,y,z);
+				getChunk(x,y,z) = NULL;
 			}
 }
 
-Chunk* &World::operator()(int x, int y, int z) {
+Chunk* &World::getChunk(int x, int y, int z) {
 	return chunks[x*WORLDSIZE*WORLDSIZE + y*WORLDSIZE + z];
 }
 
-Chunk* &World::operator()(vec3i coord) {
+Chunk* &World::getChunk(vec3i coord) {
 	return chunks[coord.x*WORLDSIZE*WORLDSIZE + coord.y*WORLDSIZE + coord.z];
 }
 
-Chunk* const &World::operator()(int x, int y, int z) const {
+Chunk* const &World::getChunk(int x, int y, int z) const {
 	return chunks[x*WORLDSIZE*WORLDSIZE+y*WORLDSIZE+z];
 }
 
-Chunk* const &World::operator()(vec3i coord) const {
+Chunk* const &World::getChunk(vec3i coord) const {
 	return chunks[coord.x*WORLDSIZE*WORLDSIZE+coord.y*WORLDSIZE+coord.z];
 }
 
 bool World::getOutOfBounds(int x, int y, int z) const{
-	Chunk* c = (*this)(getCoords(x,y,z).first);
+	Chunk* c = getChunk(getCoords(x,y,z).first);
 	if(c == NULL || c->XPOS != (x >> CHUNKSIZE_POW2) || c->YPOS != (y >> CHUNKSIZE_POW2) || c->ZPOS != (z >> CHUNKSIZE_POW2))
 		return true;
 	return false;
@@ -51,7 +51,7 @@ Cube World::getCube(int x, int y, int z) const {
 
 Cube World::getCubeRaw(int x, int y, int z) const {
 	std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
-	return (*(*this)(matrixCoords.first))(matrixCoords.second);
+	return getChunk(matrixCoords.first)->getLocal(matrixCoords.second);
 }
 
 void World::setCubeID(int x, int y, int z, unsigned char ID) {
@@ -63,8 +63,8 @@ void World::setCubeID(int x, int y, int z, unsigned char ID) {
 
 void World::setCubeIDRaw(int x, int y, int z, unsigned char ID) {
 	std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
-	(*(*this)(matrixCoords.first))(matrixCoords.second).ID = ID;
-	(*this)(matrixCoords.first)->markedForRedraw = true;
+	getChunk(matrixCoords.first)->getLocal(matrixCoords.second).ID = ID;
+	getChunk(matrixCoords.first)->markedForRedraw = true;
 }
 
 void World::setCubeLight(int x, int y, int z, unsigned char light) {
@@ -75,8 +75,8 @@ void World::setCubeLight(int x, int y, int z, unsigned char light) {
 
 void World::setCubeLightRaw(int x, int y, int z, unsigned char light) {
 	std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
-	(*(*this)(matrixCoords.first))(matrixCoords.second).light = light;
-	(*this)(matrixCoords.first)->markedForRedraw = true;
+	getChunk(matrixCoords.first)->getLocal(matrixCoords.second).light = light;
+	getChunk(matrixCoords.first)->markedForRedraw = true;
 }
 
 std::pair<vec3i,vec3i> World::getCoords(int x, int y, int z) const {
@@ -97,7 +97,7 @@ void World::update(float deltaTime) {
 		chunkGen.chunksLoaded.pop_front();
 		newChunk->initBuffer();
 		vec3i matrixCoords = getCoords(newChunk->getPos()).first;
-		(*this)(matrixCoords) = newChunk;
+		getChunk(matrixCoords) = newChunk;
 		calculateLight(newChunk->getPos() + vec3i(CHUNKSIZE*0.5),CHUNKSIZE*0.5 -1);
 	}
 	chunkGen.chunkMutex.unlock();
@@ -109,13 +109,13 @@ void World::update(float deltaTime) {
 				vec3i chunkPos(playerChunkPos.x+x,playerChunkPos.y+y,playerChunkPos.z+z);
 				std::pair<vec3i,vec3i> matrixCoords = getCoords(chunkPos*CHUNKSIZE);
 				float dist = glm::length(vec3f(CHUNKSIZE*chunkPos) - player->pos);
-				Chunk* current = (*this)(matrixCoords.first);
+				Chunk* current = getChunk(matrixCoords.first);
 				if(current != NULL){
 					if(current->XPOS != chunkPos.x ||
 							current->YPOS != chunkPos.y ||
 							current->ZPOS != chunkPos.z) {
 						delete current;
-						(*this)(matrixCoords.first) = NULL;
+						getChunk(matrixCoords.first) = NULL;
 						queue.push(std::pair<float,vec3i>(-dist,chunkPos));
 					}
 				}
@@ -305,7 +305,7 @@ void World::calculateLight(vec3i source, int radius) { //BFS
 			for(int z = source.z-updateRad; z <= source.z+updateRad; ++z) {
 				if (!getOutOfBounds(x,y,z)){
 					std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
-					Chunk* chunk = (*this)(matrixCoords.first);
+					Chunk* chunk = getChunk(matrixCoords.first);
 					Cube* cube = &chunk->cubes[matrixCoords.second.x*CHUNKSIZE*CHUNKSIZE
 								 +matrixCoords.second.y*CHUNKSIZE
 								 +matrixCoords.second.z];
@@ -358,7 +358,7 @@ void World::calculateLightManhattan(vec3i source, int radius) { //BFS
 				int manhattanDistance = std::abs(x-source.x)+std::abs(y-source.y)+std::abs(z-source.z);
 				if (manhattanDistance <= updateRad && !getOutOfBounds(x,y,z)){
 					std::pair<vec3i,vec3i> matrixCoords = getCoords(x,y,z);
-					Chunk* chunk = (*this)(matrixCoords.first);
+					Chunk* chunk = getChunk(matrixCoords.first);
 					Cube* cube = &chunk->cubes[matrixCoords.second.x*CHUNKSIZE*CHUNKSIZE
 								 +matrixCoords.second.y*CHUNKSIZE
 								 +matrixCoords.second.z];
