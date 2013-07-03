@@ -22,9 +22,9 @@ class World {
 		~World();
 
 		Chunk* &getChunk(int x, int y, int z);
-		Chunk* &getChunk(vec3i coord);
+		Chunk* &getChunk(const vec3i &coord);
 		Chunk* const &getChunk(int x, int y, int z) const;
-		Chunk* const &getChunk(vec3i coord) const;
+		Chunk* const &getChunk(const vec3i &coord) const;
 
 		//Getters and setters
 		bool getOutOfBounds(int x, int y, int z) const;
@@ -37,7 +37,7 @@ class World {
 
 		//coordinates
 		std::pair<vec3i,vec3i> getCoords(int x, int y, int z) const;
-		std::pair<vec3i,vec3i> getCoords(vec3i coord);
+		std::pair<vec3i,vec3i> getCoords(const vec3i &coord);
 
 		//main
 		void draw() const;
@@ -53,8 +53,8 @@ class World {
 
 	private:
 		//Lighting
-		void calculateLight(vec3i source, int radius);
-		void calculateLightManhattan(vec3i source, int radius);
+		void calculateLight(const vec3i &source, int radius);
+		void calculateLightManhattan(const vec3i &source, int radius);
 
 		//BFS Helper functions
 		void processCubeLighting(const vec3i& source, const vec3i& offset, std::vector<vec3i> &queue);

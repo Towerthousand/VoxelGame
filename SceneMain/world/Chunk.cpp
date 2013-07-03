@@ -122,18 +122,19 @@ void Chunk::pushCubeToArray(short x,short y, short z,unsigned char cubeID, std::
 		if (cubeID != 4) {
 			//if it's not a light (light should be fully lit) calculate the average of the adjacent
 			//air blocks and assign max(max(average,adjacentBlock.light/2),MINLIGHT)
-			lindAf = (getCube(x,y,z+1).light + getCube(x,y+1,z+1).light +
+			unsigned char centerLight = getCube(x,y,z+1).light;
+			lindAf = (centerLight + getCube(x,y+1,z+1).light +
 					 getCube(x-1,y,z+1).light + getCube(x-1,y+1,z+1).light)/4.0; //between 0 and MAXLIGHT
-			lindBf = (getCube(x,y,z+1).light + getCube(x,y-1,z+1).light +
+			lindBf = (centerLight + getCube(x,y-1,z+1).light +
 					 getCube(x-1,y,z+1).light + getCube(x-1,y-1,z+1).light)/4.0;
-			lindCf = (getCube(x,y,z+1).light + getCube(x,y-1,z+1).light +
+			lindCf = (centerLight + getCube(x,y-1,z+1).light +
 					 getCube(x+1,y,z+1).light + getCube(x+1,y-1,z+1).light)/4.0;
-			lindDf = (getCube(x,y,z+1).light + getCube(x,y+1,z+1).light +
+			lindDf = (centerLight + getCube(x,y+1,z+1).light +
 					 getCube(x+1,y,z+1).light + getCube(x+1,y+1,z+1).light)/4.0;
-			lindA = (std::fmax(std::fmax(lindAf,getCube(x,y,z+1).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
-			lindB = (std::fmax(std::fmax(lindBf,getCube(x,y,z+1).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
-			lindC = (std::fmax(std::fmax(lindCf,getCube(x,y,z+1).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
-			lindD = (std::fmax(std::fmax(lindDf,getCube(x,y,z+1).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
+			lindA = (std::fmax(std::fmax(lindAf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
+			lindB = (std::fmax(std::fmax(lindBf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
+			lindC = (std::fmax(std::fmax(lindCf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
+			lindD = (std::fmax(std::fmax(lindDf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
 			lindE = (lindA+lindB+lindC+lindD)/4; //between 0 and 255
 		}
 		texX = (textureIndexes[cubeID][0] % (512/TEXSIZE))*TEXSIZE; // TEXSIZE/2 = number of textures/row
@@ -157,18 +158,19 @@ void Chunk::pushCubeToArray(short x,short y, short z,unsigned char cubeID, std::
 	}
 	if(getCube(x,y,z-1).ID == 0) { // back face
 		if (cubeID != 4) {
-			lindAf = (getCube(x,y,z-1).light + getCube(x,y+1,z-1).light +
+			unsigned char centerLight = getCube(x,y,z-1).light;
+			lindAf = (centerLight + getCube(x,y+1,z-1).light +
 					 getCube(x+1,y,z-1).light + getCube(x+1,y+1,z-1).light)/4.0;
-			lindBf = (getCube(x,y,z-1).light + getCube(x,y-1,z-1).light +
+			lindBf = (centerLight + getCube(x,y-1,z-1).light +
 					 getCube(x+1,y,z-1).light + getCube(x+1,y-1,z-1).light)/4.0;
-			lindCf = (getCube(x,y,z-1).light + getCube(x,y-1,z-1).light +
+			lindCf = (centerLight + getCube(x,y-1,z-1).light +
 					 getCube(x-1,y,z-1).light + getCube(x-1,y-1,z-1).light)/4.0;
-			lindDf = (getCube(x,y,z-1).light + getCube(x,y+1,z-1).light +
+			lindDf = (centerLight + getCube(x,y+1,z-1).light +
 					 getCube(x-1,y,z-1).light + getCube(x-1,y+1,z-1).light)/4.0;
-			lindA = (std::fmax(std::fmax(lindAf,getCube(x,y,z-1).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
-			lindB = (std::fmax(std::fmax(lindBf,getCube(x,y,z-1).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
-			lindC = (std::fmax(std::fmax(lindCf,getCube(x,y,z-1).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
-			lindD = (std::fmax(std::fmax(lindDf,getCube(x,y,z-1).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
+			lindA = (std::fmax(std::fmax(lindAf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
+			lindB = (std::fmax(std::fmax(lindBf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
+			lindC = (std::fmax(std::fmax(lindCf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
+			lindD = (std::fmax(std::fmax(lindDf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
 			lindE = (lindA+lindB+lindC+lindD)/4;
 		}
 		texX = (textureIndexes[cubeID][1] % (512/TEXSIZE))*TEXSIZE;
@@ -192,18 +194,19 @@ void Chunk::pushCubeToArray(short x,short y, short z,unsigned char cubeID, std::
 	}
 	if(getCube(x+1,y,z).ID == 0) { // left face
 		if (cubeID != 4) {
-			lindAf = (getCube(x+1,y,z).light + getCube(x+1,y+1,z).light +
+			unsigned char centerLight = getCube(x+1,y,z).light;
+			lindAf = (centerLight + getCube(x+1,y+1,z).light +
 					 getCube(x+1,y,z+1).light + getCube(x+1,y+1,z+1).light)/4.0;
-			lindBf = (getCube(x+1,y,z).light + getCube(x+1,y-1,z).light +
+			lindBf = (centerLight + getCube(x+1,y-1,z).light +
 					 getCube(x+1,y,z+1).light + getCube(x+1,y-1,z+1).light)/4.0;
-			lindCf = (getCube(x+1,y,z).light + getCube(x+1,y-1,z).light +
+			lindCf = (centerLight + getCube(x+1,y-1,z).light +
 					 getCube(x+1,y,z-1).light + getCube(x+1,y-1,z-1).light)/4.0;
-			lindDf = (getCube(x+1,y,z).light + getCube(x+1,y+1,z).light +
+			lindDf = (centerLight + getCube(x+1,y+1,z).light +
 					 getCube(x+1,y,z-1).light + getCube(x+1,y+1,z-1).light)/4.0;
-			lindA = (std::fmax(std::fmax(lindAf,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
-			lindB = (std::fmax(std::fmax(lindBf,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
-			lindC = (std::fmax(std::fmax(lindCf,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
-			lindD = (std::fmax(std::fmax(lindDf,getCube(x+1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
+			lindA = (std::fmax(std::fmax(lindAf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
+			lindB = (std::fmax(std::fmax(lindBf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
+			lindC = (std::fmax(std::fmax(lindCf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
+			lindD = (std::fmax(std::fmax(lindDf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
 			lindE = (lindA+lindB+lindC+lindD)/4;
 		}
 		texX = (textureIndexes[cubeID][2] % (512/TEXSIZE))*TEXSIZE;
@@ -227,18 +230,19 @@ void Chunk::pushCubeToArray(short x,short y, short z,unsigned char cubeID, std::
 	}
 	if(getCube(x-1,y,z).ID == 0) { // right face
 		if (cubeID != 4) {
-			lindAf = (getCube(x-1,y,z).light + getCube(x-1,y+1,z).light +
+			unsigned char centerLight = getCube(x-1,y,z).light;
+			lindAf = (centerLight + getCube(x-1,y+1,z).light +
 					 getCube(x-1,y,z-1).light + getCube(x-1,y+1,z-1).light)/4.0;
-			lindBf = (getCube(x-1,y,z).light + getCube(x-1,y-1,z).light +
+			lindBf = (centerLight + getCube(x-1,y-1,z).light +
 					 getCube(x-1,y,z-1).light + getCube(x-1,y-1,z-1).light)/4.0;
-			lindCf = (getCube(x-1,y,z).light + getCube(x-1,y-1,z).light +
+			lindCf = (centerLight + getCube(x-1,y-1,z).light +
 					 getCube(x-1,y,z+1).light + getCube(x-1,y-1,z+1).light)/4.0;
-			lindDf = (getCube(x-1,y,z).light + getCube(x-1,y+1,z).light +
+			lindDf = (centerLight + getCube(x-1,y+1,z).light +
 					 getCube(x-1,y,z+1).light + getCube(x-1,y+1,z+1).light)/4.0;
-			lindA = (std::fmax(std::fmax(lindAf,getCube(x-1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
-			lindB = (std::fmax(std::fmax(lindBf,getCube(x-1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
-			lindC = (std::fmax(std::fmax(lindCf,getCube(x-1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
-			lindD = (std::fmax(std::fmax(lindDf,getCube(x-1,y,z).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
+			lindA = (std::fmax(std::fmax(lindAf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
+			lindB = (std::fmax(std::fmax(lindBf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
+			lindC = (std::fmax(std::fmax(lindCf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
+			lindD = (std::fmax(std::fmax(lindDf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
 			lindE = (lindA+lindB+lindC+lindD)/4;
 		}
 		texX = (textureIndexes[cubeID][3] % (512/TEXSIZE))*TEXSIZE;
@@ -262,18 +266,19 @@ void Chunk::pushCubeToArray(short x,short y, short z,unsigned char cubeID, std::
 	}
 	if(getCube(x,y-1,z).ID == 0) { // bottom face
 		if (cubeID != 4) {
-			lindAf = (getCube(x,y-1,z).light + getCube(x+1,y-1,z).light +
+			unsigned char centerLight = getCube(x,y-1,z).light;
+			lindAf = (centerLight + getCube(x+1,y-1,z).light +
 					 getCube(x,y-1,z+1).light + getCube(x+1,y-1,z+1).light)/4.0;
-			lindBf = (getCube(x,y-1,z).light + getCube(x-1,y-1,z).light +
+			lindBf = (centerLight + getCube(x-1,y-1,z).light +
 					 getCube(x,y-1,z+1).light + getCube(x-1,y-1,z+1).light)/4.0;
-			lindCf = (getCube(x,y-1,z).light + getCube(x-1,y-1,z).light +
+			lindCf = (centerLight + getCube(x-1,y-1,z).light +
 					 getCube(x,y-1,z-1).light + getCube(x-1,y-1,z-1).light)/4.0;
-			lindDf = (getCube(x,y-1,z).light + getCube(x+1,y-1,z).light +
+			lindDf = (centerLight + getCube(x+1,y-1,z).light +
 					 getCube(x,y-1,z-1).light + getCube(x+1,y-1,z-1).light)/4.0;
-			lindA = (std::fmax(std::fmax(lindAf,getCube(x,y-1,z).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
-			lindB = (std::fmax(std::fmax(lindBf,getCube(x,y-1,z).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
-			lindC = (std::fmax(std::fmax(lindCf,getCube(x,y-1,z).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
-			lindD = (std::fmax(std::fmax(lindDf,getCube(x,y-1,z).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
+			lindA = (std::fmax(std::fmax(lindAf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
+			lindB = (std::fmax(std::fmax(lindBf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
+			lindC = (std::fmax(std::fmax(lindCf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
+			lindD = (std::fmax(std::fmax(lindDf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
 			lindE = (lindA+lindB+lindC+lindD)/4;
 		}
 		texX = (textureIndexes[cubeID][4] % (512/TEXSIZE))*TEXSIZE;
@@ -297,18 +302,19 @@ void Chunk::pushCubeToArray(short x,short y, short z,unsigned char cubeID, std::
 	}
 	if(getCube(x,y+1,z).ID == 0) { // top face
 		if (cubeID != 4) {
-			lindAf = (getCube(x,y+1,z).light + getCube(x-1,y+1,z).light +
+			unsigned char centerLight = getCube(x,y+1,z).light;
+			lindAf = (centerLight + getCube(x-1,y+1,z).light +
 					 getCube(x,y+1,z+1).light + getCube(x-1,y+1,z+1).light)/4.0;
-			lindBf = (getCube(x,y+1,z).light + getCube(x+1,y+1,z).light +
+			lindBf = (centerLight + getCube(x+1,y+1,z).light +
 					 getCube(x,y+1,z+1).light + getCube(x+1,y+1,z+1).light)/4.0;
-			lindCf = (getCube(x,y+1,z).light + getCube(x+1,y+1,z).light +
+			lindCf = (centerLight + getCube(x+1,y+1,z).light +
 					 getCube(x,y+1,z-1).light + getCube(x+1,y+1,z-1).light)/4.0;
-			lindDf = (getCube(x,y+1,z).light + getCube(x-1,y+1,z).light +
+			lindDf = (centerLight + getCube(x-1,y+1,z).light +
 					 getCube(x,y+1,z-1).light + getCube(x-1,y+1,z-1).light)/4.0;
-			lindA = (std::fmax(std::fmax(lindAf,getCube(x,y+1,z).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
-			lindB = (std::fmax(std::fmax(lindBf,getCube(x,y+1,z).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
-			lindC = (std::fmax(std::fmax(lindCf,getCube(x,y+1,z).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
-			lindD = (std::fmax(std::fmax(lindDf,getCube(x,y+1,z).light/3.0),MINLIGHT)/(MAXLIGHT))*255;
+			lindA = (std::fmax(std::fmax(lindAf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
+			lindB = (std::fmax(std::fmax(lindBf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
+			lindC = (std::fmax(std::fmax(lindCf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
+			lindD = (std::fmax(std::fmax(lindDf,centerLight >> 2),MINLIGHT)/(MAXLIGHT))*255;
 			lindE = (lindA+lindB+lindC+lindD)/4;
 		}
 		texX = (textureIndexes[cubeID][5] % (512/TEXSIZE))*TEXSIZE;

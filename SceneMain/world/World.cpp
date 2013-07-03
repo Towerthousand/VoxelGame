@@ -24,7 +24,7 @@ Chunk* &World::getChunk(int x, int y, int z) {
 	return chunks[x*WORLDSIZE*WORLDSIZE + y*WORLDSIZE + z];
 }
 
-Chunk* &World::getChunk(vec3i coord) {
+Chunk* &World::getChunk(const vec3i &coord) {
 	return chunks[coord.x*WORLDSIZE*WORLDSIZE + coord.y*WORLDSIZE + coord.z];
 }
 
@@ -32,7 +32,7 @@ Chunk* const &World::getChunk(int x, int y, int z) const {
 	return chunks[x*WORLDSIZE*WORLDSIZE+y*WORLDSIZE+z];
 }
 
-Chunk* const &World::getChunk(vec3i coord) const {
+Chunk* const &World::getChunk(const vec3i &coord) const {
 	return chunks[coord.x*WORLDSIZE*WORLDSIZE+coord.y*WORLDSIZE+coord.z];
 }
 
@@ -86,7 +86,7 @@ std::pair<vec3i,vec3i> World::getCoords(int x, int y, int z) const {
 								  vec3i(x & CHUNKSIZE_MASK, y & CHUNKSIZE_MASK,z & CHUNKSIZE_MASK));
 }
 
-std::pair<vec3i,vec3i> World::getCoords(vec3i coord) {
+std::pair<vec3i,vec3i> World::getCoords(const vec3i &coord) {
 	return getCoords(coord.x,coord.y,coord.z);
 }
 
@@ -295,7 +295,7 @@ void World::traceView(const Player *playerCam, float tMax) {
 	playerTargetsBlock = false;
 }
 
-void World::calculateLight(vec3i source, int radius) { //BFS
+void World::calculateLight(const vec3i &source, int radius) { //BFS
 	sf::Clock clock;
 	clock.restart();
 	int updateRad = radius + 1; //if any component distance >= updateRad, lighting is OK
@@ -347,7 +347,7 @@ void World::calculateLight(vec3i source, int radius) { //BFS
 	}
 }
 
-void World::calculateLightManhattan(vec3i source, int radius) { //BFS
+void World::calculateLightManhattan(const vec3i &source, int radius) { //BFS
 	sf::Clock clock;
 	clock.restart();
 	int updateRad = radius + 1; //if manhattan dist >= updateRad, lighting is OK

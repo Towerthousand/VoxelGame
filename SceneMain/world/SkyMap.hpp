@@ -9,10 +9,10 @@ class skyMap {
 		skyMap();
 		~skyMap();
 
-        int &operator()(int x, int z);
-        int &operator()(vec2i coord);
-        int const &operator()(int x, int z) const;
-        int const &operator()(vec2i coord) const;
+		int &getHeight(int x, int z);
+		int &getHeight(vec2i coord);
+		int const &getHeight(int x, int z) const;
+		int const &getHeight(vec2i coord) const;
 
 		bool updateValues(Chunk* c); //returns wether there was a change
 
