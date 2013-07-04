@@ -1,4 +1,4 @@
-#include "World.hpp"
+﻿#include "World.hpp"
 #include "Chunk.hpp"
 #include "../entities/Player.hpp"
 #include "../SceneMain.hpp"
@@ -174,7 +174,6 @@ void World::draw() const {
 		//disable rendering state
 		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 		glDepthMask(GL_FALSE);
-		glDisable(GL_LIGHTING);
 
 		//generate and send the queries
 		int queriesSent = 0;
@@ -193,7 +192,6 @@ void World::draw() const {
 		//enable rendering state
 		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 		glDepthMask(GL_TRUE);
-		glDisable(GL_LIGHTING);
 
 		//collect query results
 		for (int i = 0; i < queriesSent; ++i) {
@@ -419,15 +417,13 @@ void World::drawWireCube(const vec3f &pos) const {
 						   vec3f(pos.x-0.0025,pos.y-0.0025,pos.z-0.0025));
 	parentScene->getState().model =
 			glm::scale(parentScene->getState().model,vec3f(1.005,1.005,1.005));
-	parentScene->getState().updateShaderUniforms(parentScene->getShader("MODEL"));
-	parentScene->getShader("MODEL").use();
+	parentScene->getState().updateShaderUniforms(parentScene->getShader("BLACK"));
+	parentScene->getShader("BLACK").use();
 	glLineWidth(1.5);
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glColor4f(0.0,0.0,0.0,0.5);
-	glVertexPointer(3, GL_INT, 0, &vertexPoints[0]);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_INT, GL_FALSE, 0, &vertexPoints[0]);
 	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,&indexes[0]);
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glColor4f(1.0,1.0,1.0,1.0);
+	glDisableVertexAttribArray(0);
 	parentScene->getState().model = poppedMat;
 }
 

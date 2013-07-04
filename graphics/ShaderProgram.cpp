@@ -32,11 +32,16 @@ bool ShaderProgram::makeProgram(const std::string& filePathVertex, const std::st
 		glDeleteProgram(programHandle);
 		return false;
 	}
+	name = filePathVertex + filePathFragment;
 	return true;
 }
 
 void ShaderProgram::use() const {
 	glUseProgram(programHandle);
+}
+
+void ShaderProgram::bindLocation(uint index, const std::string &location) {
+	glBindAttribLocation(programHandle, index, (GLchar *)location.c_str());
 }
 
 GLint ShaderProgram::getUniLoc(const std::string &uniformID) const {
@@ -46,9 +51,10 @@ GLint ShaderProgram::getUniLoc(const std::string &uniformID) const {
 /////////////////////////////////////////////FLOATS
 
 void ShaderProgram::sendUniform1f(const std::string& uniformID, float x) const {
+	use();
 	GLint location = getUniLoc(uniformID);
 	if (location == -1) {
-		outLog("#ERROR When trying to get uniform: no uniform named " + uniformID);
+		outLog("#ERROR When trying to get uniform: no uniform named " + uniformID +" " + name);
 		return;
 	}
 	glUniform1f(location, x);

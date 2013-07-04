@@ -78,9 +78,8 @@ struct Vertex {
 			vx(vx), vy(vy), vz(vz),
 			tx(tx), ty(ty),
 			cr(cr), cg(cg), cb(cb), ca(ca) {}
-		short
-		vx,vy,vz,
-		tx,ty;
+		char vx,vy,vz,shit;
+		short tx,ty;
 		unsigned char
 		cr,cg,cb,ca;
 };
@@ -100,7 +99,7 @@ std::string toString(float num);
 
 //defines (global settings and constants)
 #define WINDOW_TITLE "VoxelGame"
-#define CONTEXT_SETTINGS_OPENGL sf::ContextSettings(32,32,0,3,0)
+#define CONTEXT_SETTINGS_OPENGL sf::ContextSettings(32,32,0,4,2)
 #define DEG_TO_RAD ((2*M_PI)/360.0f)
 
 //world size

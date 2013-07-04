@@ -8,6 +8,7 @@ class ShaderProgram {
 		~ShaderProgram();
 
 		bool makeProgram(const std::string& filePathVertex, const std::string& filePathFragment);
+		void bindLocation(uint index,const std::string& location);
 		void use() const;
 		GLint getUniLoc(const std::string &uniformID) const;
 
@@ -66,6 +67,8 @@ class ShaderProgram {
 							  , const mat3f &mat) const;
 		void sendUniformMat4f(const std::string& uniformID
 							  , const mat4f &mat) const;
+
+		std::string name;
 
 	private:
 		GLuint programHandle;

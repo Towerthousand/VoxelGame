@@ -18,7 +18,6 @@ class Player : public Entity , public Camera {
 		void update(float deltaTime);
 		void draw() const;
 
-		void drawFrustum() const;
 		bool insideFrustum(const vec3f &center, float radius) const; //sphere-plane check for frustum culling
 
 		unsigned char selectedID; //current blockID, used to place blocks

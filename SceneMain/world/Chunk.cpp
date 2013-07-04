@@ -78,19 +78,20 @@ void Chunk::draw() const {
 		parentScene->getShader("TERRAIN").use();
 		glBindBuffer(GL_ARRAY_BUFFER, VBOID);
 
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glEnableClientState(GL_COLOR_ARRAY);
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
 
-		glVertexPointer(3, GL_SHORT, sizeof(Vertex), 0);
-		glTexCoordPointer(2, GL_SHORT, sizeof(Vertex), (GLvoid*)(3*sizeof(short)));
-		glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(Vertex), (GLvoid*)(2*sizeof(short)+3*sizeof(short)));
+		glVertexAttribPointer(0, 3, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(Vertex), 0);
+		glVertexAttribPointer(1, 2, GL_SHORT, GL_FALSE, sizeof(Vertex), (GLvoid*)(4*sizeof(char)));
+		glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(Vertex), (GLvoid*)(2*sizeof(short)+4*sizeof(char)));
 
 		glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 
-		glDisableClientState(GL_COLOR_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(2);
+
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		parentScene->getState().model = poppedMat;
 	}
@@ -99,12 +100,12 @@ void Chunk::draw() const {
 void Chunk::drawBoundingBox() const {
 	mat4f poppedMat = parentScene->getState().model;
 	parentScene->getState().model = modelMatrix;
-	parentScene->getState().updateShaderUniforms(parentScene->getShader("MODEL"));
-	parentScene->getShader("MODEL").use();
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
+	parentScene->getState().updateShaderUniforms(parentScene->getShader("BLACK"));
+	parentScene->getShader("BLACK").use();
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, &vertices[0]);
 	glDrawArrays(GL_QUADS,0,24);
-	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableVertexAttribArray(0);
 	parentScene->getState().model = poppedMat;
 }
 

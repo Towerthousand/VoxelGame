@@ -36,23 +36,6 @@ void Player::draw() const {
 	//draw the model when there is one...
 }
 
-void Player::drawFrustum() const {
-	//for debugging purposes. Assign makeFrustrum() to a key
-	//instead of every update and call drawFrustum() every draw
-	//to see the culling from outside.
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	for (uint i = 0; i < frustumPlanes.size(); ++i) {
-		glPushMatrix();
-		glColor4f(0.0,0.0,0.0,1);
-		glBegin(GL_LINE_STRIP);
-		for(int j = 0; j < 5; ++j)
-			glVertex3f(frustumPlanes[i][j%4].x,frustumPlanes[i][j%4].y,frustumPlanes[i][j%4].z);
-		glEnd();
-		glColor4f(1.0,1.0,1.0,1.0);
-		glPopMatrix();
-	}
-}
-
 bool Player::insideFrustum( const vec3f &center, float radius) const {
 	float distance,D;
 	for(uint i=0; i < frustumPlanes.size(); i++) {

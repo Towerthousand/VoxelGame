@@ -21,10 +21,20 @@ bool SceneMain::loadResources() {
 	if(!s.makeProgram("shaders/terrain_vertex.glsl","shaders/terrain_fragment.glsl"))
 		return false;
 	shaders["TERRAIN"] = s;
+	s.bindLocation(0,"aVertexPos");
+	s.bindLocation(1,"aTexCoord");
+	s.bindLocation(2,"aVertexColor");
 	s = ShaderProgram();
 	if(!s.makeProgram("shaders/model_vertex.glsl","shaders/model_fragment.glsl"))
 		return false;
 	shaders["MODEL"] = s;
+	s.bindLocation(0,"aVertexPos");
+	s.bindLocation(1,"aVertexColor");
+	s = ShaderProgram();
+	if(!s.makeProgram("shaders/black_vertex.glsl","shaders/black_fragment.glsl"))
+		return false;
+	shaders["BLACK"] = s;
+	s.bindLocation(0,"aVertexPos");
 	//textures
 	if(!parent.textures().loadTexture("terrain","resources/blocks" + toString(TEXSIZE) +".png"))
 		return false;
@@ -47,8 +57,8 @@ bool SceneMain::init() {
 	if (!loadResources())
 		return false;
 	//Init music
-	//parent.audio().musicBank["troll"]->getTrack().play();
-	//parent.audio().musicBank["troll"]->getTrack().setLoop(true);
+	parent.audio().musicBank["troll"]->getTrack().play();
+	parent.audio().musicBank["troll"]->getTrack().setLoop(true);
 	//Init debug tags
 	parent.font().makeText("posX","",20,vec2f(10,10),sf::Color::White,sf::Text::Bold,false);
 	parent.font().makeText("posY","",20,vec2f(10,30),sf::Color::White,sf::Text::Bold,false);

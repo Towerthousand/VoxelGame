@@ -3,7 +3,6 @@ CONFIG -= qt
 LIBS += -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lGL
 INCLUDEPATH += $$PWD/
 QMAKE_CXXFLAGS += -std=c++11 -O3
-CXX_FLAGS += -O3
 SOURCES += \
     $$PWD/main.cpp \
     $$PWD/Game.cpp \
@@ -95,4 +94,6 @@ OTHER_FILES += \
     $$PWD/shaders/terrain_fragment.glsl \
     $$PWD/shaders/terrain_vertex.glsl \
     $$PWD/shaders/model_vertex.glsl \
-    $$PWD/shaders/model_fragment.glsl
+    $$PWD/shaders/model_fragment.glsl \
+    shaders/black_vertex.glsl \
+    shaders/black_fragment.glsl

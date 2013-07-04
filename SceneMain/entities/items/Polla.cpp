@@ -22,7 +22,7 @@ void Polla::draw() const{
 	mat4f poppedMat = parentScene->getState().model;
 	parentScene->getState().model = modelMatrix;
 	parentScene->getState().updateShaderUniforms(parentScene->getShader("MODEL"));
-	parentScene->getShader("MODEL").sendUniform1f("ambientLight",ambientLight);
+	//parentScene->getShader("MODEL").sendUniform1f("ambientLight",ambientLight);
 	model.draw();
 	parentScene->getState().model = poppedMat;
 }

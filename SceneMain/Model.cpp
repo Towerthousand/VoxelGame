@@ -56,17 +56,15 @@ bool Model::loadVoxelization(const std::string &filePath) {
 void Model::draw() const {
 	glBindBuffer(GL_ARRAY_BUFFER, VBOID);
 
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-	glDisable(GL_TEXTURE_2D);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
 
-	glVertexPointer(3, GL_FLOAT, sizeof(ModelVertex), 0);
-	glColorPointer(4, GL_FLOAT, sizeof(ModelVertex), (GLvoid*)(3*sizeof(float)));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ModelVertex), 0);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(ModelVertex), (GLvoid*)(3*sizeof(float)));
 	glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 
-	glEnable(GL_TEXTURE_2D);
-	glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
