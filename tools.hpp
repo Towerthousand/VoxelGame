@@ -26,6 +26,7 @@
 #include <sys/stat.h>
 #include <thread>
 #include <mutex>
+#include <algorithm>
 
 //GLM (openGL Math)
 #include <glm/glm.hpp> // vec3, vec4, ivec4, mat4 (core)
@@ -106,8 +107,8 @@ std::string toString(float num);
 #define CHUNKSIZE_POW2 4 //CHUNKSIZE must be 1 << CHUNKSIZE_POW2
 #define CHUNKSIZE 16 //in voxels
 #define CHUNKSIZE_MASK 15 //CHUNKSIZE -1
-#define WORLDSIZE 32 //in chunks
-#define WORLDSIZE_MASK 31 //WORLDWIDTH -1
+#define WORLDSIZE 16 //in chunks
+#define WORLDSIZE_MASK 15 //WORLDWIDTH -1
 
 //light settings
 #define MAXLIGHT 16

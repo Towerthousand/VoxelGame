@@ -49,48 +49,37 @@ ChunkGenerator::~ChunkGenerator() {
 	delete entry; //will delete all child node functions recursively into the function tree
 }
 
-bool ChunkGenerator::queueChunk(vec3i chunk) { //chunkgrid coords
-	//1. delete the chunk that is in the place of the new chunk and assign pointer to null
-	vec3i chunkIndex = parentScene->getWorld()->getCoords(chunk*CHUNKSIZE).first;
-	if(parentScene->getWorld()->getChunk(chunkIndex) != NULL) {
-		delete parentScene->getWorld()->getChunk(chunkIndex);
-		parentScene->getWorld()->getChunk(chunkIndex) = NULL;
-	}
-	//2. queue new chunk
-	chunkMutex.lock();
-	if(chunksToLoad.find(chunk) == chunksToLoad.end()) {
-		for(std::list<Chunk*>::iterator it = chunksLoaded.begin();it != chunksLoaded.end(); ++it)
-			if(vec3i((*it)->XPOS,(*it)->YPOS,(*it)->ZPOS) == chunk) {
-				chunkMutex.unlock();
-				return false;//chunk was already generated but not picked up yet
-			}
-		chunksToLoad.insert(chunk);
-		chunksToLoadQueue.push(chunk);
-		chunkMutex.unlock();
-		return true; //chunk is now queued
-	}
-	chunkMutex.unlock();
-	return false; //chunk was already queued
-}
-
 void ChunkGenerator::threadedChunkManagement() {
+	bool found;
 	while(true) {
 		//Look for new chunks. If there are, generate and output to output queue. If not, sleep for a short while
 		chunkMutex.lock();
-		if(!chunksToLoad.empty() && !chunksToLoadQueue.empty()) {
-			vec3i chunkPos = chunksToLoadQueue.front();
-			chunksToLoadQueue.pop();
+		if(!chunksToLoad.empty()) {
+			found = false;
+			vec3i chunkPos;
+			while(!chunksToLoad.empty()) {
+				chunkPos = chunksToLoad.top();
+				chunksToLoad.pop();
+				if(chunksBeingLoaded.find(chunkPos) == chunksBeingLoaded.end() &&
+				   chunksLoaded.find(chunkPos) == chunksLoaded.end()) {
+					chunksBeingLoaded.insert(chunkPos); //set the chunk to load
+					found = true;
+					break;
+				}
+			}
 			chunkMutex.unlock();
-			Chunk* newChunk = new Chunk(chunkPos.x,chunkPos.y,chunkPos.z,parentScene);
-			ID3Data data = entry->getID3Data(chunkPos.x*CHUNKSIZE,chunkPos.y*CHUNKSIZE,chunkPos.z*CHUNKSIZE,CHUNKSIZE,CHUNKSIZE+5,CHUNKSIZE);
-			for (int i = 0; i < CHUNKSIZE; ++i)
-				for (int j = 0; j < CHUNKSIZE; ++j)
-					for (int k = 0; k < CHUNKSIZE; ++k)
-						newChunk->getLocal(i,j,k) = Cube(data[i][j][k],MINLIGHT);
-			chunkMutex.lock();
-			chunksLoaded.push_back(newChunk);
-			chunksToLoad.erase(chunkPos);
-			chunkMutex.unlock();
+			if(found) {
+				Chunk* newChunk = new Chunk(chunkPos.x,chunkPos.y,chunkPos.z,parentScene);
+				ID3Data data = entry->getID3Data(chunkPos.x*CHUNKSIZE,chunkPos.y*CHUNKSIZE,chunkPos.z*CHUNKSIZE,CHUNKSIZE,CHUNKSIZE+5,CHUNKSIZE);
+				for (int i = 0; i < CHUNKSIZE; ++i)
+					for (int j = 0; j < CHUNKSIZE; ++j)
+						for (int k = 0; k < CHUNKSIZE; ++k)
+							newChunk->getLocal(i,j,k) = Cube(data[i][j][k],MINLIGHT);
+				chunkMutex.lock();
+				chunksLoaded.insert(newChunk);
+				chunksBeingLoaded.erase(chunkPos);
+				chunkMutex.unlock();
+			}
 		}
 		else {
 			chunkMutex.unlock();

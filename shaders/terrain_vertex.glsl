@@ -11,5 +11,5 @@ varying vec2 vTexCoord;
 void main () {
         gl_Position = modelViewProjectionMatrix * vec4(aVertexPos,1.0);
         vTexCoord = vec4(texMat0 * vec4(aTexCoord,0.0,0.0)).xy;
-        vColor = aVertexColor/256.0;
+        vColor = aVertexColor/255.0;
 }

@@ -69,7 +69,6 @@ void Chunk::update(float deltaTime) {
 	vertexCount = renderData.size();
 }
 
-
 void Chunk::draw() const {
 	if(vertexCount != 0) {
 		mat4f poppedMat = parentScene->getState().model;

@@ -122,10 +122,6 @@ void World::update(float deltaTime) {
 				else
 					queue.push(std::pair<float,vec3i>(-dist,chunkPos));
 			}
-	if(!queue.empty()) {
-		while(!queue.empty() && !chunkGen.queueChunk(queue.top().second))
-			queue.pop();
-	}
 	traceView(player,10);
 	for(std::vector<Chunk*>::iterator it = chunks.begin(); it != chunks.end(); ++it)
 		if(*it != NULL)
