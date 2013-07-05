@@ -1,2 +1,4 @@
-
-*.pro.user
+*.o
+VoxelGame
+*.user
+Makefile
