@@ -11,9 +11,10 @@ class ChunkGenerator {
 		~ChunkGenerator();
 
 		void threadedChunkManagement();
+		void replaceQueue(std::priority_queue<std::pair<float,vec3i>, std::vector<std::pair<float,vec3i> >, FunctorCompare > newQueue);
 
 		static std::mutex chunkMutex;
-		std::set<Chunk*> chunksLoaded;
+		std::map<vec3i,Chunk*,FunctorCompare> chunksLoaded;
 
 	private:
 		SceneMain* parentScene;

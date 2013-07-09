@@ -92,14 +92,14 @@ std::pair<vec3i,vec3i> World::getCoords(const vec3i &coord) {
 
 void World::update(float deltaTime) {
 	chunkGen.chunkMutex.lock();
-	while(!chunkGen.chunksLoaded.empty()) {
-		Chunk* newChunk = chunkGen.chunksLoaded.front();
-		chunkGen.chunksLoaded.pop_front();
+	for(auto it = chunkGen.chunksLoaded.begin(); it != chunkGen.chunksLoaded.end(); ++it) {
+		Chunk* newChunk = (*it).second;
 		newChunk->initBuffer();
 		vec3i matrixCoords = getCoords(newChunk->getPos()).first;
 		getChunk(matrixCoords) = newChunk;
 		calculateLight(newChunk->getPos() + vec3i(CHUNKSIZE*0.5),CHUNKSIZE*0.5 -1);
 	}
+	chunkGen.chunksLoaded.clear();
 	chunkGen.chunkMutex.unlock();
 	vec3i playerChunkPos = vec3i(std::floor(player->pos.x),std::floor(player->pos.y),std::floor(player->pos.z))/CHUNKSIZE;
 	std::priority_queue<std::pair<float,vec3i>, std::vector<std::pair<float,vec3i> >, FunctorCompare > queue;
@@ -109,11 +109,14 @@ void World::update(float deltaTime) {
 				vec3i chunkPos(playerChunkPos.x+x,playerChunkPos.y+y,playerChunkPos.z+z);
 				std::pair<vec3i,vec3i> matrixCoords = getCoords(chunkPos*CHUNKSIZE);
 				float dist = glm::length(vec3f(CHUNKSIZE*chunkPos) - player->pos);
+				if(!player->insideFrustum(vec3f(CHUNKSIZE*chunkPos) + vec3f(CHUNKSIZE/2)
+										  ,glm::length(vec3i(CHUNKSIZE/2))))
+					dist *= 10;
 				Chunk* current = getChunk(matrixCoords.first);
 				if(current != NULL){
 					if(current->XPOS != chunkPos.x ||
-							current->YPOS != chunkPos.y ||
-							current->ZPOS != chunkPos.z) {
+					   current->YPOS != chunkPos.y ||
+					   current->ZPOS != chunkPos.z) {
 						delete current;
 						getChunk(matrixCoords.first) = NULL;
 						queue.push(std::pair<float,vec3i>(-dist,chunkPos));
@@ -122,6 +125,7 @@ void World::update(float deltaTime) {
 				else
 					queue.push(std::pair<float,vec3i>(-dist,chunkPos));
 			}
+	chunkGen.replaceQueue(queue);
 	traceView(player,10);
 	for(std::vector<Chunk*>::iterator it = chunks.begin(); it != chunks.end(); ++it)
 		if(*it != NULL)
@@ -212,7 +216,7 @@ void World::draw() const {
 //Implemented by Jordi "BuD" Santiago Provencio
 void World::traceView(const Player *playerCam, float tMax) {
 	if (!getOutOfBounds(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z)) &&
-			getCube(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z)).ID != 0) {
+		getCube(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z)).ID != 0) {
 		playerTargetsBlock = true;
 		targetedBlock = vec3f(floor(playerCam->camPos.x),floor(playerCam->camPos.y),floor(playerCam->camPos.z));
 		return;
@@ -307,8 +311,8 @@ void World::calculateLight(const vec3i &source, int radius) { //BFS
 						switch(cube->ID) {
 							case 0: //air
 								if (x == source.x-updateRad || x == source.x+updateRad
-										||y == source.y-updateRad || y == source.y+updateRad
-										||z == source.z-updateRad || z == source.z+updateRad) { //if it is on border, mark it as node
+									||y == source.y-updateRad || y == source.y+updateRad
+									||z == source.z-updateRad || z == source.z+updateRad) { //if it is on border, mark it as node
 									if (cube->light > MINLIGHT)
 										blocksToCheck[cube->light].push_back(vec3i(x,y,z));
 								}

@@ -58,7 +58,7 @@ void ChunkGenerator::threadedChunkManagement() {
 			found = false;
 			vec3i chunkPos;
 			while(!chunksToLoad.empty()) {
-				chunkPos = chunksToLoad.top();
+				chunkPos = chunksToLoad.top().second;
 				chunksToLoad.pop();
 				if(chunksBeingLoaded.find(chunkPos) == chunksBeingLoaded.end() &&
 				   chunksLoaded.find(chunkPos) == chunksLoaded.end()) {
@@ -76,7 +76,7 @@ void ChunkGenerator::threadedChunkManagement() {
 						for (int k = 0; k < CHUNKSIZE; ++k)
 							newChunk->getLocal(i,j,k) = Cube(data[i][j][k],MINLIGHT);
 				chunkMutex.lock();
-				chunksLoaded.insert(newChunk);
+				chunksLoaded.insert(std::pair<vec3i,Chunk*>(chunkPos,newChunk));
 				chunksBeingLoaded.erase(chunkPos);
 				chunkMutex.unlock();
 			}
@@ -86,6 +86,12 @@ void ChunkGenerator::threadedChunkManagement() {
 			sf::sleep(sf::seconds(0.1));
 		}
 	}
+}
+
+void ChunkGenerator::replaceQueue(std::priority_queue<std::pair<float,vec3i>, std::vector<std::pair<float,vec3i> >, FunctorCompare > newQueue) {
+	chunkMutex.lock();
+	this->chunksToLoad = newQueue;
+	chunkMutex.unlock();
 }
 
 std::mutex ChunkGenerator::chunkMutex;
