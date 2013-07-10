@@ -11,18 +11,17 @@ class ChunkGenerator {
 		~ChunkGenerator();
 
 		void threadedChunkManagement();
-		void replaceQueue(std::priority_queue<std::pair<float,vec3i>, std::vector<std::pair<float,vec3i> >, FunctorCompare > newQueue);
+		void replaceQueue(const std::priority_queue<std::pair<float,vec3i>, std::vector<std::pair<float,vec3i> >, FunctorCompare > &newQueue);
 
 		static std::mutex chunkMutex;
-		std::map<vec3i,Chunk*,FunctorCompare> chunksLoaded;
+		std::queue<Chunk*> chunksLoaded;
 
-	private:
 		SceneMain* parentScene;
 		std::mt19937 generator; //Mersenne twister with nice configuration
 
 		FunctionTerrain* entry; //root function for the generation tree
 		std::priority_queue<std::pair<float,vec3i>, std::vector<std::pair<float,vec3i> >, FunctorCompare > chunksToLoad;
-		std::set<vec3i,FunctorCompare> chunksBeingLoaded;
+		std::set<vec3i,FunctorCompare> chunksInProcess;
 };
 
 #endif // WORLDGENERATOR_HPP

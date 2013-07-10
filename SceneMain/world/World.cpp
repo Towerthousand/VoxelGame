@@ -91,16 +91,23 @@ std::pair<vec3i,vec3i> World::getCoords(const vec3i &coord) {
 }
 
 void World::update(float deltaTime) {
+	//Add to matrix and light some freshly loaded chunks.
+	//TODO: Separate adding to matrix and lighting so that you can just add
+	//all the loaded chunks (very fast) and then light them (slow) progressively
 	chunkGen.chunkMutex.lock();
-	for(auto it = chunkGen.chunksLoaded.begin(); it != chunkGen.chunksLoaded.end(); ++it) {
-		Chunk* newChunk = (*it).second;
+	for(int a = 0; !chunkGen.chunksLoaded.empty() && a < 10; ++a) {
+		Chunk* newChunk = chunkGen.chunksLoaded.front();
+		chunkGen.chunksInProcess.erase(newChunk->getPos()/CHUNKSIZE);
+		chunkGen.chunksLoaded.pop();
 		newChunk->initBuffer();
 		vec3i matrixCoords = getCoords(newChunk->getPos()).first;
+		if(getChunk(matrixCoords) != NULL)
+			delete getChunk(matrixCoords);
 		getChunk(matrixCoords) = newChunk;
 		calculateLight(newChunk->getPos() + vec3i(CHUNKSIZE*0.5),CHUNKSIZE*0.5 -1);
 	}
-	chunkGen.chunksLoaded.clear();
 	chunkGen.chunkMutex.unlock();
+	//check which chunks are yet to load
 	vec3i playerChunkPos = vec3i(std::floor(player->pos.x),std::floor(player->pos.y),std::floor(player->pos.z))/CHUNKSIZE;
 	std::priority_queue<std::pair<float,vec3i>, std::vector<std::pair<float,vec3i> >, FunctorCompare > queue;
 	for (int x = -WORLDSIZE/2; x < WORLDSIZE/2; ++x)
@@ -125,8 +132,11 @@ void World::update(float deltaTime) {
 				else
 					queue.push(std::pair<float,vec3i>(-dist,chunkPos));
 			}
+	//send those chunks to load, ordered by distance to player
 	chunkGen.replaceQueue(queue);
+	//trace the player's view, this should go in the player's update function :(
 	traceView(player,10);
+	//update all chunks that need updating
 	for(std::vector<Chunk*>::iterator it = chunks.begin(); it != chunks.end(); ++it)
 		if(*it != NULL)
 			if ((*it)->markedForRedraw == true)

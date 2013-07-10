@@ -57,27 +57,28 @@ void ChunkGenerator::threadedChunkManagement() {
 		if(!chunksToLoad.empty()) {
 			found = false;
 			vec3i chunkPos;
+			//search for a chunk not being processed already
 			while(!chunksToLoad.empty()) {
 				chunkPos = chunksToLoad.top().second;
 				chunksToLoad.pop();
-				if(chunksBeingLoaded.find(chunkPos) == chunksBeingLoaded.end() &&
-				   chunksLoaded.find(chunkPos) == chunksLoaded.end()) {
-					chunksBeingLoaded.insert(chunkPos); //set the chunk to load
+				if(chunksInProcess.find(chunkPos) == chunksInProcess.end()) {
+					chunksInProcess.insert(chunkPos); //set the chunk to load
 					found = true;
 					break;
 				}
 			}
 			chunkMutex.unlock();
 			if(found) {
+				//generate the terrain
 				Chunk* newChunk = new Chunk(chunkPos.x,chunkPos.y,chunkPos.z,parentScene);
 				ID3Data data = entry->getID3Data(chunkPos.x*CHUNKSIZE,chunkPos.y*CHUNKSIZE,chunkPos.z*CHUNKSIZE,CHUNKSIZE,CHUNKSIZE+5,CHUNKSIZE);
 				for (int i = 0; i < CHUNKSIZE; ++i)
 					for (int j = 0; j < CHUNKSIZE; ++j)
 						for (int k = 0; k < CHUNKSIZE; ++k)
 							newChunk->getLocal(i,j,k) = Cube(data[i][j][k],MINLIGHT);
+				//and off it goes! it will be picked up by the main thread eventually
 				chunkMutex.lock();
-				chunksLoaded.insert(std::pair<vec3i,Chunk*>(chunkPos,newChunk));
-				chunksBeingLoaded.erase(chunkPos);
+				chunksLoaded.push(newChunk);
 				chunkMutex.unlock();
 			}
 		}
@@ -88,9 +89,9 @@ void ChunkGenerator::threadedChunkManagement() {
 	}
 }
 
-void ChunkGenerator::replaceQueue(std::priority_queue<std::pair<float,vec3i>, std::vector<std::pair<float,vec3i> >, FunctorCompare > newQueue) {
+void ChunkGenerator::replaceQueue(const std::priority_queue<std::pair<float,vec3i>, std::vector<std::pair<float,vec3i> >, FunctorCompare > &newQueue) {
 	chunkMutex.lock();
-	this->chunksToLoad = newQueue;
+	this->chunksToLoad = newQueue; //this should be a pointer. You're copying something huge!
 	chunkMutex.unlock();
 }
 
